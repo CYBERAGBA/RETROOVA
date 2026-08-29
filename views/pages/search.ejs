@@ -1,0 +1,73 @@
+<%- include('../partials/header') %>
+    <main class="container">
+        <div class="search-page">
+            <div class="page-heading">
+                <span class="eyebrow">RECHERCHER</span>
+                <h1><%= title %></h1>
+                <p><%= title === 'Objets perdus' ? 'Quelqu’un a peut-être retrouvé ce que vous cherchez.' : 'Quelqu’un a peut-être retrouvé ce que vous cherchez.' %></p>
+            </div>
+
+            <form class="search-panel" method="GET" action="/search">
+                <input type="text" name="keyword" value="<%= filters.keyword || '' %>" placeholder="Que recherchez-vous ?">
+                <select name="type">
+                    <option value="">Type</option>
+                    <option value="lost" <%= filters.type === 'lost' ? 'selected' : '' %>>Perdu</option>
+                    <option value="found" <%= filters.type === 'found' ? 'selected' : '' %>>Trouvé</option>
+                </select>
+                <select name="category">
+                    <option value="">Catégorie</option>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category %>" <%= filters.category === category ? 'selected' : '' %>><%= categoryLabels[category] %></option>
+                    <% }) %>
+                </select>
+                <input type="text" name="city" value="<%= filters.city || '' %>" placeholder="Ville">
+                <input type="date" name="startDate" value="<%= filters.startDate || '' %>" placeholder="Date">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </form>
+
+            <% if (hasNextPage || page > 1) { %>
+                <nav class="pagination">
+                    <% if (page > 1) { %>
+                        <a href="/search?<%= new URLSearchParams({ ...filters, page: page - 1 }).toString() %>">← Précédente</a>
+                    <% } %>
+                    <span>Page <%= page %></span>
+                    <% if (hasNextPage) { %>
+                        <a href="/search?<%= new URLSearchParams({ ...filters, page: page + 1 }).toString() %>">Suivante →</a>
+                    <% } %>
+                </nav>
+            <% } %>
+
+            <div class="results-header">
+                <h2><%= results.length %> annonce<%= results.length !== 1 ? 's' : '' %></h2>
+                <span>Les plus récentes en premier</span>
+            </div>
+
+            <% if (!results.length) { %>
+                <div class="empty-state">
+                    <div class="empty-mark">R</div>
+                    <h3>Aucune annonce trouvée</h3>
+                    <p>Essayez une autre ville, catégorie ou mot-clé.</p>
+                </div>
+            <% } else { %>
+                <div class="items-grid">
+                    <% results.forEach(item => { %>
+                        <article class="item-card">
+                            <% if (item.photo_url) { %>
+                                <img src="<%= item.photo_url %>" alt="Photo de <%= item.title %>" class="item-card-photo">
+                            <% } %>
+                            <div class="item-card-top">
+                                <span class="type-pill <%= item.type %>"><%= item.type === 'lost' ? 'PERDU' : 'TROUVÉ' %></span>
+                                <span class="status-pill status-<%= item.status %>"><%= item.status %></span>
+                                <span class="item-date"><%= item.event_date || 'Date non précisée' %></span>
+                            </div>
+                            <h3><a href="/items/<%= item.id %>"><%= item.title %></a></h3>
+                            <p class="item-meta"><%= item.category %> · <%= item.city %><%= item.district ? ' · ' + item.district : '' %></p>
+                            <p><%= item.description ? item.description.substring(0, 130) + (item.description.length > 130 ? '…' : '') : 'Aucune description.' %></p>
+                            <a href="/items/<%= item.id %>" class="text-link">Voir l'annonce →</a>
+                        </article>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+    </main>
+    <%- include('../partials/footer') %>

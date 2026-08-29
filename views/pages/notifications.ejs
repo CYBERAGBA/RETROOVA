@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+    <main class="container">
+        <form method="POST" action="/notifications/read-all" class="notification-actions"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-secondary">Marquer tout comme lu</button></form>
+        <div class="page-heading"><span class="eyebrow">CENTRE D’ALERTES</span>
+            <h1>Notifications</h1>
+            <p>Suivez vos correspondances et vos nouveaux messages.</p>
+        </div>
+        <section class="notification-list">
+            <% if (!notifications.length) { %>
+                <div class="empty-state">
+                    <p>Aucune notification.</p>
+                </div>
+                <% } else { notifications.forEach(notification=> { %><article
+                        class="notification-row <%= notification.is_read ? '' : 'unread' %>">
+                        <div class="notification-icon">
+                            <%= notification.type==='match' ? '↗' : '✉' %>
+                        </div>
+                        <div><strong>
+                                <%= notification.title %>
+                            </strong>
+                            <p>
+                                <%= notification.message %>
+                            </p><small>
+                                <%= notification.created_at %>
+                            </small>
+                        </div>
+                    </article>
+                    <% }) } %>
+        </section>
+    </main>
+    <%- include('../partials/footer') %>

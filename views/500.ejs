@@ -1,0 +1,25 @@
+<%
+const errorDetails = typeof error !== 'undefined' && error
+    ? `
+        <div class="error-details">
+            <p><strong>Détails :</strong> ${error}</p>
+        </div>
+    `
+    : '';
+%>
+<%- include('./layouts/main', {
+    title: 'Erreur serveur',
+    metaDescription: 'Une erreur technique est survenue sur RETROOVA. Veuillez réessayer plus tard ou revenir à l’accueil.',
+    canonicalUrl: typeof canonicalUrl !== 'undefined' ? canonicalUrl : siteUrl,
+    body: `
+<div class="error-container">
+    <div class="error-card">
+        <h1 class="error-code">500</h1>
+        <h2>Erreur serveur</h2>
+        <p>Une erreur est survenue. Veuillez réessayer plus tard.</p>
+        ${errorDetails}
+        <a href="/" class="btn btn-primary">Retourner à l'accueil</a>
+    </div>
+</div>
+`
+}) %>

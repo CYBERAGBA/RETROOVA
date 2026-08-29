@@ -1,0 +1,15 @@
+<%- include('./layouts/main', {
+    title: 'Page non trouvée',
+    metaDescription: 'Cette page est introuvable sur RETROOVA. Consultez l’accueil pour continuer votre recherche d’objets perdus et trouvés.',
+    canonicalUrl: typeof canonicalUrl !== 'undefined' ? canonicalUrl : siteUrl,
+    body: `
+<div class="error-container">
+    <div class="error-card">
+        <h1 class="error-code">404</h1>
+        <h2>Page non trouvée</h2>
+        <p>La page que vous recherchez n'existe pas.</p>
+        <a href="/" class="btn btn-primary">Retourner à l'accueil</a>
+    </div>
+</div>
+`
+}) %>

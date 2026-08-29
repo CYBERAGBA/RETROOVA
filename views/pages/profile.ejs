@@ -1,0 +1,66 @@
+<%- include('../partials/header') %>
+    <main class="container profile-page">
+        <div class="profile-intro">
+            <span class="eyebrow">ESPACE PERSONNEL</span>
+            <h1>Mon profil</h1>
+            <p>Votre identité RETROOVA, vos repères et votre activité au même endroit.</p>
+        </div>
+
+        <% if (typeof message !== 'undefined' && message) { %>
+            <div class="alert alert-success"><p>✅ <%= message %></p></div>
+        <% } %>
+
+        <section class="profile-hero-panel">
+            <div class="profile-avatar-large" aria-hidden="true">👤</div>
+            <div class="profile-hero-copy">
+                <p class="profile-kicker">MEMBRE RETROOVA</p>
+                <h2><%= user?.name || 'Membre RETROOVA' %></h2>
+                <p class="profile-member-since">Membre depuis <%= user?.created_at ? new Date(user.created_at).getFullYear() : 'votre inscription' %></p>
+                <p class="reputation-badge <%= reputation?.tone || 'standard' %>"><%= reputation?.tone === 'success' ? 'Bonne réputation' : reputation?.tone === 'danger' ? 'Compte sous surveillance' : 'Réputation standard' %><span>·</span><%= reputation?.level || 'Nouveau membre' %></p>
+            </div>
+            <div class="profile-verifications">
+                <span class="verification-pill <%= stats?.email_verified ? 'is-verified' : '' %>"><%= stats?.email_verified ? '✓' : '○' %> Email vérifié</span>
+                <span class="verification-pill <%= stats?.phone_verified ? 'is-verified' : '' %>"><%= stats?.phone_verified ? '✓' : '○' %> Téléphone vérifié</span>
+            </div>
+        </section>
+
+        <section class="profile-stat-grid" aria-label="Statistiques du profil">
+            <div class="profile-stat-card accent-blue"><strong><%= profileStats?.lost || 0 %></strong><span>Objets perdus</span><small>Déclarations</small></div>
+            <div class="profile-stat-card accent-orange"><strong><%= profileStats?.found || 0 %></strong><span>Objets trouvés</span><small>Contributions</small></div>
+            <div class="profile-stat-card accent-green"><strong><%= profileStats?.returned || 0 %></strong><span>Objets restitués</span><small>Confirmés</small></div>
+            <div class="profile-stat-card accent-navy"><strong><%= profileStats?.matches || 0 %></strong><span>Correspondances</span><small>Potentielles</small></div>
+        </section>
+
+        <div class="profile-content-grid">
+            <section class="profile-surface">
+                <div class="surface-heading"><div><span class="section-label">VOS DONNÉES</span><h2>Informations personnelles</h2></div><span class="surface-mark">01</span></div>
+                <form method="POST" action="/profile/update" class="profile-form">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="profile-form-grid">
+                        <label class="form-group"><span>Nom complet</span><input type="text" name="name" value="<%= user?.name || '' %>" required></label>
+                        <label class="form-group"><span>Email</span><input type="email" value="<%= user?.email || '' %>" disabled><small>L'email ne peut pas être changé.</small></label>
+                        <label class="form-group"><span>Ville</span><input type="text" name="city" value="<%= user?.city || '' %>" required></label>
+                        <label class="form-group"><span>Téléphone</span><input type="tel" name="phone" placeholder="+225 XX XX XX XX" value="<%= user?.phone || '' %>"></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                </form>
+            </section>
+
+            <section class="profile-surface profile-activity-surface">
+                <div class="surface-heading"><div><span class="section-label">VOTRE HISTORIQUE</span><h2>Activité récente</h2></div><span class="surface-mark">02</span></div>
+                <% if (activity?.length) { %>
+                    <div class="activity-list">
+                        <% activity.forEach(entry => { %><article class="activity-entry"><span class="activity-icon"><%= entry.type === 'match' ? '✦' : '•' %></span><div><strong><%= entry.title %></strong><p><%= entry.detail %></p></div><time><%= entry.date ? new Date(entry.date).toLocaleDateString('fr-FR') : '' %></time></article><% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state"><span>✦</span><p>Votre activité apparaîtra ici.</p></div>
+                <% } %>
+            </section>
+        </div>
+
+        <section class="profile-surface profile-security-surface">
+            <div class="surface-heading"><div><span class="section-label">ACCÈS ET CONFIANCE</span><h2>Votre réputation</h2></div><span class="surface-mark">03</span></div>
+            <div class="reputation-summary"><div class="reputation-dot <%= reputation?.tone || 'standard' %>"></div><div><strong><%= reputation?.level || 'Nouveau membre' %></strong><p>Un statut fondé sur vos actions vérifiables chez RETROOVA.</p></div><a href="/dashboard" class="text-link">Voir mon tableau de bord <span>→</span></a></div>
+        </section>
+    </main>
+    <%- include('../partials/footer') %>

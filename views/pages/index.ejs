@@ -1,0 +1,81 @@
+<%- include('../partials/header') %>
+    <main class="home-page">
+        <section class="home-hero container">
+            <div class="hero-copy">
+                <div class="hero-brand hero-brand-wide">
+                    <img src="/images/logo_nom_slogan_paysage.png" alt="Logo RETROOVA">
+                </div>
+                <h1>Vous avez perdu quelque chose ?</h1>
+                <h2>Ne désespérez pas !</h2>
+                <p class="hero-lead">Quelqu'un l'a peut-être retrouvé.</p>
+                <p class="hero-description">RETROOVA connecte les personnes qui ont perdu un objet avec celles qui l'ont retrouvé.</p>
+
+                <form class="home-search" method="GET" action="/search">
+                    <label class="search-field search-keyword">
+                        <span aria-hidden="true">⌕</span>
+                        <input type="text" name="keyword" placeholder="Que recherchez-vous ?" aria-label="Que recherchez-vous ?">
+                    </label>
+                    <label class="search-field">
+                        <span aria-hidden="true">▦</span>
+                        <select name="category" aria-label="Catégorie">
+                            <option value="">Catégorie</option>
+                            <% ['phone','wallet','bank-card','id-card','passport','license','documents','keys','jewelry','bag','computer','tablet','luggage','clothing','electronics','birth-certificate','cmu-card','money-card','book','notebook','other-things','other'].forEach((category) => { %>
+                                <option value="<%= category %>"><%= { phone: 'Téléphone', wallet: 'Portefeuille', 'bank-card': 'Carte bancaire', 'id-card': 'Carte d’identité', passport: 'Passeport', license: 'Permis de conduire', documents: 'Documents', keys: 'Clés', jewelry: 'Bijoux', bag: 'Sac', computer: 'Ordinateur', tablet: 'Tablette', luggage: 'Bagage', clothing: 'Vêtement', electronics: 'Électronique', 'birth-certificate': 'Extrait de naissance', 'cmu-card': 'Carte CMU', 'money-card': 'Carte monétaire', book: 'Livre', notebook: 'Cahier', 'other-things': 'Autres choses', other: 'Autre' }[category] %></option>
+                            <% }); %>
+                        </select>
+                    </label>
+                    <label class="search-field">
+                        <span aria-hidden="true">⌖</span>
+                        <input type="text" name="city" placeholder="Ville" aria-label="Ville">
+                    </label>
+                    <button type="submit" class="home-search-button">Rechercher</button>
+                </form>
+
+                <div class="hero-actions">
+                    <a href="/lost/create" class="home-action lost-action">J'AI PERDU UN OBJET</a>
+                    <a href="/found/create" class="home-action found-action">J'AI TROUVÉ UN OBJET</a>
+                </div>
+            </div>
+            <div class="hero-visual" aria-label="Illustration d'une personne qui a perdu un objet">
+                <div class="hero-pin">⌖</div>
+                <img src="/images/femme_desesperee_fond_transparent.png" alt="Une femme désespérée cherche un objet perdu" class="hero-woman">
+            </div>
+        </section>
+
+        <section class="home-stats container" aria-label="Statistiques RETROOVA">
+            <div class="home-stat">
+                <span class="stat-symbol blue">◫</span>
+                <div>
+                    <strong><%= publicStats?.declared || 0 %></strong>
+                    <span>Objets déclarés</span>
+                </div>
+            </div>
+            <div class="home-stat">
+                <span class="stat-symbol orange">⌕</span>
+                <div>
+                    <strong><%= publicStats?.matches || 0 %></strong>
+                    <span>Annonces trouvées</span>
+                </div>
+            </div>
+            <div class="home-stat">
+                <span class="stat-symbol green">✓</span>
+                <div>
+                    <strong><%= publicStats?.returned || 0 %></strong>
+                    <span>Objets retournés</span>
+                </div>
+            </div>
+            <div class="home-stat">
+                <span class="stat-symbol navy">◎</span>
+                <div>
+                    <strong><%= publicStats?.users || 0 %></strong>
+                    <span>Utilisateurs</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="brand-message container">
+            <span>♥</span>
+            <p>Parce que chaque objet a une histoire.<br><em>Et chaque histoire mérite une fin heureuse.</em></p>
+        </section>
+    </main>
+    <%- include('../partials/footer') %>

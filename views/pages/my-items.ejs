@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+    <main class="container">
+        <div class="page-heading"><span class="eyebrow">MON ESPACE</span>
+            <h1>Mes objets <%= type==='lost' ? 'perdus' : 'trouvés' %>
+            </h1>
+            <p>Retrouvez et mettez à jour vos annonces.</p>
+        </div>
+        <div class="items-grid">
+            <% if (!items.length) { %>
+                <div class="empty-state">
+                    <h3>Pas encore d’annonce</h3>
+                    <p>Chaque déclaration augmente les chances de restitution.</p><a href="/<%= type %>/create"
+                        class="btn btn-primary">Créer une annonce</a>
+                </div>
+                <% } %>
+                    <% items.forEach(item=> { %><article class="item-card">
+                            <div class="item-card-top"><span class="type-pill <%= item.type %>">
+                                    <%= item.type==='lost' ? 'PERDU' : 'TROUVÉ' %>
+                                </span><span>
+                                    <%= item.status %>
+                                </span></div>
+                            <h3><a href="/items/<%= item.id %>">
+                                    <%= item.title %>
+                                </a></h3>
+                            <p class="item-meta">
+                                <%= item.city %> · <%= item.event_date || 'Date non précisée' %>
+                            </p>
+                            <div class="card-actions"><a href="/items/<%= item.id %>"
+                                    class="btn btn-small btn-secondary">Voir</a><a href="/items/<%= item.id %>/edit"
+                                    class="btn btn-small btn-primary">Modifier</a></div>
+                        </article>
+                        <% }) %>
+        </div>
+        </div>
+    </main>
+    <%- include('../partials/footer') %>

@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+    <main class="container">
+        <div class="page-heading"><span class="eyebrow">INTELLIGENCE RETROOVA</span>
+            <h1>Mes correspondances</h1>
+            <p>Les annonces compatibles sont classées par score de confiance.</p>
+        </div>
+        <% if (!matches.length) { %>
+            <div class="empty-state">
+                <div class="empty-mark">↗</div>
+                <h3>Pas encore de correspondance</h3>
+                <p>Publiez une annonce détaillée pour activer le matching automatique.</p>
+            </div>
+            <% } else { %>
+                <div class="match-list">
+                    <% matches.forEach(match=> { %><article class="match-card">
+                            <div class="match-score"><strong>
+                                    <%= match.score %>%
+                                </strong><span>
+                                    <% if (match.score>= 70) { %>Forte correspondance<% } else if (match.score>= 40) {
+                                            %>Correspondance possible<% } else { %>Faible correspondance<% } %>
+                                </span></div>
+                            <div class="match-copy">
+                                <h3>
+                                    <%= match.lost_title %> ↔ <%= match.found_title %>
+                                </h3>
+                                <p>
+                                    <%= match.lost_city %> · <%= match.found_city %>
+                                </p><small>Suggestion générée automatiquement</small>
+                            </div><span class="match-status">
+                                <%= match.status %>
+                            </span>
+                            <% if (match.status==='confirmed' ) { %>
+                                <form method="POST" action="/matches/<%= match.id %>/returned" class="inline-form"
+                                    data-confirm="Confirmer que l’objet a été restitué ?">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <button class="btn btn-small btn-success" type="submit">
+                                        <%= match.found_owner_id===user.id ? 'Objet restitué' : 'Mon objet trouvé' %>
+                                    </button>
+                                </form>
+                                <% } %>
+                                    <% if (match.status==='pending' ) { %>
+                                        <form method="POST" action="/matches/<%= match.id %>/accept"
+                                            class="inline-form"><input type="hidden" name="_csrf"
+                                                value="<%= csrfToken %>"><button class="btn btn-small btn-success"
+                                                type="submit">Accepter</button></form>
+                                        <form method="POST" action="/matches/<%= match.id %>/reject"
+                                            class="inline-form"><input type="hidden" name="_csrf"
+                                                value="<%= csrfToken %>"><button class="btn btn-small btn-secondary"
+                                                type="submit">Refuser</button></form>
+                                        <% } %>
+                        </article>
+                        <% }) %>
+                </div>
+                <% } %>
+    </main>
+    <%- include('../partials/footer') %>

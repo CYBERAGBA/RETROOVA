@@ -1,0 +1,78 @@
+<html lang="<%= typeof htmlLang !== 'undefined' ? htmlLang : (typeof lang !== 'undefined' ? lang : 'fr') %>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.' %>">
+<meta property="og:title" content="<%= typeof title !== 'undefined' && title ? title : 'RETROOVA' %> | RETROOVA">
+<meta property="og:description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.' %>">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : siteUrl %>">
+<meta property="og:image" content="<%= typeof ogImage !== 'undefined' ? ogImage : (siteUrl + '/images/logo_nom_slogan_paysage.png') %>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= typeof title !== 'undefined' && title ? title : 'RETROOVA' %> | RETROOVA">
+<meta name="twitter:description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.' %>">
+<link rel="canonical" href="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : siteUrl %>">
+<% if (typeof alternateLinks !== 'undefined' && alternateLinks) { %>
+    <%- alternateLinks %>
+<% } %>
+<% if (typeof schemaJsonLd !== 'undefined' && schemaJsonLd) { %>
+    <script type="application/ld+json"><%- JSON.stringify(schemaJsonLd) %></script>
+<% } %>
+<% if (typeof faqSchema !== 'undefined' && faqSchema) { %>
+    <script type="application/ld+json"><%- JSON.stringify(faqSchema) %></script>
+<% } %>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" type="image/png" href="/images/logo_lettre_R.png">
+<script defer src="/js/main.js"></script>
+<header class="navbar">
+    <div class="navbar-container">
+        <div class="navbar-brand">
+            <a href="/" class="brand-link tooltip-target" aria-label="Accueil RETROOVA" data-tooltip="Accueil">
+                <img src="/images/logo_lettre_R.png" alt="RETROOVA" class="brand-mark">
+            </a>
+        </div>
+
+        <div class="header-decorative-banner" aria-hidden="true">
+            <img src="/images/banniere.png" alt="" class="header-banner-image">
+        </div>
+
+        <nav class="navbar-menu">
+            <a href="/search" class="nav-link nav-icon-link tooltip-target" aria-label="Rechercher" data-tooltip="Rechercher">⌕</a>
+
+            <% if (user) { %>
+                <a href="/messages" class="nav-link nav-icon-link tooltip-target" aria-label="Messages" data-tooltip="Messages">✉️</a>
+                <a href="/notifications" class="nav-link nav-icon-link notification-link tooltip-target" aria-label="Notifications" data-tooltip="Notifications"><span>🔔</span><% if (typeof unreadNotifications !== 'undefined' && unreadNotifications) { %><span class="notification-badge"><%= unreadNotifications %></span><% } %></a>
+                <div class="nav-dropdown nav-user-menu">
+                    <button class="nav-link nav-user-button tooltip-target" aria-label="Menu utilisateur" data-tooltip="Menu utilisateur">
+                        <span aria-hidden="true">👤</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/profile" class="dropdown-item tooltip-target" data-tooltip="Mon profil">Mon profil</a>
+                        <a href="/dashboard" class="dropdown-item tooltip-target" data-tooltip="Tableau de bord">Tableau de bord</a>
+                        <% if (user.role === 'admin') { %>
+                            <hr>
+                            <a href="/admin" class="dropdown-item tooltip-target" data-tooltip="Administration">Admin</a>
+                        <% } %>
+                        <hr>
+                        <a href="/logout" class="dropdown-item text-danger tooltip-target" data-tooltip="Déconnexion">Déconnexion</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="nav-dropdown nav-user-menu">
+                    <button class="nav-link nav-user-button tooltip-target" aria-label="Menu utilisateur" data-tooltip="Menu utilisateur">
+                        <span aria-hidden="true">👤</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/login" class="dropdown-item tooltip-target" data-tooltip="Connexion">Connexion</a>
+                        <a href="/register" class="dropdown-item tooltip-target" data-tooltip="Inscription">Inscription</a>
+                    </div>
+                </div>
+            <% } %>
+        </nav>
+        <button type="button" class="mobile-menu-toggle tooltip-target" aria-label="Ouvrir le menu" data-tooltip="Ouvrir le menu" aria-expanded="false">☰</button>
+    </div>
+</header>
+<% if (user) { %>
+    <div class="quick-declare"><a href="/lost/create" aria-label="Déclarer un objet perdu">+</a>
+        <div><a href="/lost/create">Perdu</a><a href="/found/create">Trouvé</a></div>
+    </div>
+    <% } %>

@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+    <main class="container">
+        <article class="info-page">
+            <div class="info-brand-logo-wrap">
+                <img src="/images/logo_nom_slogan_paysage.png" alt="RETROOVA" class="info-brand-logo">
+            </div>
+            <span class="eyebrow">RETROOVA</span>
+            <h1>
+                <%= title %>
+            </h1>
+            <p class="info-lead">
+                <%= lead %>
+            </p>
+            <div class="info-content"><%- content %></div>
+            <% if (typeof faqItems !== 'undefined' && faqItems && faqItems.length) { %>
+                <section class="faq-section" aria-label="FAQ RETROOVA">
+                    <h2>FAQ</h2>
+                    <div class="faq-list">
+                        <% faqItems.forEach((item) => { %>
+                            <article class="faq-item">
+                                <h3><%= item.question %></h3>
+                                <p><%= item.answer %></p>
+                            </article>
+                        <% }); %>
+                    </div>
+                </section>
+            <% } %>
+            <div class="info-actions">
+                <a href="/" class="btn btn-primary">Retour à l’accueil</a>
+            </div>
+        </article>
+    </main>
+    <%- include('../partials/footer') %>
