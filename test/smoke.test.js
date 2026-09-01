@@ -139,6 +139,34 @@ test('un utilisateur non authentifié ne peut pas déclarer un objet', async () 
     }
 });
 
+test('une photo valide est acceptée et une photo trop volumineuse est expliquée', async () => {
+    const agent = request.agent(app);
+    await registerAndLogin(agent);
+
+    const formPage = await agent.get('/lost/create');
+    const csrf = /name="_csrf"\s+value="([^"]+)"/s.exec(formPage.text)?.[1];
+    assert.ok(csrf);
+
+    const validPhoto = await agent.post('/lost/create')
+        .field('_csrf', csrf)
+        .field('category', 'phone')
+        .field('title', 'Objet avec photo valide')
+        .field('city', 'Abidjan')
+        .attach('photo', Buffer.from('valid photo'), { filename: 'photo.png', contentType: 'image/png' });
+    assert.equal(validPhoto.status, 302);
+
+    const oversizedPhoto = await agent.post('/found/create')
+        .field('_csrf', csrf)
+        .field('category', 'wallet')
+        .field('title', 'Objet avec photo trop volumineuse')
+        .field('city', 'Abidjan')
+        .attach('photo', Buffer.alloc(5 * 1024 * 1024 + 1), { filename: 'photo.png', contentType: 'image/png' });
+    assert.equal(oversizedPhoto.status, 413);
+    assert.match(oversizedPhoto.text, /photo est trop volumineuse/i);
+    assert.match(oversizedPhoto.text, /5 Mo/);
+    assert.doesNotMatch(oversizedPhoto.text, /Erreur serveur/);
+});
+
 test('POST sans CSRF est refusé', async () => {
     const response = await request(app).post('/login').type('form').send({ email: 'x@example.com', password: 'password' });
     assert.equal(response.status, 403);

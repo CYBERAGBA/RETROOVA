@@ -12,6 +12,11 @@
                 </h1>
                 <p>Donnez assez de détails pour aider la bonne personne à le reconnaître.</p>
             </div>
+                            <% if (typeof errors !== 'undefined' && errors.length) { %>
+                                <div class="alert alert-danger" role="alert">
+                                        <% errors.forEach(error => { %><p><%= error %></p><% }) %>
+                                </div>
+                        <% } %>
             <form method="POST" enctype="multipart/form-data"
                 action="<%= isEdit ? '/items/' + itemId + '/update' : '/' + formData.type + '/create' %>"
                 class="item-form" data-wizard="true" data-edit="<%= isEdit ? 'true' : 'false' %>"
