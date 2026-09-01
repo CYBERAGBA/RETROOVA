@@ -42,6 +42,32 @@
         </section>
         <section class="admin-panel">
             <div class="panel-heading">
+                <h2>Demandes de partenariat</h2><span>
+                    <%= partnershipRequests.length %> demandes
+                </span>
+            </div>
+            <% if (!partnershipRequests.length) { %>
+                <div class="empty-state">
+                    <p>Aucune demande de partenariat.</p>
+                </div>
+                <% } else { %>
+                    <div class="admin-table partnership-table">
+                        <% partnershipRequests.forEach((request) => { %>
+                            <div>
+                                <strong><%= request.organization_name %></strong>
+                                <span><%= request.partnership_type %></span>
+                                <span><%= request.contact_name %></span>
+                                <span><%= request.country || 'Non précisé' %></span>
+                                <span><%= new Date(request.created_at).toLocaleDateString('fr-FR') %></span>
+                                <span class="partnership-status <%= request.status %>"><%= request.status === 'new' ? 'Nouveau' : request.status === 'in_progress' ? 'En cours' : request.status === 'accepted' ? 'Accepté' : request.status === 'archived' ? 'Archivé' : 'Rejeté' %></span>
+                                <a href="/admin/partnerships/<%= request.id %>">Voir</a>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+        </section>
+        <section class="admin-panel">
+            <div class="panel-heading">
                 <h2>Signalements</h2><span>
                     <%= reports.length %> récents
                 </span>

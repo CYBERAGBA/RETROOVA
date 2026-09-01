@@ -13,6 +13,95 @@ const faqItems = [
     }
 ];
 
+const partnershipTypes = [
+    'Entreprise',
+    'Hôtel / Tourisme',
+    'Aéroport / Compagnie aérienne',
+    'Transport & mobilité',
+    'École / Université',
+    'Institution / Collectivité',
+    'Événement',
+    'Association / ONG',
+    'Partenaire technologique',
+    'Partenariat stratégique',
+    'Autre'
+];
+
+const buildPartnershipPageMarkup = (csrfToken = '') => `
+        <section class="partnership-hero">
+            <div class="partnership-visual">
+                <img src="/images/image_partenaires.png" alt="Illustration de partenaires RETROOVA" loading="lazy">
+            </div>
+            <div class="partnership-copy">
+                <span class="eyebrow partnership-label">RETROOVA PARTNERS</span>
+                <h2>Building the world's lost &amp; found network.</h2>
+                <p><strong>RETROOVA accompagne les organisations qui veulent créer un écosystème plus sûr, plus utile et plus connecté autour des objets retrouvés.</strong></p>
+                <p>Que vous soyez une entreprise, une structure publique, un établissement d'accueil, un réseau de transport ou une institution locale, votre collaboration peut aider davantage de personnes à retrouver ce qu'elles ont perdu.</p>
+                <a href="#partnership-form" class="btn btn-primary">Devenir partenaire <span>→</span></a>
+            </div>
+        </section>
+        <section>
+            <h3>Pourquoi collaborer avec RETROOVA ?</h3>
+            <div class="info-value-list">
+                <div><strong>🤝 Visibilité locale</strong><p>Rendez votre organisation visible dans des situations concrètes où des objets sont perdus, retrouvés et réclamés.</p></div>
+                <div><strong>🛡️ Sécurité renforcée</strong><p>Favorisez une gestion plus claire et plus fiable des objets retrouvés dans les lieux d'accueil, les gares, les hôtels ou les campus.</p></div>
+                <div><strong>📍 Réseau de confiance</strong><p>Consolidez des partenariats utiles entre acteurs publics, privés et institutionnels autour d'un même objectif.</p></div>
+                <div><strong>💬 Expérience utilisateur</strong><p>Offrez à vos visiteurs un service simple, utile et rassurant en intégrant une solution de restitution d'objets.</p></div>
+            </div>
+        </section>
+        <section>
+            <h3>Les organisations qui peuvent participer</h3>
+            <ul>
+                <li>hôtels, aéroports, gares et entreprises de transport ;</li>
+                <li>universités, écoles, centres culturels et établissements publics ;</li>
+                <li>structures sociales, associations et organisations locales ;</li>
+                <li>plateformes ou services qui souhaitent accompagner les usagers dans la recherche d'objets perdus.</li>
+            </ul>
+        </section>
+        <section>
+            <h3>Comment se déroule un partenariat ?</h3>
+            <ol>
+                <li><strong>Échange de besoins</strong> : nous identifions les usages, les enjeux et les objectifs de votre organisation.</li>
+                <li><strong>Définition du cadre</strong> : nous précisons les modalités de diffusion, de sensibilisation et d'accompagnement.</li>
+                <li><strong>Activation</strong> : le partenariat est lancé avec une mise en œuvre adaptée à votre contexte.</li>
+                <li><strong>Suivi</strong> : nous évaluons les résultats et ajustons la collaboration en fonction des retours.</li>
+            </ol>
+        </section>
+        <section id="partnership-form" class="partnership-form-wrap">
+            <div class="partnership-form-box">
+                <div class="partnership-form-header">
+                    <span class="eyebrow">DEVENIR PARTENAIRE</span>
+                    <h3>Parlons de votre projet</h3>
+                </div>
+                <form method="POST" action="/partnerships" class="partnership-form">
+                    <input type="hidden" name="_csrf" value="${csrfToken}">
+                    <div class="form-grid">
+                        <label class="form-group"><span>Nom / Organisation *</span><input type="text" name="organization_name" placeholder="Ex. ABC Hotels" required></label>
+                        <label class="form-group"><span>Nom du contact *</span><input type="text" name="contact_name" placeholder="Votre nom" required></label>
+                        <label class="form-group"><span>Email professionnel *</span><input type="email" name="email" placeholder="contact@entreprise.com" required></label>
+                        <label class="form-group"><span>Type de partenariat *</span><select name="partnership_type" required><option value="">Sélection :</option>
+                            <option>Entreprise</option>
+                            <option>Hôtel / Tourisme</option>
+                            <option>Aéroport / Compagnie aérienne</option>
+                            <option>Transport &amp; mobilité</option>
+                            <option>École / Université</option>
+                            <option>Institution / Collectivité</option>
+                            <option>Événement</option>
+                            <option>Association / ONG</option>
+                            <option>Partenaire technologique</option>
+                            <option>Partenariat stratégique</option>
+                            <option>Autre</option>
+                        </select></label>
+                        <label class="form-group form-span-2"><span>Pays / Région</span><input type="text" name="country" placeholder="Votre pays ou région"></label>
+                        <label class="form-group form-span-2"><span>Votre projet ou proposition</span><textarea name="message" rows="5" placeholder="Expliquez-nous brièvement comment vous envisagez une collaboration avec RETROOVA..."></textarea></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary partnership-submit">Envoyer une demande de partenariat <span>→</span></button>
+                    <p class="partnership-note">Nous étudions chaque demande avec attention et vous recontacterons dans les meilleurs délais.</p>
+                </form>
+            </div>
+        </section>
+`;
+
 const pages = {
     '/how-it-works': ['Comment ça marche', 'RETROOVA aide à rapprocher les objets perdus de leurs propriétaires.', `
         <section>
@@ -243,6 +332,8 @@ const pages = {
             <p><strong>Oui</strong> ou <strong>non</strong> selon votre cas, contactez-nous par e-mail pour entamer la discussion.</p>
         </section>
     `],
+    '/partnerships': ['Partenariats', 'Des collaborations concrètes pour renforcer la sécurité, la visibilité et la restitution des objets retrouvés.', (csrfToken = '') => buildPartnershipPageMarkup(csrfToken)],
+    '/partenariats': ['Partenariats', 'Des collaborations concrètes pour renforcer la sécurité, la visibilité et la restitution des objets retrouvés.', (csrfToken = '') => buildPartnershipPageMarkup(csrfToken)],
     '/security': ['Sécurité', 'Votre sécurité est notre priorité.', `
         <section>
             <h2>Votre sécurité est notre priorité</h2>
@@ -369,16 +460,41 @@ const pages = {
 };
 
 class InfoController {
+    constructor(adminModel) { this.adminModel = adminModel; }
     show = (req, res) => {
         const [title, lead, content] = pages[req.path] || pages['/help'];
         const currentFaqItems = req.path === '/help' ? faqItems : [];
+        const renderedContent = typeof content === 'function' ? content(req.session?.csrfToken || '') : content;
         res.render('pages/info', {
             title,
             lead,
-            content,
+            content: renderedContent,
             faqItems: currentFaqItems,
-            faqSchema: currentFaqItems.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: currentFaqItems.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) } : null
+            faqSchema: currentFaqItems.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: currentFaqItems.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) } : null,
+            csrfToken: req.session?.csrfToken
         });
+    };
+    submitPartnership = async (req, res) => {
+        const payload = {
+            organization_name: String(req.body.organization_name || '').trim(),
+            contact_name: String(req.body.contact_name || '').trim(),
+            email: String(req.body.email || '').trim(),
+            partnership_type: String(req.body.partnership_type || '').trim(),
+            country: String(req.body.country || '').trim(),
+            message: String(req.body.message || '').trim()
+        };
+
+        if (!payload.organization_name || !payload.contact_name || !payload.email || !payload.partnership_type || !payload.message) {
+            return res.redirect('/partnerships?error=1');
+        }
+
+        await this.adminModel.ensurePartnershipTable();
+        const request = await this.adminModel.createPartnershipRequest(payload);
+        if (!request) {
+            return res.redirect('/partnerships?error=1');
+        }
+
+        res.redirect('/partnerships?success=1');
     };
     report = (req, res) => res.redirect('/help');
 }

@@ -1,47 +1,24 @@
-const sqlite3 = require('sqlite3').verbose();
+const { DatabaseAdapter } = require('../db');
 
 class ItemModel {
-    constructor(dbPath) {
-        this.dbPath = dbPath;
+    constructor() {
+        this.db = DatabaseAdapter;
     }
 
     getDb() {
-        const db = new sqlite3.Database(this.dbPath);
-        db.run('PRAGMA foreign_keys = ON');
-        return db;
+        return this.db.sqliteOpen ? this.db.sqliteOpen() : null;
     }
 
     run(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            const db = this.getDb();
-            db.run(sql, params, function (error) {
-                db.close();
-                if (error) return reject(error);
-                resolve({ changes: this.changes, lastID: this.lastID });
-            });
-        });
+        return this.db.run(sql, params);
     }
 
     all(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            const db = this.getDb();
-            db.all(sql, params, (error, rows) => {
-                db.close();
-                if (error) return reject(error);
-                resolve(rows || []);
-            });
-        });
+        return this.db.all(sql, params);
     }
 
     get(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            const db = this.getDb();
-            db.get(sql, params, (error, row) => {
-                db.close();
-                if (error) return reject(error);
-                resolve(row || null);
-            });
-        });
+        return this.db.get(sql, params);
     }
 
     create(item) {

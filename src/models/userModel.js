@@ -1,109 +1,47 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const { DatabaseAdapter } = require('../db');
 
 class UserModel {
-  constructor(dbPath) {
-    this.dbPath = dbPath;
+  constructor() {
+    this.db = DatabaseAdapter;
   }
 
   getDb() {
-    const db = new sqlite3.Database(this.dbPath);
-    db.run('PRAGMA foreign_keys = ON');
-    return db;
+    return this.db.sqliteOpen ? this.db.sqliteOpen() : null;
   }
 
   ensurePublicIds() {
-    return new Promise((resolve, reject) => {
-      const db = this.getDb();
-      db.all('PRAGMA table_info(users)', (error, columns) => {
-        if (error) { db.close(); return reject(error); }
-        const hasPublicId = columns.some((column) => column.name === 'public_id');
-        const finish = () => db.close((closeError) => closeError ? reject(closeError) : resolve());
-        const populate = () => db.run("UPDATE users SET public_id = 'RTV-' || UPPER(SUBSTR(REPLACE(id, '-', ''), 1, 8)) WHERE public_id IS NULL OR public_id = ''", (updateError) => updateError ? reject(updateError) : finish());
-        if (hasPublicId) return populate();
-        db.run('ALTER TABLE users ADD COLUMN public_id TEXT', (alterError) => {
-          if (alterError) { db.close(); return reject(alterError); }
-          db.run('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_public_id ON users(public_id)', (indexError) => indexError ? reject(indexError) : populate());
-        });
-      });
-    });
+    return this.db.ensurePublicIds();
   }
 
   /**
    * Créer un nouvel utilisateur
    */
   create(userData) {
-    return new Promise((resolve, reject) => {
-      const db = this.getDb();
-      const { id, name, email, phone, passwordHash, city } = userData;
-      const publicId = `RTV-${id.replace(/-/g, '').slice(0, 8).toUpperCase()}`;
-
-      db.run(
-        `INSERT INTO users (id, public_id, name, email, phone, password_hash, city, role, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, publicId, name, email, phone || null, passwordHash, city || null, 'user', 'active'],
-        function (err) {
-          if (err) {
-            db.close();
-            reject(err);
-          } else {
-            db.close();
-            resolve({ id, public_id: publicId, name, email, city });
-          }
-        }
-      );
-    });
+    const { id, name, email, phone, passwordHash, city } = userData;
+    const publicId = `RTV-${id.replace(/-/g, '').slice(0, 8).toUpperCase()}`;
+    return this.db.run(
+      `INSERT INTO users (id, public_id, name, email, phone, password_hash, city, role, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [id, publicId, name, email, phone || null, passwordHash, city || null, 'user', 'active']
+    ).then(() => ({ id, public_id: publicId, name, email, city }));
   }
 
   /**
    * Trouver un utilisateur par email
    */
   findByEmail(email) {
-    return new Promise((resolve, reject) => {
-      const db = this.getDb();
-
-      db.get(
-        'SELECT * FROM users WHERE email = ? AND status != ?',
-        [email, 'deleted'],
-        (err, row) => {
-          db.close();
-          if (err) {
-            reject(err);
-          } else {
-            resolve(row || null);
-          }
-        }
-      );
-    });
+    return this.db.get('SELECT * FROM users WHERE email = $1 AND status != $2', [email, 'deleted']);
   }
 
   /**
    * Trouver un utilisateur par ID
    */
   findById(id) {
-    return new Promise((resolve, reject) => {
-      const db = this.getDb();
-
-      db.get(
-        'SELECT * FROM users WHERE id = ? AND status != ?',
-        [id, 'deleted'],
-        (err, row) => {
-          db.close();
-          if (err) {
-            reject(err);
-          } else {
-            resolve(row || null);
-          }
-        }
-      );
-    });
+    return this.db.get('SELECT * FROM users WHERE id = $1 AND status != $2', [id, 'deleted']);
   }
 
   findByPublicId(publicId) {
-    return new Promise((resolve, reject) => {
-      const db = this.getDb();
-      db.get('SELECT * FROM users WHERE UPPER(public_id) = UPPER(?) AND status != ?', [publicId.trim(), 'deleted'], (err, row) => { db.close(); if (err) reject(err); else resolve(row || null); });
-    });
+    return this.db.get('SELECT * FROM users WHERE UPPER(public_id) = UPPER($1) AND status != $2', [publicId.trim(), 'deleted']);
   }
 
   /**

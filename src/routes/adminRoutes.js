@@ -8,6 +8,9 @@ module.exports = (model, userModel) => {
     const controller = new AdminController(model);
     const requireAdmin = isAdmin(userModel);
     router.get('/admin', isAuthenticated, requireAdmin, controller.dashboard);
+    router.get('/admin/partnerships/:id', isAuthenticated, requireAdmin, controller.partnershipDetail);
+    router.post('/admin/partnerships/:id', isAuthenticated, requireAdmin, csrfMiddleware, controller.updatePartnershipRequest);
+    router.post('/admin/partnerships/:id/delete', isAuthenticated, requireAdmin, csrfMiddleware, controller.deletePartnershipRequest);
     router.post('/admin/reports/:id', isAuthenticated, requireAdmin, csrfMiddleware, controller.updateReport);
     router.post('/admin/users/:id/status', isAuthenticated, requireAdmin, csrfMiddleware, controller.updateUser);
     router.post('/admin/items/:id/status', isAuthenticated, requireAdmin, csrfMiddleware, controller.updateItem);

@@ -5,10 +5,15 @@
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
+    "build": "node -e \"console.log('No build step required for this Node.js application.');\"",
     "start": "node server.js",
+    "start:prod": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/initDb.js",
     "test": "node --test test/smoke.test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [
     "lost",
@@ -27,6 +32,7 @@
     "express-session": "^1.17.3",
     "helmet": "^8.3.0",
     "multer": "^2.2.0",
+    "pg": "^8.23.0",
     "sqlite3": "^5.1.6",
     "uuid": "^9.0.0"
   },

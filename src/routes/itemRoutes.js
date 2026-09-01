@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const csrfMiddleware = require('../middleware/csrfMiddleware');
 
-const uploadDirectory = path.resolve(__dirname, '../../uploads');
+const uploadDirectory = path.resolve(process.env.UPLOADS_DIR || path.join(__dirname, '../../uploads'));
 fs.mkdirSync(uploadDirectory, { recursive: true });
 const upload = multer({ dest: uploadDirectory, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, callback) => callback(null, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.mimetype)) });
 

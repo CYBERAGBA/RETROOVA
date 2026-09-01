@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+<main class="container">
+  <div class="page-heading">
+    <span class="eyebrow">DEMANDE DE PARTENARIAT</span>
+    <h1><%= request.organization_name %></h1>
+  </div>
+
+  <section class="admin-panel">
+    <div class="detail-grid partnership-detail-grid">
+      <div class="detail-item">
+        <span>Organisation</span>
+        <strong><%= request.organization_name %></strong>
+      </div>
+      <div class="detail-item">
+        <span>Type de partenariat</span>
+        <strong><%= request.partnership_type %></strong>
+      </div>
+      <div class="detail-item">
+        <span>Contact</span>
+        <strong><%= request.contact_name %></strong>
+      </div>
+      <div class="detail-item">
+        <span>Email</span>
+        <strong><a href="mailto:<%= request.email %>"><%= request.email %></a></strong>
+      </div>
+      <div class="detail-item">
+        <span>Pays / Région</span>
+        <strong><%= request.country || 'Non précisé' %></strong>
+      </div>
+      <div class="detail-item">
+        <span>Date de réception</span>
+        <strong><%= new Date(request.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) %> — <%= new Date(request.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) %></strong>
+      </div>
+    </div>
+
+    <div class="detail-message-box">
+      <h3>Message</h3>
+      <p><%= request.message %></p>
+    </div>
+
+    <div class="partnership-status-panel">
+      <h3>Statut</h3>
+      <div class="partnership-status <%= request.status %>"><%= request.status === 'new' ? 'Nouveau' : request.status === 'in_progress' ? 'En cours' : request.status === 'accepted' ? 'Accepté' : request.status === 'archived' ? 'Archivé' : 'Rejeté' %></div>
+    </div>
+
+    <form method="POST" action="/admin/partnerships/<%= request.id %>" class="inline-form-stack">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="form-group">
+        <span>Notes admin</span>
+        <textarea name="admin_notes" rows="4" placeholder="Ajouter une note interne..."><%= request.admin_notes || '' %></textarea>
+      </label>
+      <div class="admin-actions">
+        <select name="status">
+          <option value="new" <%= request.status === 'new' ? 'selected' : '' %>>Nouveau</option>
+          <option value="in_progress" <%= request.status === 'in_progress' ? 'selected' : '' %>>En cours</option>
+          <option value="accepted" <%= request.status === 'accepted' ? 'selected' : '' %>>Accepté</option>
+          <option value="archived" <%= request.status === 'archived' ? 'selected' : '' %>>Archivé</option>
+          <option value="rejected" <%= request.status === 'rejected' ? 'selected' : '' %>>Rejeté</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+      </div>
+    </form>
+
+    <form method="POST" action="/admin/partnerships/<%= request.id %>/delete" class="inline-form-stack danger-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="btn btn-danger">Supprimer</button>
+    </form>
+  </section>
+</main>
+<%- include('../partials/footer') %>

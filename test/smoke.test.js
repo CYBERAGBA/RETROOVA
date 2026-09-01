@@ -35,11 +35,59 @@ test('pages publiques répondent et exposent les protections', async () => {
     assert.equal(howItWorks.status, 200);
     const about = await agent.get('/about');
     assert.equal(about.status, 200);
+    const partnership = await agent.get('/partnerships');
+    assert.equal(partnership.status, 200);
+    const partnershipAlias = await agent.get('/partenariats');
+    assert.equal(partnershipAlias.status, 200);
     const privacy = await agent.get('/privacy');
     assert.equal(privacy.status, 200);
     const report = await agent.get('/report');
     assert.equal(report.status, 302);
     assert.equal(report.headers.location, '/help');
+});
+
+test('le formulaire de partenariat enregistre une demande et l’admin l’affiche', async () => {
+    if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+        return;
+    }
+
+    const agent = request.agent(app);
+    const partnershipPage = await agent.get('/partnerships');
+    assert.equal(partnershipPage.status, 200);
+    assert.match(partnershipPage.text, /RETROOVA PARTNERS/);
+    assert.match(partnershipPage.text, /Devenir partenaire/);
+
+    const csrf = /name="_csrf"\s+value="([^"]+)"/s.exec(partnershipPage.text)?.[1];
+    assert.ok(csrf, 'Le formulaire doit intégrer un token CSRF');
+
+    const submission = await agent.post('/partnerships').type('form').send({
+        organization_name: 'ABC Hotels',
+        contact_name: 'Jean Kouassi',
+        email: 'jean@abchotels.com',
+        partnership_type: 'Hôtel / Tourisme',
+        country: 'Côte d’Ivoire',
+        message: 'Nous souhaitons intégrer RETROOVA à notre process de gestion des objets trouvés.',
+        _csrf: csrf
+    });
+
+    assert.equal(submission.status, 302);
+    assert.equal(submission.headers.location, '/partnerships?success=1');
+
+    const adminAgent = request.agent(app);
+    const adminLoginPage = await adminAgent.get('/login');
+    const adminCsrf = /name="_csrf"\s+value="([^"]+)"/s.exec(adminLoginPage.text)?.[1];
+    const adminLogin = await adminAgent.post('/login').type('form').send({
+        email: process.env.ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD,
+        _csrf: adminCsrf
+    });
+    assert.equal(adminLogin.status, 302);
+    assert.equal(adminLogin.headers.location, '/admin');
+
+    const adminResponse = await adminAgent.get('/admin');
+    assert.equal(adminResponse.status, 200);
+    assert.match(adminResponse.text, /Demandes de partenariat/);
+    assert.match(adminResponse.text, /ABC Hotels/);
 });
 
 test('les pages protégées redirigent et le profil ne contient plus de liens cassés', async () => {
@@ -60,6 +108,35 @@ test('routes protégées redirigent vers la connexion', async () => {
     const response = await request(app).get('/messages');
     assert.equal(response.status, 302);
     assert.equal(response.headers.location, '/login');
+});
+
+test('un utilisateur authentifié peut déclarer un objet perdu ou trouvé avec CSRF multipart', async () => {
+    const agent = request.agent(app);
+    await registerAndLogin(agent);
+
+    for (const type of ['lost', 'found']) {
+        const formPage = await agent.get(`/${type}/create`);
+        assert.equal(formPage.status, 200);
+        const csrf = /name="_csrf"\s+value="([^"]+)"/s.exec(formPage.text)?.[1];
+        assert.ok(csrf, `Le formulaire ${type} doit intégrer un token CSRF`);
+
+        const submission = await agent.post(`/${type}/create`)
+            .field('_csrf', csrf)
+            .field('category', 'phone')
+            .field('title', `Objet ${type} smoke`)
+            .field('city', 'Abidjan');
+
+        assert.equal(submission.status, 302);
+        assert.match(submission.headers.location, /^\/items\//);
+    }
+});
+
+test('un utilisateur non authentifié ne peut pas déclarer un objet', async () => {
+    for (const type of ['lost', 'found']) {
+        const response = await request(app).get(`/${type}/create`);
+        assert.equal(response.status, 302);
+        assert.equal(response.headers.location, '/login');
+    }
 });
 
 test('POST sans CSRF est refusé', async () => {

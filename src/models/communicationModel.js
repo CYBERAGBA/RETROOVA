@@ -1,20 +1,10 @@
-const sqlite3 = require('sqlite3').verbose();
+const { DatabaseAdapter } = require('../db');
 
 class CommunicationModel {
-    constructor(dbPath) { this.dbPath = dbPath; }
-    getDb() { const db = new sqlite3.Database(this.dbPath); db.run('PRAGMA foreign_keys = ON'); return db; }
-    run(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            const db = this.getDb();
-            db.run(sql, params, function (error) { db.close(); if (error) return reject(error); resolve({ changes: this.changes }); });
-        });
-    }
-    all(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            const db = this.getDb();
-            db.all(sql, params, (error, rows) => { db.close(); if (error) return reject(error); resolve(rows || []); });
-        });
-    }
+    constructor() { this.db = DatabaseAdapter; }
+    getDb() { return this.db.sqliteOpen ? this.db.sqliteOpen() : null; }
+    run(sql, params = []) { return this.db.run(sql, params); }
+    all(sql, params = []) { return this.db.all(sql, params); }
     async getConversations(userId) {
         return this.all(`SELECT messages.*, sender.name AS sender_name, sender.public_id AS sender_public_id, receiver.name AS receiver_name, receiver.public_id AS receiver_public_id, items.title AS item_title FROM messages JOIN users sender ON sender.id = messages.sender_id JOIN users receiver ON receiver.id = messages.receiver_id LEFT JOIN items ON items.id = messages.item_id WHERE (sender_id = ? AND sender_deleted = 0) OR (receiver_id = ? AND receiver_deleted = 0) ORDER BY messages.created_at DESC`, [userId, userId]);
     }

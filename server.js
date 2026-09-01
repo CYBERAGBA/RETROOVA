@@ -1,12 +1,12 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+const { DatabaseAdapter, DATABASE_URL, DATABASE_PATH, UPLOADS_DIR, isPostgres } = require('./src/db');
 const UserModel = require('./src/models/userModel');
 const ItemModel = require('./src/models/itemModel');
 const CommunicationModel = require('./src/models/communicationModel');
@@ -34,8 +34,7 @@ const app = express();
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
-const SITE_URL = process.env.SITE_URL || 'https://retroova.com';
-const DATABASE_PATH = path.resolve(__dirname, process.env.DATABASE_PATH || './database/database.sqlite');
+const SITE_URL = process.env.SITE_URL || (NODE_ENV === 'production' ? process.env.BASE_URL : 'https://retroova.com') || 'https://retroova.com';
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
 app.disable('x-powered-by');
@@ -46,14 +45,18 @@ if (!SESSION_SECRET && NODE_ENV === 'production') {
   process.exit(1);
 }
 
-// ============================================
-// Vérifier que la base de données existe
-// ============================================
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-if (!fs.existsSync(DATABASE_PATH)) {
-  console.error(`\n⚠️  Base de données non trouvée à ${DATABASE_PATH}`);
+if (!DATABASE_URL && !fs.existsSync(DATABASE_PATH)) {
+  console.error(`\n⚠️  Base de données locale non trouvée à ${DATABASE_PATH}`);
   console.error('Veuillez exécuter: npm run init-db\n');
   process.exit(1);
+}
+
+if (isPostgres && NODE_ENV === 'production') {
+  console.log('ℹ️  DATABASE_URL détectée: PostgreSQL activé pour Railway/production.');
+} else if (isPostgres) {
+  console.log('ℹ️  DATABASE_URL détectée: PostgreSQL activé pour le mode connecté.');
 }
 
 // ============================================
@@ -81,6 +84,7 @@ app.get('/sitemap.xml', async (req, res) => {
     { url: '/map', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
     { url: '/how-it-works', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
     { url: '/about', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: '/partnerships', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
     { url: '/privacy', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
     { url: '/terms', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
     { url: '/contact', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.5' },
@@ -96,7 +100,7 @@ app.get('/sitemap.xml', async (req, res) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
@@ -128,10 +132,10 @@ app.use(csrfMiddleware);
 // Models
 // ============================================
 
-const userModel = new UserModel(DATABASE_PATH);
-const itemModel = new ItemModel(DATABASE_PATH);
-const communicationModel = new CommunicationModel(DATABASE_PATH);
-const adminModel = new AdminModel(DATABASE_PATH);
+const userModel = new UserModel();
+const itemModel = new ItemModel();
+const communicationModel = new CommunicationModel();
+const adminModel = new AdminModel();
 
 app.use(async (req, res, next) => {
   if (!req.session?.userId) return next();
@@ -185,7 +189,7 @@ app.use('/', authRoutes(userModel, itemModel, communicationModel));
 app.use('/', itemRoutes(itemModel, communicationModel, userModel));
 app.use('/', communicationRoutes(communicationModel, itemModel, userModel));
 app.use('/', adminRoutes(adminModel, userModel));
-app.use('/', infoRoutes());
+app.use('/', infoRoutes(adminModel));
 
 /**
  * Health check pour Railway et les monitorings
@@ -225,12 +229,14 @@ app.get('/en', async (req, res) => {
 
 // Page 404
 app.use((req, res) => {
+  res.locals.siteUrl = SITE_URL;
   res.status(404).render('404', { title: 'Page non trouvée' });
 });
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error('Erreur:', err);
+  res.locals.siteUrl = SITE_URL;
   res.status(500).render('500', {
     title: 'Erreur serveur',
     error: NODE_ENV === 'development' ? err.message : 'Une erreur est survenue'
@@ -250,7 +256,8 @@ const startServer = () => app.listen(PORT, HOST, () => {
 ✅ Serveur démarré avec succès
 📍 Bind: ${HOST}:${PORT}
 🔧 Environnement: ${NODE_ENV}
-💾 Base de données: ${DATABASE_PATH}
+💾 Base de données: ${DATABASE_URL ? 'DATABASE_URL configurée' : DATABASE_PATH}
+📁 Uploads: ${UPLOADS_DIR}
 
 📋 Routes disponibles:
   - GET  /health            → Vérification de santé
