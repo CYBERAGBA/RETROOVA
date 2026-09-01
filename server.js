@@ -276,10 +276,14 @@ const startServer = () => app.listen(PORT, HOST, () => {
 });
 
 if (require.main === module) {
-  userModel.ensurePublicIds().then(startServer).catch((error) => {
-    console.error('Impossible de préparer les identifiants publics:', error);
-    process.exit(1);
-  });
+  DatabaseAdapter.initializeDatabase()
+    .then(() => DatabaseAdapter.ensurePublicIds())
+    .then(() => DatabaseAdapter.ensurePartnershipRequestsTable())
+    .then(() => startServer())
+    .catch((error) => {
+      console.error('❌ Impossible d’initialiser la base de données:', error);
+      process.exit(1);
+    });
 }
 
 module.exports = app;
