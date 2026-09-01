@@ -5,10 +5,6 @@ class ItemModel {
         this.db = DatabaseAdapter;
     }
 
-    getDb() {
-        return this.db.sqliteOpen ? this.db.sqliteOpen() : null;
-    }
-
     run(sql, params = []) {
         return this.db.run(sql, params);
     }
@@ -23,19 +19,21 @@ class ItemModel {
 
     create(item) {
         const fields = ['id', 'user_id', 'type', 'category', 'title', 'description', 'brand', 'model', 'color', 'city', 'district', 'location_description', 'event_date', 'photo_filename', 'photo_url', 'is_anonymous', 'status'];
-        const values = fields.map((field) => item[field] ?? null);
+        const values = fields.map((field) => field === 'is_anonymous' && this.db.isPostgres ? Boolean(item[field]) : item[field] ?? null);
         return this.run(`INSERT INTO items (${fields.join(', ')}) VALUES (${fields.map(() => '?').join(', ')})`, values);
     }
 
     findById(id) {
-        return this.get(`SELECT items.*, CASE WHEN items.is_anonymous = 1 THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = 1 THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.id = ?`, [id]);
+        const trueValue = this.db.isPostgres ? 'TRUE' : '1';
+        return this.get(`SELECT items.*, CASE WHEN items.is_anonymous = ${trueValue} THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = ${trueValue} THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.id = ?`, [id]);
     }
 
     findBySlug(type, slug) {
         const normalizedSlug = String(slug || '').trim().toLowerCase();
         if (!normalizedSlug) return Promise.resolve(null);
 
-        const sql = `SELECT items.*, CASE WHEN items.is_anonymous = 1 THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = 1 THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.type = ? AND LOWER(items.title) LIKE ? AND status NOT IN ('closed', 'expired') LIMIT 1`;
+        const trueValue = this.db.isPostgres ? 'TRUE' : '1';
+        const sql = `SELECT items.*, CASE WHEN items.is_anonymous = ${trueValue} THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = ${trueValue} THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.type = ? AND LOWER(items.title) LIKE ? AND status NOT IN ('closed', 'expired') LIMIT 1`;
         return this.get(sql, [type, `%${normalizedSlug}%`]);
     }
 
@@ -70,11 +68,11 @@ class ItemModel {
         addLike('items.city', filters.city);
         addLike('items.district', filters.district);
         if (filters.startDate) {
-            conditions.push('date(items.event_date) >= date(?)');
+            conditions.push(this.db.isPostgres ? 'items.event_date >= ?' : 'date(items.event_date) >= date(?)');
             params.push(filters.startDate);
         }
         if (filters.endDate) {
-            conditions.push('date(items.event_date) <= date(?)');
+            conditions.push(this.db.isPostgres ? 'items.event_date <= ?' : 'date(items.event_date) <= date(?)');
             params.push(filters.endDate);
         }
         if (filters.keyword) {
@@ -87,12 +85,13 @@ class ItemModel {
         const limit = Math.min(30, Math.max(6, Number.parseInt(filters.limit, 10) || 12));
         const orderBy = filters.sort === 'oldest' ? 'items.created_at ASC' : filters.sort === 'city' ? 'items.city ASC, items.created_at DESC' : 'items.created_at DESC';
         params.push(limit + 1, (page - 1) * limit);
-        return this.all(`SELECT items.*, CASE WHEN items.is_anonymous = 1 THEN 'Membre RETROOVA' ELSE users.name END AS owner_name FROM items JOIN users ON users.id = items.user_id WHERE ${conditions.join(' AND ')} ORDER BY ${orderBy} LIMIT ? OFFSET ?`, params);
+        const trueValue = this.db.isPostgres ? 'TRUE' : '1';
+        return this.all(`SELECT items.*, CASE WHEN items.is_anonymous = ${trueValue} THEN 'Membre RETROOVA' ELSE users.name END AS owner_name FROM items JOIN users ON users.id = items.user_id WHERE ${conditions.join(' AND ')} ORDER BY ${orderBy} LIMIT ? OFFSET ?`, params);
     }
 
     update(id, userId, item) {
         const fields = ['category', 'title', 'description', 'brand', 'model', 'color', 'city', 'district', 'location_description', 'event_date', 'photo_filename', 'photo_url', 'is_anonymous'];
-        const values = fields.map((field) => item[field] ?? null);
+        const values = fields.map((field) => field === 'is_anonymous' && this.db.isPostgres ? Boolean(item[field]) : item[field] ?? null);
         values.push(id, userId);
         return this.run(`UPDATE items SET ${fields.map((field) => `${field} = ?`).join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?`, values);
     }

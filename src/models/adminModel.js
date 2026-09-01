@@ -3,7 +3,6 @@ const { DatabaseAdapter } = require('../db');
 
 class AdminModel {
     constructor() { this.db = DatabaseAdapter; }
-    getDb() { return this.db.sqliteOpen ? this.db.sqliteOpen() : null; }
     all(sql, params = []) { return this.db.all(sql, params); }
     run(sql, params = []) { return this.db.run(sql, params); }
     get(sql, params = []) { return this.db.get(sql, params); }
