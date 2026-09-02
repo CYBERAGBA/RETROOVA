@@ -27,7 +27,43 @@
 
                 <aside class="detail-side-column">
                         <section class="detail-author-card"><span class="section-label"><%= t('itemDetail.trust', 'CONFIANCE') %></span><div class="detail-author-avatar">👤</div><p class="detail-author-label"><%= t('itemDetail.publishedBy', 'Annonce publiée par') %></p><h2><%= item.is_anonymous ? t('itemDetail.publicMember', 'un membre RETROOVA') : (item.owner_name || t('itemDetail.publicMember', 'un membre RETROOVA')) %></h2><% if (typeof ownerReputation !== 'undefined' && ownerReputation) { %><p class="reputation-badge <%= ownerReputation.tone %>"><%= ownerReputation.tone === 'success' ? t('itemDetail.goodReputation', 'Bonne réputation') : ownerReputation.tone === 'danger' ? t('itemDetail.watchlist', 'Compte sous surveillance') : t('itemDetail.standardReputation', 'Réputation standard') %><span>·</span><%= ownerReputation.level %></p><% } %><% if (item.owner_public_id) { %><div class="detail-public-id"><span><%= t('itemDetail.publicId', 'Identifiant public') %></span><code id="advertiser-id"><%= item.owner_public_id %></code><button type="button" class="copy-id" data-copy-target="#advertiser-id"><%= t('itemDetail.copy', 'Copier') %></button></div><% } %></section>
-                    <section class="detail-actions"><span class="section-label"><%= t('itemDetail.whatNext', 'QUE SOUHAITEZ-VOUS FAIRE ?') %></span><h2><%= t('itemDetail.actOnAd', 'Agir sur cette annonce') %></h2><% if (user && item.user_id === user.id) { %><a href="/items/<%= item.id %>/edit" class="btn btn-primary btn-block"><%= t('itemDetail.modifyAd', 'Modifier l\'annonce') %></a><% if (['active', 'matched', 'in_contact'].includes(item.status)) { %><form method="POST" action="/items/<%= item.id %>/status" class="detail-form detail-recover-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="returned"><button type="submit" class="btn btn-quiet btn-block" onclick="return confirm('<%= t('itemDetail.confirmReturn', 'Confirmer que cet objet a bien été') %> <%= item.type === 'lost' ? t('itemDetail.lostFound', 'retrouvé') : t('itemDetail.lostReturned', 'restitué') %> ?');"><%= item.type === 'lost' ? t('itemDetail.markReturned', '✓ Objet retrouvé') : t('itemDetail.markRestituted', '✓ Objet restitué') %></button></form><% } %><% } else if (user && item.owner_public_id) { %><a href="/messages?to=<%= item.owner_public_id %>&item=<%= item.id %>" class="btn btn-primary btn-block"><%= t('itemDetail.writeToOwner', 'Écrire à cette personne') %></a><a href="/matches" class="btn btn-secondary btn-block"><%= t('itemDetail.viewMatches', 'Voir mes correspondances') %></a><form method="POST" action="/messages" class="detail-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="receiverId" value="<%= item.owner_public_id %>"><input type="hidden" name="itemId" value="<%= item.id %>"><input type="text" name="subject" placeholder="<%= t('itemDetail.subject', 'Sujet') %>"><textarea name="message" rows="3" placeholder="<%= t('itemDetail.message', 'Votre message') %>" required></textarea><button class="btn btn-secondary btn-block"><%= t('itemDetail.contactPerson', 'Contacter') %></button></form><% if (item.type === 'found') { %><form method="POST" action="/items/<%= item.id %>/proof" class="detail-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><textarea name="proofText" rows="3" placeholder="<%= t('itemDetail.proofPrompt', 'Décrivez un détail privé prouvant votre propriété') %>" required></textarea><button class="btn btn-secondary btn-block"><%= t('itemDetail.requestProof', 'Faire une demande de récupération') %></button></form><% } %><% } else if (user) { %><p class="detail-muted"><%= t('itemDetail.contactReserved', 'Les actions de contact sont réservées à la personne concernée.') %></p><% } else { %><a href="/login" class="btn btn-primary btn-block"><%= t('itemDetail.loginToAct', 'Se connecter pour agir') %></a><% } %></section>ontact ne sont pas disponibles pour cette annonce anonyme.</p><% } else { %><a href="/login" class="btn btn-primary btn-block">Se connecter pour agir</a><% } %><a href="/items/<%= item.id %>/report" class="detail-report">Signaler cette annonce <span>→</span></a></section>
+                    <section class="detail-actions">
+                        <span class="section-label"><%= t('itemDetail.whatNext', 'QUE SOUHAITEZ-VOUS FAIRE ?') %></span>
+                        <h2><%= t('itemDetail.actOnAd', 'Agir sur cette annonce') %></h2>
+                        <% if (user && item.user_id === user.id) { %>
+                            <a href="/items/<%= item.id %>/edit" class="btn btn-primary btn-block"><%= t('itemDetail.modifyAd', 'Modifier l\'annonce') %></a>
+                            <% if (['active', 'matched', 'in_contact'].includes(item.status)) { %>
+                                <form method="POST" action="/items/<%= item.id %>/status" class="detail-form detail-recover-form">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <input type="hidden" name="status" value="returned">
+                                    <button type="submit" class="btn btn-quiet btn-block" onclick="return confirm('<%= t('itemDetail.confirmReturn', 'Confirmer que cet objet a bien été') %> <%= item.type === 'lost' ? t('itemDetail.lostFound', 'retrouvé') : t('itemDetail.lostReturned', 'restitué') %> ?');"><%= item.type === 'lost' ? t('itemDetail.markReturned', '✓ Objet retrouvé') : t('itemDetail.markRestituted', '✓ Objet restitué') %></button>
+                                </form>
+                            <% } %>
+                        <% } else if (user && item.owner_public_id) { %>
+                            <a href="/messages?to=<%= item.owner_public_id %>&item=<%= item.id %>" class="btn btn-primary btn-block"><%= t('itemDetail.writeToOwner', 'Écrire à cette personne') %></a>
+                            <a href="/matches" class="btn btn-secondary btn-block"><%= t('itemDetail.viewMatches', 'Voir mes correspondances') %></a>
+                            <form method="POST" action="/messages" class="detail-form">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <input type="hidden" name="receiverId" value="<%= item.owner_public_id %>">
+                                <input type="hidden" name="itemId" value="<%= item.id %>">
+                                <input type="text" name="subject" placeholder="<%= t('itemDetail.subject', 'Sujet') %>">
+                                <textarea name="message" rows="3" placeholder="<%= t('itemDetail.message', 'Votre message') %>" required></textarea>
+                                <button class="btn btn-secondary btn-block"><%= t('itemDetail.contactPerson', 'Contacter') %></button>
+                            </form>
+                            <% if (item.type === 'found') { %>
+                                <form method="POST" action="/items/<%= item.id %>/proof" class="detail-form">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <textarea name="proofText" rows="3" placeholder="<%= t('itemDetail.proofPrompt', 'Décrivez un détail privé prouvant votre propriété') %>" required></textarea>
+                                    <button class="btn btn-secondary btn-block"><%= t('itemDetail.requestProof', 'Faire une demande de récupération') %></button>
+                                </form>
+                            <% } %>
+                        <% } else if (user) { %>
+                            <p class="detail-muted"><%= t('itemDetail.contactReserved', 'Les actions de contact sont réservées à la personne concernée.') %></p>
+                        <% } else { %>
+                            <a href="/login" class="btn btn-primary btn-block"><%= t('itemDetail.loginToAct', 'Se connecter pour agir') %></a>
+                        <% } %>
+                        <a href="/items/<%= item.id %>/report" class="detail-report">Signaler cette annonce <span>→</span></a>
+                    </section>
                 </aside>
             </div>
         </article>
