@@ -1,54 +1,31 @@
 <%- include('../partials/header') %>
     <main class="container">
-        <div class="page-heading"><span class="eyebrow">ESPACE ADMINISTRATEUR</span>
-            <h1>Pilotage RETROOVA</h1>
-            <p>Modérez les annonces et surveillez l’activité de la plateforme.</p>
+        <div class="page-heading"><span class="eyebrow"><%= t('adminDetail.adminSpace', 'ESPACE ADMINISTRATEUR') %></span>
+            <h1><%= t('admin.title', 'Pilotage RETROOVA') %></h1>
+            <p><%= t('admin.subtitle', 'Modérez les annonces et surveillez l’activité de la plateforme.') %></p>
         </div>
         <section class="admin-stats">
-            <div><strong>
-                    <%= overview.users %>
-                </strong><span>Utilisateurs</span></div>
-            <div><strong>
-                    <%= overview.lost %>
-                </strong><span>Objets perdus</span></div>
-            <div><strong>
-                    <%= overview.found %>
-                </strong><span>Objets trouvés</span></div>
-            <div><strong>
-                    <%= overview.matches %>
-                </strong><span>Correspondances</span></div>
-            <div><strong>
-                    <%= overview.pending_reports %>
-                </strong><span>Signalements à traiter</span></div>
+            <div><strong><%= overview.users %></strong><span><%= t('admin.users', 'Utilisateurs') %></span></div>
+            <div><strong><%= overview.lost %></strong><span><%= t('admin.lostItems', 'Objets perdus') %></span></div>
+            <div><strong><%= overview.found %></strong><span><%= t('admin.foundItems', 'Objets trouvés') %></span></div>
+            <div><strong><%= overview.matches %></strong><span><%= t('admin.matches', 'Correspondances') %></span></div>
+            <div><strong><%= overview.pending_reports %></strong><span><%= t('admin.pendingReports', 'Signalements à traiter') %></span></div>
         </section>
         <section class="admin-panel">
             <div class="panel-heading">
-                <h2>Utilisateurs</h2><span>
-                    <%= users.length %> affichés
-                </span>
+                <h2><%= t('admin.users', 'Utilisateurs') %></h2><span><%= users.length %> <%= t('admin.displayed', 'affichés') %></span>
             </div>
             <div class="admin-table">
-                <% users.forEach(account=> { %><div><span class="type-pill">
-                            <%= account.role %>
-                        </span><strong>
-                            <%= account.name %>
-                        </strong><span>
-                            <%= account.email %> · <%= account.city || 'Ville non précisée' %>
-                        </span><span>
-                            <%= account.status %>
-                        </span></div>
-                    <% }) %>
+                <% users.forEach(account=> { %><div><span class="type-pill"><%= account.role === 'admin' ? t('admin.roleAdmin', 'Administrateur') : t('admin.roleUser', 'Utilisateur') %></span><strong><%= account.name %></strong><span><%= account.email %> · <%= account.city || t('admin.cityUnknown', 'Ville non précisée') %></span><span><%= account.status === 'active' ? t('admin.statusActive', 'Actif') : account.status === 'suspended' ? t('admin.statusSuspended', 'Suspendu') : account.status === 'deleted' ? t('admin.statusDeleted', 'Supprimé') : account.status %></span></div><% }) %>
             </div>
         </section>
         <section class="admin-panel">
             <div class="panel-heading">
-                <h2>Demandes de partenariat</h2><span>
-                    <%= partnershipRequests.length %> demandes
-                </span>
+                <h2><%= t('admin.requests', 'Demandes de partenariat') %></h2><span><%= partnershipRequests.length %> <%= t('admin.requestCount', 'demandes') %></span>
             </div>
             <% if (!partnershipRequests.length) { %>
                 <div class="empty-state">
-                    <p>Aucune demande de partenariat.</p>
+                    <p><%= t('admin.noRequests', 'Aucune demande de partenariat.') %></p>
                 </div>
                 <% } else { %>
                     <div class="admin-table partnership-table">
@@ -57,10 +34,10 @@
                                 <strong><%= request.organization_name %></strong>
                                 <span><%= request.partnership_type %></span>
                                 <span><%= request.contact_name %></span>
-                                <span><%= request.country || 'Non précisé' %></span>
+                                <span><%= request.country || t('admin.unknown', 'Non précisé') %></span>
                                 <span><%= new Date(request.created_at).toLocaleDateString('fr-FR') %></span>
-                                <span class="partnership-status <%= request.status %>"><%= request.status === 'new' ? 'Nouveau' : request.status === 'in_progress' ? 'En cours' : request.status === 'accepted' ? 'Accepté' : request.status === 'archived' ? 'Archivé' : 'Rejeté' %></span>
-                                <a href="/admin/partnerships/<%= request.id %>">Voir</a>
+                                <span class="partnership-status <%= request.status %>"><%= request.status === 'new' ? t('admin.statusNew', 'Nouveau') : request.status === 'in_progress' ? t('admin.statusInProgress', 'En cours') : request.status === 'accepted' ? t('admin.statusAccepted', 'Accepté') : request.status === 'archived' ? t('admin.statusArchived', 'Archivé') : t('admin.statusRejected', 'Rejeté') %></span>
+                                <a href="/admin/partnerships/<%= request.id %>"><%= t('admin.view', 'Voir') %></a>
                             </div>
                         <% }) %>
                     </div>
@@ -68,83 +45,39 @@
         </section>
         <section class="admin-panel">
             <div class="panel-heading">
-                <h2>Signalements</h2><span>
-                    <%= reports.length %> récents
-                </span>
+                <h2><%= t('admin.reports', 'Signalements') %></h2><span><%= reports.length %> <%= t('admin.recentReports', 'récents') %></span>
             </div>
             <% if (!reports.length) { %>
                 <div class="empty-state">
-                    <p>Aucun signalement.</p>
+                    <p><%= t('admin.noReports', 'Aucun signalement.') %></p>
                 </div>
                 <% } else { reports.forEach(report=> { %><article class="report-row">
-                        <div><strong>
-                                <%= report.item_title %>
-                            </strong>
-                            <p>
-                                <%= report.reason %> · par <%= report.reporter_name %>
-                            </p><small>
-                                <%= report.description || 'Sans précision' %>
-                            </small>
+                        <div><strong><%= report.item_title %></strong>
+                            <p><%= report.reason %> · <%= t('admin.by', 'par') %> <%= report.reporter_name %></p><small><%= report.description || t('admin.reportDetailUnknown', 'Sans précision') %></small>
                         </div>
-                        <form method="POST" action="/admin/reports/<%= report.id %>"><input type="hidden" name="_csrf"
-                                value="<%= csrfToken %>"><select name="status">
-                                <option value="pending" <%=report.status==='pending' ? 'selected' : '' %>>En attente
-                                </option>
-                                <option value="reviewed" <%=report.status==='reviewed' ? 'selected' : '' %>>Examiné
-                                </option>
-                                <option value="resolved" <%=report.status==='resolved' ? 'selected' : '' %>>Résolu
-                                </option>
-                                <option value="dismissed" <%=report.status==='dismissed' ? 'selected' : '' %>>Rejeté
-                                </option>
-                            </select><input name="notes" placeholder="Note admin"
-                                value="<%= report.admin_notes || '' %>"><button class="btn btn-small btn-primary">Mettre
-                                à
-                                jour</button></form>
+                        <form method="POST" action="/admin/reports/<%= report.id %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><select name="status">
+                                <option value="pending" <%=report.status==='pending' ? 'selected' : '' %>><%= t('admin.statusPending', 'En attente') %></option>
+                                <option value="reviewed" <%=report.status==='reviewed' ? 'selected' : '' %>><%= t('admin.statusReviewed', 'Examiné') %></option>
+                                <option value="resolved" <%=report.status==='resolved' ? 'selected' : '' %>><%= t('admin.statusResolved', 'Résolu') %></option>
+                                <option value="dismissed" <%=report.status==='dismissed' ? 'selected' : '' %>><%= t('admin.statusDismissed', 'Rejeté') %></option>
+                            </select><input name="notes" placeholder="<%= t('admin.notePlaceholder', 'Note admin') %>" value="<%= report.admin_notes || '' %>"><button class="btn btn-small btn-primary"><%= t('admin.update', 'Mettre à jour') %></button></form>
                     </article>
                     <% }) } %>
         </section>
         <section class="admin-panel">
             <div class="panel-heading">
-                <h2>Annonces récentes</h2><a href="/search">Ouvrir la recherche</a>
+                <h2><%= t('admin.recentAds', 'Annonces récentes') %></h2><a href="/search"><%= t('admin.openSearch', 'Ouvrir la recherche') %></a>
             </div>
             <div class="admin-table">
-                <% items.forEach(item=> { %><div><span class="type-pill <%= item.type %>">
-                            <%= item.type %>
-                        </span><strong>
-                            <%= item.title %>
-                        </strong><span>
-                            <%= item.city %> · <%= item.owner_name %>
-                        </span><a href="/items/<%= item.id %>">Voir</a>
-                        <form method="POST" action="/admin/items/<%= item.id %>/status"
-                            data-confirm="Fermer cette annonce ?"><input type="hidden" name="_csrf"
-                                value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button
-                                class="btn btn-small btn-danger">Fermer</button></form>
-                    </div>
-                    <% }) %>
+                <% items.forEach(item=> { %><div><span class="type-pill <%= item.type %>"><%= item.type === 'lost' ? t('common.lost', 'Perdu') : t('common.found', 'Trouvé') %></span><strong><%= item.title %></strong><span><%= item.city %> · <%= item.owner_name %></span><a href="/items/<%= item.id %>"><%= t('admin.view', 'Voir') %></a><form method="POST" action="/admin/items/<%= item.id %>/status" data-confirm="<%= t('admin.closeConfirm', 'Fermer cette annonce ?') %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button class="btn btn-small btn-danger"><%= t('admin.close', 'Fermer') %></button></form></div><% }) %>
             </div>
         </section>
         <section class="admin-panel">
             <div class="panel-heading">
-                <h2>Utilisateurs</h2><span>
-                    <%= users.length %> affichés
-                </span>
+                <h2><%= t('admin.users', 'Utilisateurs') %></h2><span><%= users.length %> <%= t('admin.displayed', 'affichés') %></span>
             </div>
             <div class="admin-table">
-                <% users.forEach(account=> { %><div><span class="type-pill">
-                            <%= account.role %>
-                        </span><strong>
-                            <%= account.name %>
-                        </strong><span>
-                            <%= account.email %>
-                        </span>
-                        <form method="POST" action="/admin/users/<%= account.id %>/status"><input type="hidden"
-                                name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status"
-                                value="<%= account.status === 'suspended' ? 'active' : 'suspended' %>"><button
-                                class="btn btn-small btn-secondary">
-                                <%= account.status==='suspended' ? 'Réactiver' : 'Suspendre' %>
-                            </button></form>
-                    </div>
-                    <% }) %>
+                <% users.forEach(account=> { %><div><span class="type-pill"><%= account.role %></span><strong><%= account.name %></strong><span><%= account.email %></span><form method="POST" action="/admin/users/<%= account.id %>/status"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="<%= account.status === 'suspended' ? 'active' : 'suspended' %>"><button class="btn btn-small btn-secondary"><%= account.status==='suspended' ? t('admin.reactivate', 'Réactiver') : t('admin.suspend', 'Suspendre') %></button></form></div><% }) %>
             </div>
         </section>
     </main>

@@ -1,4 +1,5 @@
 (() => {
+    const i18n = window.retroovaI18n || {};
     const mapElement = document.getElementById('retroova-map');
     if (!mapElement || typeof L === 'undefined') return;
 
@@ -14,10 +15,10 @@
         const title = document.createElement('strong');
         title.textContent = item.title || '';
         const details = document.createElement('div');
-        details.textContent = `${item.type === 'lost' ? 'Perdu' : 'Trouvé'} · ${item.city || ''}`;
+        details.textContent = `${item.type === 'lost' ? i18n.lost : i18n.found} · ${item.city || ''}`;
         const link = document.createElement('a');
         link.href = `/items/${encodeURIComponent(item.id)}`;
-        link.textContent = 'Voir l’annonce';
+        link.textContent = i18n.viewAd;
         popup.append(title, document.createElement('br'), details, document.createElement('br'), link);
         L.marker(center).addTo(map).bindPopup(popup);
     });

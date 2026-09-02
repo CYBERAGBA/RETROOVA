@@ -1,16 +1,15 @@
 <%- include('../partials/header') %>
     <main class="container">
         <div class="form-page">
-            <a href="/dashboard" class="back-link">← Retour au tableau de bord</a>
+            <a href="/dashboard" class="back-link">← <%= t('itemForm.backToDashboard', 'Retour au tableau de bord') %></a>
             <div class="page-heading">
                 <span class="eyebrow">
-                    <%= isEdit ? 'MISE À JOUR' : (formData.type==='lost' ? 'OBJET PERDU' : 'OBJET TROUVÉ' ) %>
+                    <%= isEdit ? t('itemForm.updateLabel', 'MISE À JOUR') : (formData.type==='lost' ? t('itemForm.lostLabel', 'OBJET PERDU') : t('itemForm.foundLabel', 'OBJET TROUVÉ')) %>
                 </span>
                 <h1>
-                    <%= isEdit ? 'Modifier mon annonce' : (formData.type==='lost' ? 'Déclarer un objet perdu'
-                        : 'Déclarer un objet trouvé' ) %>
+                    <%= isEdit ? t('itemForm.updateAd', 'Modifier mon annonce') : (formData.type==='lost' ? t('itemForm.publishLost', 'Déclarer un objet perdu') : t('itemForm.publishFound', 'Déclarer un objet trouvé')) %>
                 </h1>
-                <p>Donnez assez de détails pour aider la bonne personne à le reconnaître.</p>
+                <p><%= t('itemForm.giveDetails', 'Donnez assez de détails pour aider la bonne personne à le reconnaître.') %></p>
             </div>
                             <% if (typeof errors !== 'undefined' && errors.length) { %>
                                 <div class="alert alert-danger" role="alert">
@@ -20,53 +19,52 @@
             <form method="POST" enctype="multipart/form-data"
                 action="<%= isEdit ? '/items/' + itemId + '/update' : '/' + formData.type + '/create' %>"
                 class="item-form" data-wizard="true" data-edit="<%= isEdit ? 'true' : 'false' %>"
-                data-confirm="Publier cette annonce maintenant ?"><input type="hidden" name="_csrf"
+                data-confirm="<%= t('itemForm.confirmPublish', 'Publier cette annonce maintenant ?') %>"><input type="hidden" name="_csrf"
                     value="<%= csrfToken %>">
                 <div class="form-grid">
-                    <div class="form-group form-span-2"><label for="title">Titre de l’annonce *</label><input id="title"
-                            name="title" value="<%= formData.title || '' %>" placeholder="Ex. iPhone 13 bleu" required
+                    <div class="form-group form-span-2"><label for="title"><%= t('itemForm.titleLabel', 'Titre de l’annonce') %> *</label><input id="title"
+                            name="title" value="<%= formData.title || '' %>" placeholder="<%= t('itemForm.placeholderTitle', 'Ex. iPhone 13 bleu') %>" required
                             maxlength="120"></div>
-                    <div class="form-group"><label for="category">Catégorie *</label><select id="category"
+                    <div class="form-group"><label for="category"><%= t('itemForm.categoryLabel', 'Catégorie') %> *</label><select id="category"
                             name="category" required>
-                            <option value="">Sélectionner</option>
+                            <option value=""><%= t('common.select', 'Sélectionner') %></option>
                             <% categories.forEach(category=> { %><option value="<%= category %>"
-                                    <%=formData.category===category ? 'selected' : '' %>><%= categoryLabels[category] %>
+                                    <%=formData.category===category ? 'selected' : '' %>><%= t('categories.' + category, categoryLabels[category]) %>
                                 </option>
                                 <% }) %>
                         </select></div>
-                    <div class="form-group"><label for="event_date">Date</label><input id="event_date" type="date"
+                    <div class="form-group"><label for="event_date"><%= t('common.date', 'Date') %></label><input id="event_date" type="date"
                             name="event_date" value="<%= formData.event_date || '' %>"></div>
-                    <div class="form-group"><label for="city">Ville *</label><input id="city" name="city"
-                            value="<%= formData.city || '' %>" placeholder="Ex. Abidjan" required></div>
-                    <div class="form-group"><label for="district">Quartier</label><input id="district" name="district"
-                            value="<%= formData.district || '' %>" placeholder="Ex. Cocody"></div>
-                    <div class="form-group"><label for="brand">Marque</label><input id="brand" name="brand"
-                            value="<%= formData.brand || '' %>" placeholder="Ex. Apple"></div>
-                    <div class="form-group"><label for="model">Modèle</label><input id="model" name="model"
-                            value="<%= formData.model || '' %>" placeholder="Ex. iPhone 13"></div>
-                    <div class="form-group"><label for="color">Couleur</label><input id="color" name="color"
-                            value="<%= formData.color || '' %>" placeholder="Ex. Bleu nuit"></div>
-                    <div class="form-group form-span-2"><label for="location_description">Lieu précis</label><input
+                    <div class="form-group"><label for="city"><%= t('itemForm.cityLabel', 'Ville') %> *</label><input id="city" name="city"
+                            value="<%= formData.city || '' %>" placeholder="<%= t('itemForm.placeholderCity', 'Ex. Abidjan') %>" required></div>
+                    <div class="form-group"><label for="district"><%= t('itemForm.districtLabel', 'Quartier') %></label><input id="district" name="district"
+                            value="<%= formData.district || '' %>" placeholder="<%= t('itemForm.placeholderDistrict', 'Ex. Cocody') %>"></div>
+                    <div class="form-group"><label for="brand"><%= t('itemForm.brandLabel', 'Marque') %></label><input id="brand" name="brand"
+                            value="<%= formData.brand || '' %>" placeholder="<%= t('itemForm.placeholderBrand', 'Ex. Apple') %>"></div>
+                    <div class="form-group"><label for="model"><%= t('itemForm.modelLabel', 'Modèle') %></label><input id="model" name="model"
+                            value="<%= formData.model || '' %>" placeholder="<%= t('itemForm.placeholderModel', 'Ex. iPhone 13') %>"></div>
+                    <div class="form-group"><label for="color"><%= t('itemForm.colorLabel', 'Couleur') %></label><input id="color" name="color"
+                            value="<%= formData.color || '' %>" placeholder="<%= t('itemForm.placeholderColor', 'Ex. Bleu nuit') %>"></div>
+                    <div class="form-group form-span-2"><label for="location_description"><%= t('itemForm.locationLabel', 'Lieu précis') %></label><input
                             id="location_description" name="location_description"
                             value="<%= formData.location_description || '' %>"
-                            placeholder="Ex. près de l’entrée du supermarché"></div>
-                    <div class="form-group form-span-2"><label for="description">Description</label><textarea
+                            placeholder="<%= t('itemForm.placeholderLocation', 'Ex. près de l’entrée du supermarché') %>"></div>
+                    <div class="form-group form-span-2"><label for="description"><%= t('itemForm.descriptionLabel', 'Description') %></label><textarea
                             id="description" name="description" rows="5" maxlength="2000"
-                            placeholder="Signes distinctifs, contenu, circonstances..."><%= formData.description || '' %></textarea>
+                            placeholder="<%= t('itemForm.descriptionPlaceholder', 'Signes distinctifs, contenu, circonstances...') %>"><%= formData.description || '' %></textarea>
                     </div>
-                    <div class="form-group"><label for="photo">Photo</label><input id="photo" type="file" name="photo"
-                            accept="image/jpeg,image/png,image/gif,image/webp"><small>5 Mo maximum. JPG, PNG, GIF ou
-                            WebP.</small><img id="photo-preview" class="photo-preview" alt="Aperçu de la photo" hidden>
+                    <div class="form-group"><label for="photo"><%= t('itemForm.photoLabel', 'Photo') %></label><input id="photo" type="file" name="photo"
+                            accept="image/jpeg,image/png,image/gif,image/webp"><small><%= t('itemForm.photoHint', '5 Mo maximum. JPG, PNG, GIF ou WebP.') %></small><img id="photo-preview" class="photo-preview" alt="<%= t('itemForm.preview', 'Aperçu de la photo') %>" hidden>
                     </div>
                     <% if (formData.type==='found' ) { %>
                         <div class="form-group"><label><input type="checkbox" name="is_anonymous" value="1"
-                                    <%=formData.is_anonymous ? 'checked' : '' %>> Je souhaite rester anonyme</label>
+                                    <%=formData.is_anonymous ? 'checked' : '' %>> <%= t('itemForm.anonymous', 'Je souhaite rester anonyme') %></label>
                         </div>
                         <% } %>
                 </div>
-                <div class="form-actions"><a href="/dashboard" class="btn btn-secondary">Annuler</a><button
+                <div class="form-actions"><a href="/dashboard" class="btn btn-secondary"><%= t('common.cancel', 'Annuler') %></a><button
                         type="submit" class="btn <%= formData.type === 'found' ? 'btn-success' : 'btn-primary' %>">
-                        <%= isEdit ? 'Enregistrer' : 'Publier l’annonce' %>
+                        <%= isEdit ? t('common.save', 'Enregistrer') : t('itemForm.publishAd', 'Publier l’annonce') %>
                     </button></div>
             </form>
         </div>

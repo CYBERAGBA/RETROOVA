@@ -2,51 +2,51 @@
     <main class="container">
         <div class="search-page">
             <div class="page-heading">
-                <span class="eyebrow">RECHERCHER</span>
+                <span class="eyebrow"><%= t('search.eyebrow', 'RECHERCHER') %></span>
                 <h1><%= title %></h1>
-                <p><%= title === 'Objets perdus' ? 'Quelqu’un a peut-être retrouvé ce que vous cherchez.' : 'Quelqu’un a peut-être retrouvé ce que vous cherchez.' %></p>
+                <p><%= title === 'Objets perdus' ? t('search.description', 'Quelqu’un a peut-être retrouvé ce que vous cherchez.') : t('search.description', 'Quelqu’un a peut-être retrouvé ce que vous cherchez.') %></p>
             </div>
 
             <form class="search-panel" method="GET" action="/search">
-                <input type="text" name="keyword" value="<%= filters.keyword || '' %>" placeholder="Que recherchez-vous ?">
+                <input type="text" name="keyword" value="<%= filters.keyword || '' %>" placeholder="<%= t('common.searchPlaceholder', 'Que recherchez-vous ?') %>">
                 <select name="type">
-                    <option value="">Type</option>
-                    <option value="lost" <%= filters.type === 'lost' ? 'selected' : '' %>>Perdu</option>
-                    <option value="found" <%= filters.type === 'found' ? 'selected' : '' %>>Trouvé</option>
+                    <option value=""><%= t('search.type', 'Type') %></option>
+                    <option value="lost" <%= filters.type === 'lost' ? 'selected' : '' %>><%= t('common.lost', 'Perdu') %></option>
+                    <option value="found" <%= filters.type === 'found' ? 'selected' : '' %>><%= t('common.found', 'Trouvé') %></option>
                 </select>
                 <select name="category">
-                    <option value="">Catégorie</option>
+                    <option value=""><%= t('common.category', 'Catégorie') %></option>
                     <% categories.forEach(category => { %>
-                        <option value="<%= category %>" <%= filters.category === category ? 'selected' : '' %>><%= categoryLabels[category] %></option>
+                        <option value="<%= category %>" <%= filters.category === category ? 'selected' : '' %>><%= t('categories.' + category, categoryLabels[category]) %></option>
                     <% }) %>
                 </select>
-                <input type="text" name="city" value="<%= filters.city || '' %>" placeholder="Ville">
-                <input type="date" name="startDate" value="<%= filters.startDate || '' %>" placeholder="Date">
-                <button type="submit" class="btn btn-primary">Rechercher</button>
+                <input type="text" name="city" value="<%= filters.city || '' %>" placeholder="<%= t('common.city', 'Ville') %>">
+                <input type="date" name="startDate" value="<%= filters.startDate || '' %>" placeholder="<%= t('search.date', 'Date') %>">
+                <button type="submit" class="btn btn-primary"><%= t('common.submit', 'Rechercher') %></button>
             </form>
 
             <% if (hasNextPage || page > 1) { %>
                 <nav class="pagination">
                     <% if (page > 1) { %>
-                        <a href="/search?<%= new URLSearchParams({ ...filters, page: page - 1 }).toString() %>">← Précédente</a>
+                        <a href="/search?<%= new URLSearchParams({ ...filters, page: page - 1 }).toString() %>">← <%= t('search.previous', 'Précédente') %></a>
                     <% } %>
-                    <span>Page <%= page %></span>
+                    <span><%= t('search.page', 'Page') %> <%= page %></span>
                     <% if (hasNextPage) { %>
-                        <a href="/search?<%= new URLSearchParams({ ...filters, page: page + 1 }).toString() %>">Suivante →</a>
+                        <a href="/search?<%= new URLSearchParams({ ...filters, page: page + 1 }).toString() %>"><%= t('search.next', 'Suivante') %> →</a>
                     <% } %>
                 </nav>
             <% } %>
 
             <div class="results-header">
-                <h2><%= results.length %> annonce<%= results.length !== 1 ? 's' : '' %></h2>
-                <span>Les plus récentes en premier</span>
+                <h2><%= results.length %> <%= results.length === 1 ? t('search.resultCount_one', 'annonce') : t('search.resultCount_other', 'annonces') %></h2>
+                <span><%= t('search.recentFirst', 'Les plus récentes en premier') %></span>
             </div>
 
             <% if (!results.length) { %>
                 <div class="empty-state">
                     <div class="empty-mark">R</div>
-                    <h3>Aucune annonce trouvée</h3>
-                    <p>Essayez une autre ville, catégorie ou mot-clé.</p>
+                    <h3><%= t('search.noResultsTitle', 'Aucune annonce trouvée') %></h3>
+                    <p><%= t('search.noResultsText', 'Essayez une autre ville, catégorie ou mot-clé.') %></p>
                 </div>
             <% } else { %>
                 <div class="items-grid">
@@ -56,14 +56,14 @@
                                 <img src="<%= item.photo_url %>" alt="Photo de <%= item.title %>" class="item-card-photo">
                             <% } %>
                             <div class="item-card-top">
-                                <span class="type-pill <%= item.type %>"><%= item.type === 'lost' ? 'PERDU' : 'TROUVÉ' %></span>
+                                <span class="type-pill <%= item.type %>"><%= item.type === 'lost' ? t('search.lostTag', 'PERDU') : t('search.foundTag', 'TROUVÉ') %></span>
                                 <span class="status-pill status-<%= item.status %>"><%= item.status %></span>
-                                <span class="item-date"><%= item.event_date || 'Date non précisée' %></span>
+                                <span class="item-date"><%= item.event_date || t('search.dateUnknown', 'Date non précisée') %></span>
                             </div>
                             <h3><a href="/items/<%= item.id %>"><%= item.title %></a></h3>
                             <p class="item-meta"><%= item.category %> · <%= item.city %><%= item.district ? ' · ' + item.district : '' %></p>
-                            <p><%= item.description ? item.description.substring(0, 130) + (item.description.length > 130 ? '…' : '') : 'Aucune description.' %></p>
-                            <a href="/items/<%= item.id %>" class="text-link">Voir l'annonce →</a>
+                            <p><%= item.description ? item.description.substring(0, 130) + (item.description.length > 130 ? '…' : '') : t('search.descriptionUnknown', 'Aucune description.') %></p>
+                            <a href="/items/<%= item.id %>" class="text-link"><%= t('search.viewAd', 'Voir l\'annonce') %> →</a>
                         </article>
                     <% }) %>
                 </div>

@@ -10,7 +10,7 @@ const loginRateLimit = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: 'Trop de tentatives de connexion. Réessayez plus tard.'
+  handler: (req, res, next, options) => res.status(options.statusCode).send(req.t('messages.rateLimit', 'Trop de tentatives de connexion. Réessayez plus tard.'))
 });
 
 module.exports = (userModel, itemModel, communicationModel) => {

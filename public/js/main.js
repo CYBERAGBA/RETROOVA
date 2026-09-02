@@ -1,11 +1,12 @@
 (() => {
+    const i18n = window.retroovaI18n || {};
     const menuButton = document.querySelector('.mobile-menu-toggle');
     const menu = document.querySelector('.navbar-menu');
     if (menuButton && menu) {
         menuButton.addEventListener('click', () => {
             const isOpen = menu.classList.toggle('is-open');
             menuButton.setAttribute('aria-expanded', String(isOpen));
-            menuButton.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
+            menuButton.setAttribute('aria-label', isOpen ? i18n.closeMenu : i18n.openMenu);
         });
     }
 
@@ -15,7 +16,7 @@
             if (!target) return;
             await navigator.clipboard.writeText(target.textContent.trim());
             const original = button.textContent;
-            button.textContent = 'Copié';
+            button.textContent = i18n.copied;
             window.setTimeout(() => { button.textContent = original; }, 1400);
         });
     });
@@ -44,13 +45,13 @@
     const steps = [fields.slice(0, 3), fields.slice(3, 6), fields.slice(6)];
     const progress = document.createElement('div');
     progress.className = 'form-progress';
-    progress.setAttribute('aria-label', 'Progression du formulaire');
+    progress.setAttribute('aria-label', i18n.formProgress);
     progress.innerHTML = '<span class="progress-step active">1</span><i></i><span class="progress-step">2</span><i></i><span class="progress-step">3</span>';
     form.prepend(progress);
 
     const navigation = document.createElement('div');
     navigation.className = 'step-actions';
-    navigation.innerHTML = '<button type="button" class="btn btn-secondary step-back" hidden>Retour</button><button type="button" class="btn btn-primary step-next">Continuer</button>';
+    navigation.innerHTML = `<button type="button" class="btn btn-secondary step-back" hidden>${i18n.back}</button><button type="button" class="btn btn-primary step-next">${i18n.continue}</button>`;
     form.querySelector('.form-actions').before(navigation);
     let current = 0;
 

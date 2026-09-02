@@ -8,12 +8,12 @@ class AdminController {
             this.model.getUsers(),
             this.model.getPartnershipRequests()
         ]);
-        res.render('pages/admin', { title: 'Administration', overview, items, reports, users, partnershipRequests });
+        res.render('pages/admin', { title: req.t('common.admin', 'Administration'), overview, items, reports, users, partnershipRequests });
     };
     partnershipDetail = async (req, res) => {
         const partnershipRequest = await this.model.getPartnershipRequestById(req.params.id);
-        if (!partnershipRequest) return res.status(404).render('404', { title: 'Demande introuvable' });
-        res.render('pages/admin-partnership-detail', { title: 'Demande de partenariat', request: partnershipRequest, csrfToken: req.session.csrfToken });
+        if (!partnershipRequest) return res.status(404).render('404', { title: req.t('messages.notFound', 'Page non trouvée') });
+        res.render('pages/admin-partnership-detail', { title: req.t('admin.requests', 'Demandes de partenariat'), request: partnershipRequest, csrfToken: req.session.csrfToken });
     };
     updatePartnershipRequest = async (req, res) => {
         const { status, admin_notes } = req.body;

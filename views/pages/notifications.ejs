@@ -1,14 +1,14 @@
 <%- include('../partials/header') %>
     <main class="container">
-        <form method="POST" action="/notifications/read-all" class="notification-actions"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-secondary">Marquer tout comme lu</button></form>
-        <div class="page-heading"><span class="eyebrow">CENTRE D’ALERTES</span>
-            <h1>Notifications</h1>
-            <p>Suivez vos correspondances et vos nouveaux messages.</p>
+        <form method="POST" action="/notifications/read-all" class="notification-actions"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-secondary"><%= t('notificationsPage.markAll', 'Marquer tout comme lu') %></button></form>
+        <div class="page-heading"><span class="eyebrow"><%= t('notificationsPage.eyebrow', 'CENTRE D’ALERTES') %></span>
+            <h1><%= t('notificationsPage.title', 'Notifications') %></h1>
+            <p><%= t('notificationsPage.intro', 'Suivez vos correspondances et vos nouveaux messages.') %></p>
         </div>
         <section class="notification-list">
             <% if (!notifications.length) { %>
                 <div class="empty-state">
-                    <p>Aucune notification.</p>
+                    <p><%= t('notificationsPage.empty', 'Aucune notification.') %></p>
                 </div>
                 <% } else { notifications.forEach(notification=> { %><article
                         class="notification-row <%= notification.is_read ? '' : 'unread' %>">

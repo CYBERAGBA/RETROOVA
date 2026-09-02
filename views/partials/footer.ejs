@@ -2,43 +2,43 @@
     <div class="footer-container">
         <div class="footer-section">
             <img src="/images/logo_nom_slogan_paysage.png" alt="RETROOVA" class="footer-logo">
-            <p>Plateforme de restitution d'objets perdus et trouvés.</p>
-            <p>Lost. Found. Returned.</p>
+            <p><%= t('footer.platform', 'Plateforme de restitution d\'objets perdus et trouvés.') %></p>
+            <p><%= t('footer.tagline', 'Lost. Found. Returned.') %></p>
         </div>
 
         <div class="footer-section">
-            <h4>Navigation</h4>
+            <h4><%= t('footer.navigation', 'Navigation') %></h4>
             <ul>
-                <li><a href="/">Accueil</a></li>
-                <li><a href="/search">Rechercher</a></li>
-                <li><a href="/map">Carte des annonces</a></li>
-                <li><a href="/how-it-works">Comment ça marche</a></li>
-                <li><a href="/about">À propos</a></li>
-                <li><a href="/partnerships">Partenariats</a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>"><%= t('footer.home', 'Home') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>search"><%= t('footer.search', 'Search') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>map"><%= t('footer.map', 'Map') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>how-it-works"><%= t('footer.howItWorks', 'How it works') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>about"><%= t('footer.about', 'About') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>partnerships"><%= t('footer.partnerships', 'Partnerships') %></a></li>
             </ul>
         </div>
 
         <div class="footer-section">
-            <h4>Légal</h4>
+            <h4><%= t('footer.legal', 'Legal') %></h4>
             <ul>
-                <li><a href="/privacy">Politique de confidentialité</a></li>
-                <li><a href="/terms">Conditions d'utilisation</a></li>
-                <li><a href="/contact">Contact</a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>privacy"><%= t('footer.privacy', 'Privacy policy') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>terms"><%= t('footer.terms', 'Terms of use') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>contact"><%= t('footer.contact', 'Contact') %></a></li>
             </ul>
         </div>
 
         <div class="footer-section">
-            <h4>Sécurité</h4>
+            <h4><%= t('footer.securitySection', 'Security') %></h4>
             <ul>
-                <li><a href="/security">Sécurité</a></li>
-                <li><a href="/report">Signaler</a></li>
-                <li><a href="/help">Aide</a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>security"><%= t('footer.security', 'Security') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>report"><%= t('footer.report', 'Report') %></a></li>
+                <li><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>help"><%= t('footer.help', 'Help') %></a></li>
             </ul>
         </div>
 
         <div class="footer-section footer-social">
-            <h4>Suivez-nous</h4>
-            <div class="social-links" aria-label="Réseaux sociaux">
+            <h4><%= t('footer.followUs', 'Suivez-nous') %></h4>
+            <div class="social-links" aria-label="<%= t('footer.socialsAria', 'Réseaux sociaux') %>">
                 <a href="#" class="social-link" aria-label="Instagram" title="Instagram">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.2A4.8 4.8 0 1 1 7.2 12 4.8 4.8 0 0 1 12 7.2Zm0 2A2.8 2.8 0 1 0 14.8 12 2.8 2.8 0 0 0 12 9.2Zm5.1-3.1a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1Z"/></svg>
                 </a>
@@ -52,12 +52,12 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2h3.5l-7.6 8.7L22.7 22h-6.9l-5.4-7.5L4.2 22H.7l8.2-9.4L1.3 2h7.1l4.9 6.8L18.9 2Zm-1.2 18h1.9L7.2 3.9H5.2L17.7 20Z"/></svg>
                 </a>
             </div>
-            <p class="social-note">Suivez l'actualité RETROOVA.</p>
+            <p class="social-note"><%= t('footer.socialNote', 'Suivez l\'actualité RETROOVA.') %></p>
         </div>
     </div>
 
     <div class="footer-bottom">
-        <p>&copy; 2026 RETROOVA. Tous droits réservés.</p>
-        <p>L'équipe <a href="https://ci-oraweb.com">OraWeb Studio</a></p>
+        <p><%= t('footer.copyright', '© 2026 RETROOVA. Tous droits réservés.') %></p>
+        <p><%= t('footer.team', 'L’équipe') %> <a href="https://ci-oraweb.com">OraWeb Studio</a></p>
     </div>
 </footer>

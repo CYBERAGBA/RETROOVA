@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.' %>">
+    <meta name="description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : t('seo.homeDescription', 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.') %>">
     <meta property="og:title" content="<%= title %> | RETROOVA">
-    <meta property="og:description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.' %>">
+    <meta property="og:description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : t('seo.homeDescription', 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.') %>">
     <meta property="og:type" content="website">
     <meta property="og:url" content="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : siteUrl %>">
     <meta property="og:image" content="<%= typeof ogImage !== 'undefined' ? ogImage : (siteUrl + '/images/logo_nom_slogan_paysage.png') %>">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<%= title %> | RETROOVA">
-    <meta name="twitter:description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.' %>">
+    <meta name="twitter:description" content="<%= typeof metaDescription !== 'undefined' && metaDescription ? metaDescription : t('seo.homeDescription', 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.') %>">
     <link rel="canonical" href="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : siteUrl %>">
     <% if (typeof alternateLinks !== 'undefined' && alternateLinks) { %>
         <%- alternateLinks %>

@@ -1,14 +1,14 @@
 <%- include('./layouts/main', {
-    title: 'Accès refusé',
-    metaDescription: 'Vous n’avez pas les permissions nécessaires pour accéder à cette page sur RETROOVA.',
+    title: t('messages.forbidden', 'Accès refusé'),
+    metaDescription: t('messages.forbidden', 'Accès refusé'),
     canonicalUrl: typeof canonicalUrl !== 'undefined' ? canonicalUrl : siteUrl,
     body: `
 <div class="error-container">
     <div class="error-card">
         <h1 class="error-code">403</h1>
-        <h2>Accès refusé</h2>
-        <p>Vous n'avez pas les permissions pour accéder à cette page.</p>
-        <a href="/" class="btn btn-primary">Retourner à l'accueil</a>
+        <h2>${t('messages.forbidden', 'Accès refusé')}</h2>
+        <p>${t('messages.forbidden', 'Accès refusé')}</p>
+        <a href="/" class="btn btn-primary">${t('messages.returnHome', "Retourner à l'accueil")}</a>
     </div>
 </div>
 `

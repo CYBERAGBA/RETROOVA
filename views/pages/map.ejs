@@ -1,9 +1,9 @@
 <%- include('../partials/header') %>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <main class="container">
-        <div class="page-heading"><span class="eyebrow">VUE LOCALE</span>
-            <h1>Carte des annonces</h1>
-            <p>Explorez les annonces actives par ville et quartier.</p>
+        <div class="page-heading"><span class="eyebrow"><%= t('adminDetail.mapEyebrow', 'VUE LOCALE') %></span>
+            <h1><%= t('adminDetail.mapTitle', 'Carte des annonces') %></h1>
+            <p><%= t('adminDetail.mapIntro', 'Explorez les annonces actives par ville et quartier.') %></p>
         </div>
         <div class="map-layout">
             <section class="map-visual">

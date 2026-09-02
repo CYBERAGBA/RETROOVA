@@ -26,7 +26,7 @@ const isNotAuthenticated = (req, res, next) => {
  */
 const isAdmin = (userModel) => async (req, res, next) => {
   if (!req.session?.userId) {
-    return res.status(403).render('403', { title: 'Accès refusé' });
+    return res.status(403).render('403', { title: req.t('messages.forbidden', 'Accès refusé') });
   }
 
   try {
@@ -39,7 +39,7 @@ const isAdmin = (userModel) => async (req, res, next) => {
     console.error('Erreur vérification droits admin:', error);
   }
 
-  res.status(403).render('403', { title: 'Accès refusé' });
+  res.status(403).render('403', { title: req.t('messages.forbidden', 'Accès refusé') });
 };
 
 /**

@@ -3,8 +3,8 @@
         <div class="auth-container">
             <div class="auth-card">
                 <img src="/images/logo_nom_slogan_paysage.png" alt="RETROOVA" class="auth-brand-logo">
-                <h1>Connexion</h1>
-                <p>Bienvenue sur la plateforme de restitution d'objets</p>
+                <h1><%= t('auth.loginTitle', 'Connexion') %></h1>
+                <p><%= t('auth.loginSubtitle', 'Bienvenue sur la plateforme de restitution d\'objets') %></p>
 
                 <% if (typeof message !=='undefined' && message) { %>
                     <div class="alert alert-success">
@@ -25,24 +25,24 @@
                                 <form method="POST" action="/login" class="auth-form"><input type="hidden" name="_csrf"
                                         value="<%= csrfToken %>">
                                     <div class="form-group">
-                                        <label for="email">Email</label>
+                                        <label for="email"><%= t('common.email', 'Email') %></label>
                                         <input type="email" id="email" name="email" placeholder="votre@email.com"
                                             value="<%= formData?.email || '' %>" required>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="password">Mot de passe</label>
+                                        <label for="password"><%= t('common.password', 'Mot de passe') %></label>
                                         <input type="password" id="password" name="password"
-                                            placeholder="Votre mot de passe" required>
+                                            placeholder="<%= t('auth.passwordPlaceholder', 'Votre mot de passe') %>" required>
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+                                    <button type="submit" class="btn btn-primary btn-block"><%= t('auth.submitLogin', 'Se connecter') %></button>
                                 </form>
 
-                                <div class="auth-divider">ou</div>
+                                <div class="auth-divider"><%= t('common.or', 'ou') %></div>
 
                                 <p class="auth-link">
-                                    Vous n'avez pas de compte ? <a href="/register">S'inscrire</a>
+                                    <%= t('auth.noAccount', 'Vous n\'avez pas de compte ?') %> <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>register"><%= t('auth.signUp', 'S\'inscrire') %></a>
                                 </p>
 
             </div>

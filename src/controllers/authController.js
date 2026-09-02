@@ -14,7 +14,7 @@ class AuthController {
    * Afficher le formulaire d'inscription
    */
   getRegister = (req, res) => {
-    res.render('pages/register', { title: 'Inscription', formData: {} });
+    res.render('pages/register', { title: req.t('auth.registerTitle', 'Inscription'), formData: {} });
   };
 
   /**
@@ -37,7 +37,7 @@ class AuthController {
 
       if (!validation.isValid) {
         return res.render('pages/register', {
-          title: 'Inscription',
+          title: req.t('auth.registerTitle', 'Inscription'),
           errors: validation.errors,
           formData: { name, email, phone, city }
         });
@@ -53,11 +53,11 @@ class AuthController {
       });
 
       // Rediriger avec message de succès
-      res.redirect('/login?message=Inscription réussie. Veuillez vous connecter.');
+      res.redirect(`/login?message=${encodeURIComponent(req.t('messages.registrationSuccess', 'Inscription réussie. Veuillez vous connecter.'))}`);
     } catch (error) {
       console.error('Erreur inscription:', error);
       res.render('pages/register', {
-        title: 'Inscription',
+        title: req.t('auth.registerTitle', 'Inscription'),
         errors: [error.message],
         formData: req.body
       });
@@ -70,7 +70,7 @@ class AuthController {
    */
   getLogin = (req, res) => {
     const message = req.query.message || '';
-    res.render('pages/login', { title: 'Connexion', message, formData: {} });
+    res.render('pages/login', { title: req.t('auth.loginTitle', 'Connexion'), message, formData: {} });
   };
 
   /**
@@ -86,7 +86,7 @@ class AuthController {
 
       if (!validation.isValid) {
         return res.render('pages/login', {
-          title: 'Connexion',
+          title: req.t('auth.loginTitle', 'Connexion'),
           errors: validation.errors,
           formData: { email }
         });
@@ -108,7 +108,7 @@ class AuthController {
     } catch (error) {
       console.error('Erreur connexion:', error);
       res.render('pages/login', {
-        title: 'Connexion',
+        title: req.t('auth.loginTitle', 'Connexion'),
         errors: [error.message],
         formData: { email: req.body.email }
       });
@@ -124,7 +124,7 @@ class AuthController {
       if (err) {
         console.error('Erreur déconnexion:', err);
       }
-      res.redirect('/?message=Vous avez été déconnecté');
+      res.redirect(`/?message=${encodeURIComponent(req.t('messages.loggedOut', 'Vous avez été déconnecté'))}`);
     });
   };
 
@@ -145,13 +145,13 @@ class AuthController {
       const notifications = this.communicationModel ? await this.communicationModel.getNotifications(req.session.userId) : [];
       const recentMessages = this.communicationModel ? await this.communicationModel.getConversations(req.session.userId) : [];
       const activity = [
-        ...matches.map((match) => ({ type: 'match', title: 'Correspondance potentielle', detail: `${match.lost_title} · ${match.found_title}`, date: match.created_at })),
+        ...matches.map((match) => ({ type: 'match', title: req.t('dashboard.matchActivity', 'Correspondance potentielle'), detail: `${match.lost_title} · ${match.found_title}`, date: match.created_at })),
         ...notifications.map((notification) => ({ type: notification.type, title: notification.title, detail: notification.message, date: notification.created_at })),
-        ...recentMessages.map((message) => ({ type: 'message', title: 'Message reçu', detail: message.subject || message.message, date: message.created_at }))
+        ...recentMessages.map((message) => ({ type: 'message', title: req.t('dashboard.messageReceived', 'Message reçu'), detail: message.subject || message.message, date: message.created_at }))
       ].sort((first, second) => new Date(second.date) - new Date(first.date)).slice(0, 5);
 
       res.render('pages/dashboard', {
-        title: 'Mon Tableau de Bord',
+        title: req.t('dashboard.title', 'Tableau de bord'),
         user,
         stats,
         reputation,
@@ -162,13 +162,13 @@ class AuthController {
     } catch (error) {
       console.error('Erreur tableau de bord:', error);
       res.render('pages/dashboard', {
-        title: 'Mon Tableau de Bord',
-        user: { name: 'Membre RETROOVA' },
+        title: req.t('dashboard.title', 'Tableau de bord'),
+        user: { name: req.t('dashboard.memberFallback', 'Membre RETROOVA') },
         itemStats: { lost: 0, found: 0, matches: 0, messages: 0, returned: 0 },
         items: [],
         activity: [],
-        error: 'Erreur lors du chargement du tableau de bord',
-        reputation: { level: 'Nouveau membre', tone: 'standard' }
+        error: req.t('messages.dashboardError', 'Erreur lors du chargement du tableau de bord'),
+        reputation: { level: req.t('dashboard.memberNew', 'Nouveau membre'), tone: 'standard' }
       });
     }
   };
@@ -186,9 +186,9 @@ class AuthController {
       const foundCount = this.itemModel ? await this.itemModel.countByUser(req.session.userId, 'found') : { count: 0 };
       const matches = this.itemModel ? await this.itemModel.getMatchesForUser(req.session.userId) : [];
       const items = this.itemModel ? await this.itemModel.findByUser(req.session.userId) : [];
-      const activity = matches.slice(0, 5).map((match) => ({ type: 'match', title: 'Correspondance potentielle', detail: `${match.lost_title} · ${match.found_title}`, date: match.created_at }));
+      const activity = matches.slice(0, 5).map((match) => ({ type: 'match', title: req.t('dashboard.matchActivity', 'Correspondance potentielle'), detail: `${match.lost_title} · ${match.found_title}`, date: match.created_at }));
       res.render('pages/profile', {
-        title: 'Mon Profil',
+        title: req.t('profile.title', 'Mon profil'),
         user,
         stats,
         reputation,
@@ -201,14 +201,14 @@ class AuthController {
     } catch (error) {
       console.error('Erreur profil:', error);
       res.render('pages/profile', {
-        title: 'Mon Profil',
-        user: { name: 'Client', email: '', city: '', phone: '' },
+        title: req.t('profile.title', 'Mon profil'),
+        user: { name: req.t('dashboard.profileFallback', 'Client'), email: '', city: '', phone: '' },
         stats: { items_found_count: 0, items_returned_count: 0, email_verified: 0, phone_verified: 0 },
-        reputation: { level: 'Nouveau membre', tone: 'standard' },
+        reputation: { level: req.t('dashboard.memberNew', 'Nouveau membre'), tone: 'standard' },
         profileStats: { lost: 0, found: 0, returned: 0, matches: 0 },
         items: [],
         activity: [],
-        error: 'Les informations du profil sont momentanément indisponibles.'
+        error: req.t('messages.profileError', 'Les informations du profil sont momentanément indisponibles.')
       });
     }
   };
@@ -221,7 +221,7 @@ class AuthController {
     try {
       const { name, phone, city } = req.body;
       if (!name || name.trim().length < 2 || name.trim().length > 100 || !city || city.trim().length < 2 || city.trim().length > 100) {
-        return res.redirect('/profile?error=Le nom et la ville doivent être valides');
+        return res.redirect(`/profile?error=${encodeURIComponent(req.t('messages.invalidProfile', 'Le nom et la ville doivent être valides'))}`);
       }
 
       await this.userModel.updateProfile(req.session.userId, {
@@ -234,10 +234,10 @@ class AuthController {
       req.session.userName = name;
       req.session.city = city;
 
-      res.redirect('/profile?message=Profil mis à jour avec succès');
+      res.redirect(`/profile?message=${encodeURIComponent(req.t('messages.profileUpdated', 'Profil mis à jour avec succès'))}`);
     } catch (error) {
       console.error('Erreur mise à jour profil:', error);
-      res.redirect('/profile?error=Erreur lors de la mise à jour');
+      res.redirect(`/profile?error=${encodeURIComponent(req.t('messages.updateError', 'Erreur lors de la mise à jour'))}`);
     }
   };
 }

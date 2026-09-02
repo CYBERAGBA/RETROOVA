@@ -1,56 +1,54 @@
 <%- include('../partials/header') %>
     <main class="container">
-        <div class="page-heading"><span class="eyebrow">COMMUNICATION PRIVÉE</span>
-            <h1>Messages</h1>
-            <p>Échangez sans exposer vos coordonnées personnelles.</p>
+        <div class="page-heading"><span class="eyebrow"><%= t('communication.eyebrow', 'COMMUNICATION PRIVÉE') %></span>
+            <h1><%= t('communication.title', 'Messages') %></h1>
+            <p><%= t('communication.intro', 'Échangez sans exposer vos coordonnées personnelles.') %></p>
         </div>
         <div class="communication-layout">
             <section class="message-panel">
-                <h2>Envoyer un message</h2>
+                <h2><%= t('communication.send', 'Envoyer un message') %></h2>
                 <form method="POST" action="/messages"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="form-group"><label for="receiverId">Identifiant public du destinataire</label><input
+                    <div class="form-group"><label for="receiverId"><%= t('communication.recipient', 'Identifiant public du destinataire') %></label><input
                             id="receiverId" name="receiverId" required pattern="RTV-[A-Z0-9]{8}"
                             placeholder="Ex. RTV-A1B2C3D4" value="<%= receiverId || '' %>"><input type="hidden"
-                            name="itemId" value="<%= itemId || '' %>"><small>Vous le trouverez sur
-                            chaque annonce. Il ne s’agit
-                            pas d’un email.</small></div>
-                    <div class="form-group"><label for="subject">Sujet</label><input id="subject" name="subject"
-                            placeholder="À propos d’une annonce"></div>
-                    <div class="form-group"><label for="message">Message</label><textarea id="message" name="message"
+                                name="itemId" value="<%= itemId || '' %>"><small><%= t('communication.recipientHint', 'Vous le trouverez sur chaque annonce. Il ne s’agit pas d’un email.') %></small></div>
+                            <div class="form-group"><label for="subject"><%= t('communication.subject', 'Sujet') %></label><input id="subject" name="subject"
+                                placeholder="<%= t('communication.subjectPlaceholder', 'À propos d’une annonce') %>"></div>
+                            <div class="form-group"><label for="message"><%= t('communication.message', 'Message') %></label><textarea id="message" name="message"
                             rows="5" required
-                            placeholder="Présentez les détails permettant de vérifier l’objet..."></textarea></div>
-                    <button class="btn btn-primary" type="submit">Envoyer</button>
+                                placeholder="<%= t('communication.messagePlaceholder', 'Présentez les détails permettant de vérifier l’objet...') %>"></textarea></div>
+                            <button class="btn btn-primary" type="submit"><%= t('communication.sendButton', 'Envoyer') %></button>
                 </form>
             </section>
             <section class="message-panel">
                 <div class="panel-heading">
-                    <h2>Échanges récents</h2><a href="/notifications">Notifications</a>
+                    <h2><%= t('communication.recent', 'Échanges récents') %></h2><a href="/notifications"><%= t('communication.notifications', 'Notifications') %></a>
                 </div>
                 <% if (!messages.length) { %>
                     <div class="empty-state">
-                        <p>Aucun message pour le moment.</p>
+                        <p><%= t('communication.empty', 'Aucun message pour le moment.') %></p>
                     </div>
                     <% } else { conversations.filter(Boolean).forEach(conversation=> { const createdAt = conversation.created_at || conversation.messages?.[0]?.created_at || ''; %><article class="message-row">
                             <div><strong>
-                                    <%= conversation.sender_id===user.id ? 'Vous' : (conversation.sender_name || 'Utilisateur') %>
+                                    <%= conversation.sender_id===user.id ? t('communication.you', 'Vous') : (conversation.sender_name || t('communication.user', 'Utilisateur')) %>
                                 </strong><span>
-                                    <%= conversation.item_title || 'Conversation générale' %>
+                                    <%= conversation.item_title || t('communication.general', 'Conversation générale') %>
                                 </span>
                                 <% const conversationPublicId = conversation.sender_id===user.id ? conversation.receiver_public_id : conversation.sender_public_id; %>
-                                <% if (conversationPublicId) { %><small class="message-public-id">Identifiant public : <strong><%= conversationPublicId %></strong></small><% } %>
+                                <% if (conversationPublicId) { %><small class="message-public-id"><%= t('communication.publicId', 'Identifiant public') %> : <strong><%= conversationPublicId %></strong></small><% } %>
                                 <p>
                                     <%= conversation.message || (conversation.messages && conversation.messages[0] ? conversation.messages[0].message : '') %>
                                 </p>
                                 <% if (!conversation.is_read && conversation.receiver_id===user.id) { %>
                                     <form method="POST" action="/messages/<%= conversation.id %>/read"><input
                                             type="hidden" name="_csrf" value="<%= csrfToken %>"><button
-                                            class="btn btn-small btn-secondary">Marquer lu</button></form>
+                                            class="btn btn-small btn-secondary"><%= t('communication.markRead', 'Marquer lu') %></button></form>
                                     <% } %>
                                         <form method="POST" action="/messages/block"
-                                            data-confirm="Bloquer cet utilisateur ?"><input type="hidden" name="_csrf"
+                                            data-confirm="<%= t('communication.blockConfirm', 'Bloquer cet utilisateur ?') %>"><input type="hidden" name="_csrf"
                                                 value="<%= csrfToken %>"><input type="hidden" name="publicId"
                                                 value="<%= conversation.sender_id===user.id ? (conversation.receiver_public_id || '') : (conversation.sender_public_id || '') %>"><button
-                                                class="btn btn-small btn-danger">Bloquer</button></form>
+                                                class="btn btn-small btn-danger"><%= t('communication.block', 'Bloquer') %></button></form>
                             </div><time>
                                 <%= createdAt %>
                             </time>

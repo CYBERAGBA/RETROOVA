@@ -908,6 +908,41 @@ button, input, select, textarea { font: inherit; }
   margin-left: auto;
   padding-left: 1rem;
 }
+.locale-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.78);
+  border-radius: 999px;
+  box-shadow: 0 10px 18px rgba(10,29,61,0.03);
+}
+.locale-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition), border-color var(--transition);
+  border: 1px solid transparent;
+  background: transparent;
+}
+.locale-button:hover,
+.locale-button:focus-visible {
+  background: rgba(13,110,253,0.05);
+  border-color: rgba(13,110,253,0.15);
+  transform: translateY(-1px);
+}
+.locale-button.is-active {
+  background: rgba(13,110,253,0.08);
+  border-color: rgba(13,110,253,0.18);
+  box-shadow: 0 8px 18px rgba(13,110,253,0.08);
+}
 .nav-link {
   padding: 0.6rem 0.8rem;
   border-radius: 12px;

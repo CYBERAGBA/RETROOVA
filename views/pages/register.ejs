@@ -3,8 +3,8 @@
         <div class="auth-container">
             <div class="auth-card">
                 <img src="/images/logo_nom_slogan_paysage.png" alt="RETROOVA" class="auth-brand-logo">
-                <h1>Inscription</h1>
-                <p>Rejoignez-nous pour retrouver vos objets perdus</p>
+                <h1><%= t('auth.registerTitle', 'Inscription') %></h1>
+                <p><%= t('auth.registerDescription', 'Rejoignez-nous pour retrouver vos objets perdus') %></p>
 
                 <% if (typeof errors !=='undefined' && errors.length> 0) { %>
                     <div class="alert alert-danger">
@@ -18,47 +18,47 @@
                         <form method="POST" action="/register" class="auth-form"><input type="hidden" name="_csrf"
                                 value="<%= csrfToken %>">
                             <div class="form-group">
-                                <label for="name">Nom complet</label>
-                                <input type="text" id="name" name="name" placeholder="Votre nom"
+                                <label for="name"><%= t('profile.fullName', 'Nom complet') %></label>
+                                <input type="text" id="name" name="name" placeholder="<%= t('auth.namePlaceholder', 'Votre nom') %>"
                                     value="<%= formData?.name || '' %>" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="email">Email</label>
+                                <label for="email"><%= t('common.email', 'Email') %></label>
                                 <input type="email" id="email" name="email" placeholder="votre@email.com"
                                     value="<%= formData?.email || '' %>" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="city">Ville</label>
-                                <input type="text" id="city" name="city" placeholder="Votre ville"
+                                <label for="city"><%= t('profile.city', 'Ville') %></label>
+                                <input type="text" id="city" name="city" placeholder="<%= t('auth.cityPlaceholder', 'Votre ville') %>"
                                     value="<%= formData?.city || '' %>" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="phone">Téléphone (optionnel)</label>
+                                <label for="phone"><%= t('profile.phone', 'Téléphone') %> (optionnel)</label>
                                 <input type="tel" id="phone" name="phone" placeholder="+225 XX XX XX XX"
                                     value="<%= formData?.phone || '' %>">
                             </div>
 
                             <div class="form-group">
-                                <label for="password">Mot de passe</label>
-                                <input type="password" id="password" name="password" placeholder="Au moins 8 caractères"
+                                <label for="password"><%= t('common.password', 'Mot de passe') %></label>
+                                <input type="password" id="password" name="password" placeholder="<%= t('auth.passwordPlaceholder', 'Au moins 8 caractères') %>"
                                     required>
-                                <small>Minimum 8 caractères pour la sécurité</small>
+                                <small><%= t('auth.passwordHint', 'Minimum 8 caractères pour la sécurité') %></small>
                             </div>
 
                             <div class="form-group">
-                                <label for="passwordConfirm">Confirmer le mot de passe</label>
+                                <label for="passwordConfirm"><%= t('auth.confirmPassword', 'Confirmer le mot de passe') %></label>
                                 <input type="password" id="passwordConfirm" name="passwordConfirm"
-                                    placeholder="Confirmez votre mot de passe" required>
+                                    placeholder="<%= t('auth.confirmPasswordPlaceholder', 'Confirmez votre mot de passe') %>" required>
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-block">Créer mon compte</button>
+                            <button type="submit" class="btn btn-primary btn-block"><%= t('auth.createAccount', 'Créer mon compte') %></button>
                         </form>
 
                         <p class="auth-link">
-                            Vous avez déjà un compte ? <a href="/login">Se connecter</a>
+                            <%= t('auth.alreadyHaveAccount', 'Vous avez déjà un compte ?') %> <a href="/login"><%= t('auth.submitLogin', 'Se connecter') %></a>
                         </p>
             </div>
         </div>

@@ -5,35 +5,35 @@
                 <div class="hero-brand hero-brand-wide">
                     <img src="/images/logo_nom_slogan_paysage.png" alt="Logo RETROOVA">
                 </div>
-                <h1>Vous avez perdu quelque chose ?</h1>
-                <h2>Ne désespérez pas !</h2>
-                <p class="hero-lead">Quelqu'un l'a peut-être retrouvé.</p>
-                <p class="hero-description">RETROOVA connecte les personnes qui ont perdu un objet avec celles qui l'ont retrouvé.</p>
+                <h1><%= t('home.headline', 'Vous avez perdu quelque chose ?') %></h1>
+                <h2><%= t('home.subheadline', 'Ne désespérez pas !') %></h2>
+                <p class="hero-lead"><%= t('home.lead', 'Quelqu\'un l\'a peut-être retrouvé.') %></p>
+                <p class="hero-description"><%= t('home.description', 'RETROOVA connecte les personnes qui ont perdu un objet avec celles qui l\'ont retrouvé.') %></p>
 
-                <form class="home-search" method="GET" action="/search">
+                <form class="home-search" method="GET" action="/<%= locale === 'en' ? 'en/' : 'fr/' %>search">
                     <label class="search-field search-keyword">
                         <span aria-hidden="true">⌕</span>
-                        <input type="text" name="keyword" placeholder="Que recherchez-vous ?" aria-label="Que recherchez-vous ?">
+                        <input type="text" name="keyword" placeholder="<%= t('common.searchPlaceholder', 'Que recherchez-vous ?') %>" aria-label="<%= t('common.searchPlaceholder', 'Que recherchez-vous ?') %>">
                     </label>
                     <label class="search-field">
                         <span aria-hidden="true">▦</span>
-                        <select name="category" aria-label="Catégorie">
-                            <option value="">Catégorie</option>
+                        <select name="category" aria-label="<%= t('common.category', 'Catégorie') %>">
+                            <option value=""><%= t('common.category', 'Catégorie') %></option>
                             <% ['phone','wallet','bank-card','id-card','passport','license','documents','keys','jewelry','bag','computer','tablet','luggage','clothing','electronics','birth-certificate','cmu-card','money-card','book','notebook','other-things','other'].forEach((category) => { %>
-                                <option value="<%= category %>"><%= { phone: 'Téléphone', wallet: 'Portefeuille', 'bank-card': 'Carte bancaire', 'id-card': 'Carte d’identité', passport: 'Passeport', license: 'Permis de conduire', documents: 'Documents', keys: 'Clés', jewelry: 'Bijoux', bag: 'Sac', computer: 'Ordinateur', tablet: 'Tablette', luggage: 'Bagage', clothing: 'Vêtement', electronics: 'Électronique', 'birth-certificate': 'Extrait de naissance', 'cmu-card': 'Carte CMU', 'money-card': 'Carte monétaire', book: 'Livre', notebook: 'Cahier', 'other-things': 'Autres choses', other: 'Autre' }[category] %></option>
+                                <option value="<%= category %>"><%= t('categories.' + category, category) %></option>
                             <% }); %>
                         </select>
                     </label>
                     <label class="search-field">
                         <span aria-hidden="true">⌖</span>
-                        <input type="text" name="city" placeholder="Ville" aria-label="Ville">
+                        <input type="text" name="city" placeholder="<%= t('common.city', 'Ville') %>" aria-label="<%= t('common.city', 'Ville') %>">
                     </label>
-                    <button type="submit" class="home-search-button">Rechercher</button>
+                    <button type="submit" class="home-search-button"><%= t('common.submit', 'Rechercher') %></button>
                 </form>
 
                 <div class="hero-actions">
-                    <a href="/lost/create" class="home-action lost-action">J'AI PERDU UN OBJET</a>
-                    <a href="/found/create" class="home-action found-action">J'AI TROUVÉ UN OBJET</a>
+                    <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>lost/create" class="home-action lost-action"><%= t('home.lostAction', 'J\'AI PERDU UN OBJET') %></a>
+                    <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>found/create" class="home-action found-action"><%= t('home.foundAction', 'J\'AI TROUVÉ UN OBJET') %></a>
                 </div>
             </div>
             <div class="hero-visual" aria-label="Illustration d'une personne qui a perdu un objet">
@@ -47,35 +47,35 @@
                 <span class="stat-symbol blue">◫</span>
                 <div>
                     <strong><%= publicStats?.declared || 0 %></strong>
-                    <span>Objets déclarés</span>
+                    <span><%= t('home.statsDeclared', 'Objets déclarés') %></span>
                 </div>
             </div>
             <div class="home-stat">
                 <span class="stat-symbol orange">⌕</span>
                 <div>
                     <strong><%= publicStats?.matches || 0 %></strong>
-                    <span>Annonces trouvées</span>
+                    <span><%= t('home.statsMatches', 'Annonces trouvées') %></span>
                 </div>
             </div>
             <div class="home-stat">
                 <span class="stat-symbol green">✓</span>
                 <div>
                     <strong><%= publicStats?.returned || 0 %></strong>
-                    <span>Objets retournés</span>
+                    <span><%= t('home.statsReturned', 'Objets retournés') %></span>
                 </div>
             </div>
             <div class="home-stat">
                 <span class="stat-symbol navy">◎</span>
                 <div>
                     <strong><%= publicStats?.users || 0 %></strong>
-                    <span>Utilisateurs</span>
+                    <span><%= t('home.statsUsers', 'Utilisateurs') %></span>
                 </div>
             </div>
         </section>
 
         <section class="brand-message container">
             <span>♥</span>
-            <p>Parce que chaque objet a une histoire.<br><em>Et chaque histoire mérite une fin heureuse.</em></p>
+            <p><%= t('home.brandLine', 'Parce que chaque objet a une histoire.') %><br><em><%= t('home.brandLineAccent', 'Et chaque histoire mérite une fin heureuse.') %></em></p>
         </section>
     </main>
     <%- include('../partials/footer') %>

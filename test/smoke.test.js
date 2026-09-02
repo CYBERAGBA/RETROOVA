@@ -16,6 +16,26 @@ async function registerAndLogin(agent) {
     return agent.post('/login').type('form').send({ email, password, _csrf: loginCsrf });
 }
 
+test('les pages d’information du footer sont traduites selon la locale', async () => {
+    const agent = request.agent(app);
+
+    const frPage = await agent.get('/fr/how-it-works');
+    assert.equal(frPage.status, 200);
+    assert.match(frPage.text, /Comment fonctionne RETROOVA/i);
+
+    const enPage = await agent.get('/en/how-it-works');
+    assert.equal(enPage.status, 200);
+    assert.match(enPage.text, /How RETROOVA works/i);
+
+    const frPrivacy = await agent.get('/fr/privacy');
+    assert.equal(frPrivacy.status, 200);
+    assert.match(frPrivacy.text, /Politique de confidentialité/i);
+
+    const enPrivacy = await agent.get('/en/privacy');
+    assert.equal(enPrivacy.status, 200);
+    assert.match(enPrivacy.text, /Privacy policy/i);
+});
+
 test('pages publiques répondent et exposent les protections', async () => {
     const agent = request.agent(app);
     const loginPage = await agent.get('/login');
@@ -165,6 +185,16 @@ test('une photo valide est acceptée et une photo trop volumineuse est expliqué
     assert.match(oversizedPhoto.text, /photo est trop volumineuse/i);
     assert.match(oversizedPhoto.text, /5 Mo/);
     assert.doesNotMatch(oversizedPhoto.text, /Erreur serveur/);
+
+    const invalidPhoto = await agent.post('/lost/create')
+        .field('_csrf', csrf)
+        .field('category', 'phone')
+        .field('title', 'Objet avec fichier invalide')
+        .field('city', 'Abidjan')
+        .attach('photo', Buffer.from('not an image'), { filename: 'photo.txt', contentType: 'text/plain' });
+    assert.equal(invalidPhoto.status, 422);
+    assert.match(invalidPhoto.text, /JPG, PNG, GIF ou WebP/i);
+    assert.doesNotMatch(invalidPhoto.text, /Erreur serveur/);
 });
 
 test('POST sans CSRF est refusé', async () => {

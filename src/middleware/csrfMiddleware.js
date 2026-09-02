@@ -6,7 +6,7 @@ function csrfMiddleware(req, res, next) {
     res.locals.csrfToken = req.session.csrfToken;
     if (req.is('multipart/form-data') && (!req.body || Object.keys(req.body).length === 0)) return next();
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && req.body?._csrf !== req.session.csrfToken) {
-        return res.status(403).render('403', { title: 'Requête refusée', message: 'Le formulaire a expiré. Rechargez la page puis réessayez.' });
+        return res.status(403).render('403', { title: req.t('messages.requestRefused', 'Requête refusée'), message: req.t('messages.csrfExpired', 'Le formulaire a expiré. Rechargez la page puis réessayez.') });
     }
     next();
 }

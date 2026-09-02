@@ -26,7 +26,7 @@
 <header class="navbar">
     <div class="navbar-container">
         <div class="navbar-brand">
-            <a href="/" class="brand-link tooltip-target" aria-label="Accueil RETROOVA" data-tooltip="Accueil">
+            <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>" class="brand-link tooltip-target" aria-label="<%= t('nav.home', 'Accueil') %> RETROOVA" data-tooltip="<%= t('nav.home', 'Accueil') %>">
                 <img src="/images/logo_lettre_R.png" alt="RETROOVA" class="brand-mark">
             </a>
         </div>
@@ -36,43 +36,63 @@
         </div>
 
         <nav class="navbar-menu">
-            <a href="/search" class="nav-link nav-icon-link tooltip-target" aria-label="Rechercher" data-tooltip="Rechercher">⌕</a>
+            <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>search" class="nav-link nav-icon-link tooltip-target" aria-label="<%= t('nav.search', 'Rechercher') %>" data-tooltip="<%= t('nav.search', 'Rechercher') %>">⌕</a>
 
             <% if (user) { %>
-                <a href="/messages" class="nav-link nav-icon-link tooltip-target" aria-label="Messages" data-tooltip="Messages">✉️</a>
-                <a href="/notifications" class="nav-link nav-icon-link notification-link tooltip-target" aria-label="Notifications" data-tooltip="Notifications"><span>🔔</span><% if (typeof unreadNotifications !== 'undefined' && unreadNotifications) { %><span class="notification-badge"><%= unreadNotifications %></span><% } %></a>
+                <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>messages" class="nav-link nav-icon-link tooltip-target" aria-label="<%= t('nav.messages', 'Messages') %>" data-tooltip="<%= t('nav.messages', 'Messages') %>">✉️</a>
+                <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>notifications" class="nav-link nav-icon-link notification-link tooltip-target" aria-label="<%= t('nav.notifications', 'Notifications') %>" data-tooltip="<%= t('nav.notifications', 'Notifications') %>"><span>🔔</span><% if (typeof unreadNotifications !== 'undefined' && unreadNotifications) { %><span class="notification-badge"><%= unreadNotifications %></span><% } %></a>
                 <div class="nav-dropdown nav-user-menu">
-                    <button class="nav-link nav-user-button tooltip-target" aria-label="Menu utilisateur" data-tooltip="Menu utilisateur">
+                    <button class="nav-link nav-user-button tooltip-target" aria-label="<%= t('nav.userMenu', 'Menu utilisateur') %>" data-tooltip="<%= t('nav.userMenu', 'Menu utilisateur') %>">
                         <span aria-hidden="true">👤</span>
                     </button>
                     <div class="dropdown-menu">
-                        <a href="/profile" class="dropdown-item tooltip-target" data-tooltip="Mon profil">Mon profil</a>
-                        <a href="/dashboard" class="dropdown-item tooltip-target" data-tooltip="Tableau de bord">Tableau de bord</a>
+                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.home', 'Accueil') %>"><%= t('nav.home', 'Accueil') %></a>
+                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>profile" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.profile', 'Mon profil') %>"><%= t('nav.profile', 'Mon profil') %></a>
+                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>dashboard" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.dashboard', 'Tableau de bord') %>"><%= t('nav.dashboard', 'Tableau de bord') %></a>
                         <% if (user.role === 'admin') { %>
                             <hr>
-                            <a href="/admin" class="dropdown-item tooltip-target" data-tooltip="Administration">Admin</a>
+                            <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>admin" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.admin', 'Administration') %>"><%= t('nav.admin', 'Administration') %></a>
                         <% } %>
                         <hr>
-                        <a href="/logout" class="dropdown-item text-danger tooltip-target" data-tooltip="Déconnexion">Déconnexion</a>
+                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>logout" class="dropdown-item text-danger tooltip-target" data-tooltip="<%= t('nav.logout', 'Déconnexion') %>"><%= t('nav.logout', 'Déconnexion') %></a>
                     </div>
                 </div>
             <% } else { %>
                 <div class="nav-dropdown nav-user-menu">
-                    <button class="nav-link nav-user-button tooltip-target" aria-label="Menu utilisateur" data-tooltip="Menu utilisateur">
+                    <button class="nav-link nav-user-button tooltip-target" aria-label="<%= t('nav.userMenu', 'Menu utilisateur') %>" data-tooltip="<%= t('nav.userMenu', 'Menu utilisateur') %>">
                         <span aria-hidden="true">👤</span>
                     </button>
                     <div class="dropdown-menu">
-                        <a href="/login" class="dropdown-item tooltip-target" data-tooltip="Connexion">Connexion</a>
-                        <a href="/register" class="dropdown-item tooltip-target" data-tooltip="Inscription">Inscription</a>
+                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.home', 'Accueil') %>"><%= t('nav.home', 'Accueil') %></a>
+                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>login" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.login', 'Connexion') %>"><%= t('nav.login', 'Connexion') %></a>
+                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>register" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.register', 'Inscription') %>"><%= t('nav.register', 'Inscription') %></a>
                     </div>
                 </div>
             <% } %>
         </nav>
-        <button type="button" class="mobile-menu-toggle tooltip-target" aria-label="Ouvrir le menu" data-tooltip="Ouvrir le menu" aria-expanded="false">☰</button>
+        <% const currentPath = req && req.originalUrl ? req.originalUrl.replace(/^\/(?:fr|en)(?=\/|$)/, '') || '/' : '/'; %>
+        <div class="locale-switcher" aria-label="<%= t('nav.language', 'Langue') %>">
+            <a href="/fr<%= currentPath %>" class="locale-button <%= locale === 'fr' ? 'is-active' : '' %>" aria-label="<%= t('nav.french', 'Français') %>" title="<%= t('nav.french', 'Français') %>"><span aria-hidden="true">🇫🇷</span></a>
+            <a href="/en<%= currentPath %>" class="locale-button <%= locale === 'en' ? 'is-active' : '' %>" aria-label="<%= t('nav.english', 'English') %>" title="<%= t('nav.english', 'English') %>"><span aria-hidden="true">🇬🇧</span></a>
+        </div>
+        <button type="button" class="mobile-menu-toggle tooltip-target" aria-label="<%= t('nav.toggleMenu', 'Ouvrir le menu') %>" data-tooltip="<%= t('nav.toggleMenu', 'Ouvrir le menu') %>" aria-expanded="false">☰</button>
     </div>
 </header>
 <% if (user) { %>
-    <div class="quick-declare"><a href="/lost/create" aria-label="Déclarer un objet perdu">+</a>
-        <div><a href="/lost/create">Perdu</a><a href="/found/create">Trouvé</a></div>
+    <div class="quick-declare"><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>lost/create" aria-label="<%= t('common.lost', 'Perdu') %>">+</a>
+        <div><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>lost/create"><%= t('common.lost', 'Perdu') %></a><a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>found/create"><%= t('common.found', 'Trouvé') %></a></div>
     </div>
     <% } %>
+<script>
+    window.retroovaI18n = <%- JSON.stringify({
+        closeMenu: t('nav.closeMenu', 'Fermer le menu'),
+        openMenu: t('nav.toggleMenu', 'Ouvrir le menu'),
+        copied: t('common.copied', 'Copié'),
+        formProgress: t('itemForm.formProgress', 'Progression du formulaire'),
+        back: t('common.back', 'Retour'),
+        continue: t('common.continue', 'Continuer'),
+        lost: t('common.lost', 'Perdu'),
+        found: t('common.found', 'Trouvé'),
+        viewAd: t('search.viewAd', 'Voir l’annonce')
+    }) %>;
+</script>

@@ -11,7 +11,7 @@ class CommunicationModel {
     }
     async sendMessage(message) {
         const result = await this.run('INSERT INTO messages (id, sender_id, receiver_id, item_id, subject, message) VALUES (?, ?, ?, ?, ?, ?)', [message.id, message.senderId, message.receiverId, message.itemId || null, message.subject || null, message.message]);
-        await this.createNotification({ id: message.notificationId, userId: message.receiverId, type: 'message', title: 'Nouveau message', message: `${message.subject || 'Un membre'} vous a écrit. Identifiant public de l'expéditeur : ${message.senderPublicId || 'non disponible'}.` });
+        await this.createNotification({ id: message.notificationId, userId: message.receiverId, type: 'message', title: message.notificationTitle || 'New message', message: message.notificationMessage || `${message.subject || 'A member'} wrote to you. Sender public ID: ${message.senderPublicId || 'not available'}.` });
         return result;
     }
     getNotifications(userId) { return this.all('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [userId]); }

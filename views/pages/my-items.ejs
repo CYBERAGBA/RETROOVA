@@ -1,21 +1,21 @@
 <%- include('../partials/header') %>
     <main class="container">
-        <div class="page-heading"><span class="eyebrow">MON ESPACE</span>
-            <h1>Mes objets <%= type==='lost' ? 'perdus' : 'trouvés' %>
+        <div class="page-heading"><span class="eyebrow"><%= t('myItems.eyebrow', 'MON ESPACE') %></span>
+            <h1><%= type==='lost' ? t('myItems.titleLost', 'Mes objets perdus') : t('myItems.titleFound', 'Mes objets trouvés') %>
             </h1>
-            <p>Retrouvez et mettez à jour vos annonces.</p>
+            <p><%= t('myItems.intro', 'Retrouvez et mettez à jour vos annonces.') %></p>
         </div>
         <div class="items-grid">
             <% if (!items.length) { %>
                 <div class="empty-state">
-                    <h3>Pas encore d’annonce</h3>
-                    <p>Chaque déclaration augmente les chances de restitution.</p><a href="/<%= type %>/create"
-                        class="btn btn-primary">Créer une annonce</a>
+                    <h3><%= t('myItems.emptyTitle', 'Pas encore d’annonce') %></h3>
+                    <p><%= t('myItems.emptyText', 'Chaque déclaration augmente les chances de restitution.') %></p><a href="/<%= type %>/create"
+                        class="btn btn-primary"><%= t('myItems.create', 'Créer une annonce') %></a>
                 </div>
                 <% } %>
                     <% items.forEach(item=> { %><article class="item-card">
                             <div class="item-card-top"><span class="type-pill <%= item.type %>">
-                                    <%= item.type==='lost' ? 'PERDU' : 'TROUVÉ' %>
+                                    <%= item.type==='lost' ? t('myItems.lost', 'PERDU') : t('myItems.found', 'TROUVÉ') %>
                                 </span><span>
                                     <%= item.status %>
                                 </span></div>
@@ -23,11 +23,11 @@
                                     <%= item.title %>
                                 </a></h3>
                             <p class="item-meta">
-                                <%= item.city %> · <%= item.event_date || 'Date non précisée' %>
+                                <%= item.city %> · <%= item.event_date || t('myItems.dateUnknown', 'Date non précisée') %>
                             </p>
                             <div class="card-actions"><a href="/items/<%= item.id %>"
-                                    class="btn btn-small btn-secondary">Voir</a><a href="/items/<%= item.id %>/edit"
-                                    class="btn btn-small btn-primary">Modifier</a></div>
+                                    class="btn btn-small btn-secondary"><%= t('myItems.view', 'Voir') %></a><a href="/items/<%= item.id %>/edit"
+                                    class="btn btn-small btn-primary"><%= t('myItems.edit', 'Modifier') %></a></div>
                         </article>
                         <% }) %>
         </div>

@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
 const helmet = require('helmet');
@@ -18,6 +19,8 @@ const adminRoutes = require('./src/routes/adminRoutes');
 const infoRoutes = require('./src/routes/infoRoutes');
 const { attachUser } = require('./src/middleware/authMiddleware');
 const csrfMiddleware = require('./src/middleware/csrfMiddleware');
+const localeMiddleware = require('./src/middleware/localeMiddleware');
+const { i18nMiddleware, DEFAULT_LOCALE, SUPPORTED_LOCALES } = require('./src/i18n');
 const {
   buildAbsoluteUrl,
   buildSitemapXml,
@@ -110,6 +113,10 @@ app.use(rateLimit({
 }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
+app.use((req, res, next) => { req.cookies = req.cookies || {}; next(); });
+app.use(localeMiddleware);
+app.use(i18nMiddleware);
 
 // Sessions sécurisées
 app.use(session({
@@ -184,7 +191,48 @@ app.use((req, res, next) => {
 // Routes
 // ============================================
 
+app.get('/fr/', async (req, res) => {
+  const publicStats = await itemModel.getPublicStats();
+  const canonicalUrl = buildAbsoluteUrl(SITE_URL, '/fr/');
+  res.render('pages/index', {
+    title: `RETROOVA — ${req.t('seo.homeTitle', 'Objets perdus et trouvés')}`,
+    lang: 'fr',
+    metaDescription: req.t('seo.homeDescription', 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.'),
+    publicStats,
+    canonicalUrl,
+    ogImage: buildAbsoluteUrl(SITE_URL, '/images/logo_nom_slogan_paysage.png'),
+    schemaJsonLd: buildWebSiteSchema(SITE_URL, 'fr')
+  });
+});
+
+app.get('/en/', async (req, res) => {
+  const publicStats = await itemModel.getPublicStats();
+  const canonicalUrl = buildAbsoluteUrl(SITE_URL, '/en/');
+  res.render('pages/index', {
+    title: `RETROOVA — ${req.t('seo.homeTitle', 'Lost and found objects')}`,
+    lang: 'en',
+    metaDescription: req.t('seo.homeDescription', 'RETROOVA helps people recover lost items and reconnect found belongings with their owners.'),
+    publicStats,
+    canonicalUrl,
+    ogImage: buildAbsoluteUrl(SITE_URL, '/images/logo_nom_slogan_paysage.png'),
+    schemaJsonLd: buildWebSiteSchema(SITE_URL, 'en')
+  });
+});
+
+app.get('/fr', async (req, res) => { res.redirect('/fr/'); });
+app.get('/en', async (req, res) => { res.redirect('/en/'); });
+
 // Routes d'authentification
+app.use('/fr', authRoutes(userModel, itemModel, communicationModel));
+app.use('/en', authRoutes(userModel, itemModel, communicationModel));
+app.use('/fr', itemRoutes(itemModel, communicationModel, userModel));
+app.use('/en', itemRoutes(itemModel, communicationModel, userModel));
+app.use('/fr', communicationRoutes(communicationModel, itemModel, userModel));
+app.use('/en', communicationRoutes(communicationModel, itemModel, userModel));
+app.use('/fr', adminRoutes(adminModel, userModel));
+app.use('/en', adminRoutes(adminModel, userModel));
+app.use('/fr', infoRoutes(adminModel));
+app.use('/en', infoRoutes(adminModel));
 app.use('/', authRoutes(userModel, itemModel, communicationModel));
 app.use('/', itemRoutes(itemModel, communicationModel, userModel));
 app.use('/', communicationRoutes(communicationModel, itemModel, userModel));
@@ -198,14 +246,17 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Page d'accueil
+// Legacy homepage retained for compatibility
 app.get('/', async (req, res) => {
+  if (req.locale && req.locale !== DEFAULT_LOCALE) {
+    return res.redirect(`/${req.locale}/`);
+  }
   const publicStats = await itemModel.getPublicStats();
   const canonicalUrl = buildAbsoluteUrl(SITE_URL, '/');
   res.render('pages/index', {
-    title: 'RETROOVA — Objets perdus et trouvés',
+    title: `RETROOVA — ${req.t('seo.homeTitle', 'Objets perdus et trouvés')}`,
     lang: 'fr',
-    metaDescription: 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire. Publiez une annonce, recherchez rapidement et récupérez ce qui vous appartient.',
+    metaDescription: req.t('seo.homeDescription', 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.'),
     publicStats,
     canonicalUrl,
     ogImage: buildAbsoluteUrl(SITE_URL, '/images/logo_nom_slogan_paysage.png'),
@@ -213,24 +264,10 @@ app.get('/', async (req, res) => {
   });
 });
 
-app.get('/en', async (req, res) => {
-  const publicStats = await itemModel.getPublicStats();
-  const canonicalUrl = buildAbsoluteUrl(SITE_URL, '/en');
-  res.render('pages/index', {
-    title: 'RETROOVA — Lost and found objects',
-    lang: 'en',
-    metaDescription: 'RETROOVA helps people recover lost items and reconnect found belongings with their owners through a safe and simple search process.',
-    publicStats,
-    canonicalUrl,
-    ogImage: buildAbsoluteUrl(SITE_URL, '/images/logo_nom_slogan_paysage.png'),
-    schemaJsonLd: buildWebSiteSchema(SITE_URL, 'en')
-  });
-});
-
 // Page 404
 app.use((req, res) => {
   res.locals.siteUrl = SITE_URL;
-  res.status(404).render('404', { title: 'Page non trouvée' });
+  res.status(404).render('404', { title: req.t('messages.notFound', 'Page non trouvée') });
 });
 
 // Gestion des erreurs
@@ -238,7 +275,7 @@ app.use((err, req, res, next) => {
   console.error('Erreur:', err);
   res.locals.siteUrl = SITE_URL;
   res.status(500).render('500', {
-    title: 'Erreur serveur',
+    title: req.t('messages.serverError', 'Erreur serveur'),
     error: NODE_ENV === 'development' ? err.message : 'Une erreur est survenue'
   });
 });
@@ -274,6 +311,8 @@ const startServer = () => app.listen(PORT, HOST, () => {
 ⚡ Pour développement: npm run dev
   `);
 });
+
+module.exports = app;
 
 if (require.main === module) {
   DatabaseAdapter.initializeDatabase()
