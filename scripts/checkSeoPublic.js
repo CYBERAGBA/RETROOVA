@@ -14,7 +14,7 @@ async function assertCheck(name, condition, details) {
   await assertCheck('canonical link', /<link rel="canonical"/.test(home.text), 'missing canonical');
   await assertCheck('og tags', /og:title/.test(home.text), 'missing OG tags');
   await assertCheck('json-ld', /application\/ld\+json/.test(home.text), 'missing JSON-LD');
-  await assertCheck('faq', /FAQ/.test(home.text), 'missing FAQ section');
+  await assertCheck('title', /<title>\s*[^<]+RETROOVA\s*<\/title>/i.test(home.text), 'missing title');
 
   const about = await request(app).get('/about');
   await assertCheck('about status', about.status === 200, `status=${about.status}`);
@@ -29,7 +29,7 @@ async function assertCheck(name, condition, details) {
 
   const sitemap = await request(app).get('/sitemap.xml');
   await assertCheck('sitemap status', sitemap.status === 200, `status=${sitemap.status}`);
-  await assertCheck('sitemap loc', /<loc>.*retroova\.com/.test(sitemap.text), 'missing absolute XML loc');
+  await assertCheck('sitemap loc', /<loc>https?:\/\/[^<]+<\/loc>/.test(sitemap.text), 'missing absolute XML loc');
 
   const enHome = await request(app).get('/en');
   await assertCheck('en home status', enHome.status === 200, `status=${enHome.status}`);

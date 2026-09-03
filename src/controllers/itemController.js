@@ -163,11 +163,20 @@ class ItemController {
         res.render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item, error: req.query.error });
     };
 
+    reportGeneric = (req, res) => res.render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item: null, error: req.query.error });
+
     submitReport = async (req, res) => {
-        const { reason, description } = req.body;
-        if (!reason) return res.redirect(`/items/${req.params.id}/report?error=${encodeURIComponent(req.t('messages.chooseReason', 'Choisissez un motif'))}`);
-        await this.itemModel.createReport({ id: uuidv4(), reporterId: req.session.userId, itemId: req.params.id, reason, description });
-        res.redirect(`/items/${req.params.id}?message=${encodeURIComponent(req.t('messages.reportSent', 'Signalement transmis'))}`);
+        const itemId = req.params.id || String(req.body.itemId || '').trim();
+        const item = await this.itemModel.findById(itemId);
+        const reason = String(req.body.reason || '').trim();
+        const description = String(req.body.description || '').trim();
+        const allowedReasons = new Set(['fake', 'scam', 'inappropriate', 'personal', 'suspicious', 'other']);
+        if (!item) return res.status(404).render('404', { title: req.t('seo.notFoundAd', 'Annonce introuvable') });
+        if (!allowedReasons.has(reason) || description.length > 5000) {
+            return res.status(422).render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item, error: req.t('messages.invalidReport', 'Le signalement est invalide.') });
+        }
+        await this.itemModel.createReport({ id: uuidv4(), reporterId: req.session.userId, itemId: item.id, reason, description, attachmentFilename: req.file?.filename });
+        res.redirect(`/items/${item.id}?message=${encodeURIComponent(req.t('messages.reportSent', 'Votre signalement a été transmis à l’équipe de modération.'))}`);
     };
 
     submitProof = async (req, res) => {

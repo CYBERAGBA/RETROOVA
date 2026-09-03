@@ -37,7 +37,9 @@ const app = express();
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
-const SITE_URL = process.env.SITE_URL || (NODE_ENV === 'production' ? process.env.BASE_URL : 'https://retroova.com') || 'https://retroova.com';
+const SITE_URL = process.env.SITE_URL
+  || process.env.BASE_URL
+  || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'https://retroova.com');
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
 app.disable('x-powered-by');

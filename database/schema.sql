@@ -143,6 +143,7 @@ CREATE TABLE IF NOT EXISTS reports (
   item_id TEXT NOT NULL,
   reason TEXT NOT NULL,
   description TEXT,
+  attachment_filename TEXT,
   status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewed', 'resolved', 'dismissed')),
   admin_notes TEXT,
   resolved_at TIMESTAMPTZ,

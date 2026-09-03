@@ -124,8 +124,13 @@ class ItemModel {
         return this.run('UPDATE items SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?', [status, id, userId]);
     }
 
-    createReport(report) {
-        return this.run('INSERT INTO reports (id, reporter_id, item_id, reason, description) VALUES (?, ?, ?, ?, ?)', [report.id, report.reporterId, report.itemId, report.reason, report.description || null]);
+    async createReport(report) {
+        try {
+            await this.run('ALTER TABLE reports ADD COLUMN attachment_filename TEXT');
+        } catch (error) {
+            if (!/duplicate column|already exists/i.test(error.message)) throw error;
+        }
+        return this.run('INSERT INTO reports (id, reporter_id, item_id, reason, description, attachment_filename) VALUES (?, ?, ?, ?, ?, ?)', [report.id, report.reporterId, report.itemId, report.reason, report.description || null, report.attachmentFilename || null]);
     }
 
     createOwnershipProof(proof) {

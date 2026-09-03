@@ -1,17 +1,19 @@
 const faqItems = [
     {
-        question: 'Comment retrouver un objet perdu ?',
-        answer: 'Déclarez la perte, utilisez les filtres de recherche et comparez les annonces similaires pour identifier une correspondance fiable.'
+        fr: { question: 'Comment retrouver un objet perdu ?', answer: 'Déclarez la perte, utilisez les filtres de recherche et comparez les annonces similaires pour identifier une correspondance fiable.' },
+        en: { question: 'How can I find a lost item?', answer: 'Report your loss, use the search filters and compare similar listings to identify a reliable match.' }
     },
     {
-        question: 'Que faire si j’ai trouvé un objet ?',
-        answer: 'Publiez une annonce avec une description claire, le lieu et la date de découverte, puis attendez les échanges sécurisés sur la plateforme.'
+        fr: { question: 'Que faire si j’ai trouvé un objet ?', answer: 'Publiez une annonce avec une description claire, le lieu et la date de découverte, puis attendez les échanges sécurisés sur la plateforme.' },
+        en: { question: 'What should I do if I found an item?', answer: 'Post a listing with a clear description, the location and the date you found it, then wait for secure exchanges on the platform.' }
     },
     {
-        question: 'Puis-je signaler une annonce suspecte ?',
-        answer: 'Oui. Le système de signalement permet d’alerter la modération sur les annonces ou comportements anormaux.'
+        fr: { question: 'Puis-je signaler une annonce suspecte ?', answer: 'Oui. Le système de signalement permet d’alerter la modération sur les annonces ou comportements anormaux.' },
+        en: { question: 'Can I report a suspicious listing?', answer: 'Yes. The reporting system lets you alert the moderation team about unusual listings or behavior.' }
     }
 ];
+
+const getLocalizedFaqItems = (locale) => faqItems.map((item) => item[locale] || item.fr);
 
 const partnershipTypes = [
     'Entreprise',
@@ -270,7 +272,7 @@ const pages = {
         en: ['Help', 'RETROOVA help center', `
             <section>
                 <h2>How can we help?</h2>
-                <p>Use a clearer interface here with major categories instead of a long text block.</p>
+                <p>Find answers about reporting an item, searching listings and safely arranging its return.</p>
             </section>
         `]
     },
@@ -302,7 +304,7 @@ class InfoController {
         const locale = req.locale || 'fr';
         const page = getLocalizedPage(pages[req.path] || pages['/help'], locale);
         const [title, lead, content] = Array.isArray(page) ? page : [page.title, page.lead, page.content];
-        const currentFaqItems = req.path === '/help' ? faqItems : [];
+        const currentFaqItems = req.path === '/help' ? getLocalizedFaqItems(locale) : [];
         const renderedContent = typeof content === 'function' ? content(req.session?.csrfToken || '') : content;
         res.render('pages/info', {
             title,

@@ -5,8 +5,9 @@ const isAuthenticated = (req, res, next) => {
   if (req.session && req.session.userId) {
     return next();
   }
-  
-  res.redirect('/login');
+
+  const returnTo = req.path.endsWith('/report') ? req.originalUrl : '';
+  res.redirect(returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : '/login');
 };
 
 /**

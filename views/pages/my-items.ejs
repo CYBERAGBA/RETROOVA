@@ -23,7 +23,7 @@
                                     <%= item.title %>
                                 </a></h3>
                             <p class="item-meta">
-                                <%= item.city %> · <%= item.event_date || t('myItems.dateUnknown', 'Date non précisée') %>
+                                <%= item.city %><%= item.event_date ? ' · ' + new Date(`${item.event_date}T00:00:00`).toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : ' · ' + t('myItems.dateUnknown', 'Date non précisée') %>
                             </p>
                             <div class="card-actions"><a href="/items/<%= item.id %>"
                                     class="btn btn-small btn-secondary"><%= t('myItems.view', 'Voir') %></a><a href="/items/<%= item.id %>/edit"

@@ -53,12 +53,12 @@
                     <% results.forEach(item => { %>
                         <article class="item-card">
                             <% if (item.photo_url) { %>
-                                <img src="<%= item.photo_url %>" alt="Photo de <%= item.title %>" class="item-card-photo">
+                                <img src="<%= item.photo_url %>" alt="Photo de <%= item.title %>" class="item-card-photo" onerror="this.remove()">
                             <% } %>
                             <div class="item-card-top">
                                 <span class="type-pill <%= item.type %>"><%= item.type === 'lost' ? t('search.lostTag', 'PERDU') : t('search.foundTag', 'TROUVÉ') %></span>
                                 <span class="status-pill status-<%= item.status %>"><%= item.status %></span>
-                                <span class="item-date"><%= item.event_date || t('search.dateUnknown', 'Date non précisée') %></span>
+                                <span class="item-date"><%= item.event_date ? new Date(`${item.event_date}T00:00:00`).toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : t('search.dateUnknown', 'Date non précisée') %></span>
                             </div>
                             <h3><a href="/items/<%= item.id %>"><%= item.title %></a></h3>
                             <p class="item-meta"><%= item.category %> · <%= item.city %><%= item.district ? ' · ' + item.district : '' %></p>

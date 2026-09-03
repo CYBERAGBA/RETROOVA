@@ -70,7 +70,7 @@ class AuthController {
    */
   getLogin = (req, res) => {
     const message = req.query.message || '';
-    res.render('pages/login', { title: req.t('auth.loginTitle', 'Connexion'), message, formData: {} });
+    res.render('pages/login', { title: req.t('auth.loginTitle', 'Connexion'), message, formData: {}, returnTo: req.query.returnTo || '' });
   };
 
   /**
@@ -103,7 +103,10 @@ class AuthController {
       req.session.city = user.city;
 
       // Rediriger selon le rôle
-      const redirectUrl = user.role === 'admin' ? '/admin' : '/dashboard';
+      const requestedReturnTo = String(req.body.returnTo || '');
+      const redirectUrl = /^\/(?:fr\/|en\/)?(?:items\/[^/?#]+\/report|report)(?:\?|$)/.test(requestedReturnTo)
+        ? requestedReturnTo
+        : user.role === 'admin' ? '/admin' : '/dashboard';
       res.redirect(redirectUrl);
     } catch (error) {
       console.error('Erreur connexion:', error);

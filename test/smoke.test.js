@@ -61,9 +61,14 @@ test('pages publiques répondent et exposent les protections', async () => {
     assert.equal(partnershipAlias.status, 200);
     const privacy = await agent.get('/privacy');
     assert.equal(privacy.status, 200);
-    const report = await agent.get('/report');
+    const report = await request(app).get('/report');
     assert.equal(report.status, 302);
-    assert.equal(report.headers.location, '/help');
+    assert.match(report.headers.location, /^\/login\?returnTo=%2Freport$/);
+
+    const authenticatedReport = await agent.get('/report');
+    assert.equal(authenticatedReport.status, 200);
+    assert.match(authenticatedReport.text, /name="itemId"/);
+    assert.match(authenticatedReport.text, /enctype="multipart\/form-data"/);
 });
 
 test('le formulaire de partenariat enregistre une demande et l’admin l’affiche', async () => {
