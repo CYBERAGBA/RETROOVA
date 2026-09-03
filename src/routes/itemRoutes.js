@@ -7,7 +7,8 @@ const fs = require('fs');
 const crypto = require('crypto');
 const csrfMiddleware = require('../middleware/csrfMiddleware');
 const { categories, categoryLabels } = require('../services/itemService');
-const { cloudinaryConfigured, cloudinaryRequired, storeImage, sensitiveCategories } = require('../services/imageStorage');
+const { cloudinaryConfigured, cloudinaryRequired, storeImage, removeLocalUpload, sensitiveCategories } = require('../services/imageStorage');
+const reportRateLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false });
 
 const uploadDirectory = path.resolve(process.env.UPLOADS_DIR || path.join(__dirname, '../../uploads'));
 const privateReportDirectory = path.resolve(process.env.REPORT_UPLOADS_DIR || path.join(__dirname, '../../private-uploads/reports'));
@@ -33,11 +34,11 @@ const upload = multer({
 const reportUpload = multer({
     storage: multer.diskStorage({
         destination: privateReportDirectory,
-        filename: (req, file, callback) => callback(null, `${crypto.randomUUID()}${path.extname(file.originalname).toLowerCase()}`)
+        filename: (req, file, callback) => callback(null, `${crypto.randomUUID()}${({ 'image/jpeg': '.jpg', 'image/png': '.png', 'application/pdf': '.pdf' })[file.mimetype]}`)
     }),
     limits: { fileSize: 2 * 1024 * 1024 },
     fileFilter: (req, file, callback) => {
-        if (!new Set(['image/jpeg', 'image/png', 'application/pdf']).has(file.mimetype)) {
+        if (!new Set(['image/jpeg', 'image/png', 'application/pdf']).has(file.mimetype) || !allowedExtensions.has(path.extname(file.originalname).toLowerCase()) && file.mimetype !== 'application/pdf') {
             const error = new Error('Invalid report attachment.');
             error.code = 'INVALID_REPORT_ATTACHMENT';
             return callback(error);
@@ -48,8 +49,11 @@ const reportUpload = multer({
 
 const uploadReportAttachment = (req, res, next) => reportUpload.single('attachment')(req, res, (error) => {
     if (!error) return next();
+    removeLocalUpload(req.file);
     if (error.code === 'LIMIT_FILE_SIZE' || error.code === 'INVALID_REPORT_ATTACHMENT') {
-        return res.redirect(`${req.baseUrl}/items/${encodeURIComponent(req.params.id || req.body.itemId || '')}/report?error=${encodeURIComponent(req.t('report.invalidAttachment', 'La pièce jointe est invalide ou dépasse 2 Mo.'))}`);
+        const itemId = req.params.id || req.body.itemId || '';
+        const reportPath = itemId ? `/items/${encodeURIComponent(itemId)}/report` : '/report';
+        return res.redirect(`${req.baseUrl}${reportPath}?error=${encodeURIComponent(req.t('report.invalidAttachment', 'La pièce jointe est invalide ou dépasse 2 Mo.'))}`);
     }
     return next(error);
 });
@@ -60,6 +64,7 @@ const uploadPhoto = (type, isEdit = false) => (req, res, next) => upload.single(
             req.storedImage = await storeImage(req.file, { sensitive: sensitiveCategories.has(req.body.category) });
             return next();
         } catch (storageError) {
+            await removeLocalUpload(req.file);
             error = storageError;
         }
     }
@@ -123,8 +128,8 @@ module.exports = (itemModel, communicationModel, userModel) => {
     router.post('/items/:id/delete', isAuthenticated, csrfMiddleware, controller.remove);
     router.get('/items/:id/report', isAuthenticated, controller.report);
     router.get('/report', isAuthenticated, controller.reportGeneric);
-    router.post('/items/:id/report', isAuthenticated, uploadReportAttachment, csrfMiddleware, controller.submitReport);
-    router.post('/report', isAuthenticated, uploadReportAttachment, csrfMiddleware, controller.submitReport);
+    router.post('/items/:id/report', isAuthenticated, reportRateLimit, uploadReportAttachment, csrfMiddleware, controller.submitReport);
+    router.post('/report', isAuthenticated, reportRateLimit, uploadReportAttachment, csrfMiddleware, controller.submitReport);
     router.post('/items/:id/proof', isAuthenticated, csrfMiddleware, controller.submitProof);
     router.get('/matches', isAuthenticated, controller.matches);
     router.post('/matches/:id/accept', isAuthenticated, csrfMiddleware, controller.acceptMatch);

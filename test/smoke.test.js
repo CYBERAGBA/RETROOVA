@@ -256,10 +256,8 @@ test('le compte admin utilise /login et les routes admin restent protégées', {
 
 test('SEO public et routes de référencement sont cohérentes', async () => {
     const homePage = await request(app).get('/');
-    assert.equal(homePage.status, 200);
-    assert.match(homePage.text, /<meta name="description"/);
-    assert.match(homePage.text, /<link rel="canonical"/);
-    assert.match(homePage.text, /retroova\.com|localhost/);
+    assert.equal(homePage.status, 302);
+    assert.match(homePage.headers.location, /^\/(fr|en)\/$/);
 
     const healthCheck = await request(app).get('/health');
     assert.equal(healthCheck.status, 200);
@@ -272,4 +270,27 @@ test('SEO public et routes de référencement sont cohérentes', async () => {
     const sitemap = await request(app).get('/sitemap.xml');
     assert.equal(sitemap.status, 200);
     assert.match(sitemap.text, /<loc>.*retroova\.com/);
+});
+
+test('la racine détecte la langue du navigateur et respecte la préférence manuelle', async () => {
+    const frenchBrowser = await request(app).get('/').set('Accept-Language', 'fr-FR,fr;q=0.9');
+    assert.equal(frenchBrowser.status, 302);
+    assert.equal(frenchBrowser.headers.location, '/fr/');
+
+    const englishBrowser = await request(app).get('/').set('Accept-Language', 'en-US,en;q=0.9');
+    assert.equal(englishBrowser.status, 302);
+    assert.equal(englishBrowser.headers.location, '/en/');
+
+    for (const language of ['es-ES,es;q=0.9', 'de-DE,de;q=0.9', 'pt-PT,pt;q=0.9']) {
+        const unsupportedBrowser = await request(app).get('/').set('Accept-Language', language);
+        assert.equal(unsupportedBrowser.status, 302);
+        assert.equal(unsupportedBrowser.headers.location, '/fr/');
+    }
+
+    const manuallySelectedEnglish = request.agent(app);
+    const selected = await manuallySelectedEnglish.get('/en/').set('Accept-Language', 'fr-FR,fr;q=0.9');
+    assert.equal(selected.status, 200);
+    const laterVisit = await manuallySelectedEnglish.get('/').set('Accept-Language', 'fr-FR,fr;q=0.9');
+    assert.equal(laterVisit.status, 302);
+    assert.equal(laterVisit.headers.location, '/en/');
 });

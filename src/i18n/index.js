@@ -38,8 +38,15 @@ function getLocaleFromBrowser(req) {
 
   const preferred = header
     .split(',')
-    .map((part) => part.split(';')[0].trim().toLowerCase())
-    .find((lang) => SUPPORTED_LOCALES.includes(lang));
+    .map((part, index) => {
+      const [languageTag, ...parameters] = part.trim().toLowerCase().split(';');
+      const qualityParameter = parameters.find((parameter) => parameter.trim().startsWith('q='));
+      const quality = qualityParameter ? Number(qualityParameter.trim().slice(2)) : 1;
+      return { language: languageTag.split('-')[0], quality: Number.isFinite(quality) ? quality : 0, index };
+    })
+    .filter(({ quality }) => quality > 0)
+    .sort((left, right) => right.quality - left.quality || left.index - right.index)
+    .find(({ language }) => SUPPORTED_LOCALES.includes(language))?.language;
 
   return preferred || DEFAULT_LOCALE;
 }

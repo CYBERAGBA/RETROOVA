@@ -23,9 +23,11 @@ class ItemModel {
         return this.run(`INSERT INTO items (${fields.join(', ')}) VALUES (${fields.map(() => '?').join(', ')})`, values);
     }
 
-    findById(id) {
+    findById(id, viewerId = null) {
         const trueValue = this.db.isPostgres ? 'TRUE' : '1';
-        return this.get(`SELECT items.*, CASE WHEN items.is_anonymous = ${trueValue} THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = ${trueValue} THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.id = ?`, [id]);
+        const ownerCondition = viewerId ? ' AND (users.status = \'active\' OR items.user_id = ?)' : " AND users.status = 'active'";
+        const params = viewerId ? [id, viewerId] : [id];
+        return this.get(`SELECT items.*, CASE WHEN items.is_anonymous = ${trueValue} THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = ${trueValue} THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.id = ?${ownerCondition}`, params);
     }
 
     findBySlug(type, slug) {
@@ -33,7 +35,7 @@ class ItemModel {
         if (!normalizedSlug) return Promise.resolve(null);
 
         const trueValue = this.db.isPostgres ? 'TRUE' : '1';
-        const sql = `SELECT items.*, CASE WHEN items.is_anonymous = ${trueValue} THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = ${trueValue} THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.type = ? AND LOWER(items.title) LIKE ? AND status NOT IN ('closed', 'expired') LIMIT 1`;
+        const sql = `SELECT items.*, CASE WHEN items.is_anonymous = ${trueValue} THEN 'Membre RETROOVA' ELSE users.name END AS owner_name, CASE WHEN items.is_anonymous = ${trueValue} THEN NULL ELSE users.public_id END AS owner_public_id FROM items JOIN users ON users.id = items.user_id WHERE items.type = ? AND LOWER(items.title) LIKE ? AND items.status NOT IN ('closed', 'expired') AND users.status = 'active' LIMIT 1`;
         return this.get(sql, [type, `%${normalizedSlug}%`]);
     }
 
@@ -49,7 +51,7 @@ class ItemModel {
 
     search(filters = {}) {
         const params = [];
-        const conditions = ["items.status NOT IN ('closed', 'expired')"];
+        const conditions = ["items.status NOT IN ('closed', 'expired')", "users.status = 'active'"];
         const addLike = (field, value) => {
             if (value) {
                 conditions.push(`LOWER(${field}) LIKE ?`);
@@ -97,7 +99,7 @@ class ItemModel {
     }
 
     findCandidates(item) {
-        return this.all(`SELECT * FROM items WHERE type = ? AND status = 'active' AND category = ? AND id != ? ORDER BY created_at DESC LIMIT 100`, [item.type === 'lost' ? 'found' : 'lost', item.category, item.id]);
+        return this.all(`SELECT items.* FROM items JOIN users ON users.id = items.user_id WHERE items.type = ? AND items.status = 'active' AND users.status = 'active' AND items.category = ? AND items.id != ? ORDER BY items.created_at DESC LIMIT 100`, [item.type === 'lost' ? 'found' : 'lost', item.category, item.id]);
     }
 
     findMatch(lostItemId, foundItemId) {
@@ -117,20 +119,15 @@ class ItemModel {
     }
 
     getPublicStats() {
-        return this.get(`SELECT (SELECT COUNT(*) FROM items WHERE status NOT IN ('closed', 'expired')) AS declared, (SELECT COUNT(*) FROM matches) AS matches, (SELECT COUNT(*) FROM items WHERE status = 'returned') AS returned, (SELECT COUNT(*) FROM users WHERE status = 'active') AS users`);
+        return this.get(`SELECT (SELECT COUNT(*) FROM items JOIN users ON users.id = items.user_id WHERE items.status NOT IN ('closed', 'expired') AND users.status = 'active') AS declared, (SELECT COUNT(*) FROM matches) AS matches, (SELECT COUNT(*) FROM items JOIN users ON users.id = items.user_id WHERE items.status = 'returned' AND users.status = 'active') AS returned, (SELECT COUNT(*) FROM users WHERE status = 'active') AS users`);
     }
 
     updateStatus(id, userId, status) {
         return this.run('UPDATE items SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?', [status, id, userId]);
     }
 
-    async createReport(report) {
-        try {
-            await this.run('ALTER TABLE reports ADD COLUMN attachment_filename TEXT');
-        } catch (error) {
-            if (!/duplicate column|already exists/i.test(error.message)) throw error;
-        }
-        return this.run('INSERT INTO reports (id, reporter_id, item_id, reason, description, attachment_filename) VALUES (?, ?, ?, ?, ?, ?)', [report.id, report.reporterId, report.itemId, report.reason, report.description || null, report.attachmentFilename || null]);
+    createReport(report) {
+        return this.run('INSERT INTO reports (report_id, public_reference, user_id, item_id, reason, comment, attachment, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [report.reportId, report.publicReference, report.userId, report.itemId, report.reason, report.comment, report.attachment || null, 'pending']);
     }
 
     createOwnershipProof(proof) {

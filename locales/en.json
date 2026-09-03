@@ -209,6 +209,7 @@
     "description": "Your report will be reviewed by the RETROOVA team.",
     "reason": "Reason",
     "select": "Select",
+    "itemPlaceholder": "Ad reference",
     "details": "Details",
     "placeholder": "Explain the problem without sharing sensitive information.",
     "submit": "Send report",
@@ -216,8 +217,19 @@
     "scam": "Scam",
     "inappropriate": "Inappropriate content",
     "personal": "Personal information",
+    "duplicate": "Duplicate",
+    "returned": "Item already returned",
+    "wrongCategory": "Wrong category",
+    "suspiciousContent": "Suspicious content",
+    "suspiciousBehavior": "Suspicious behavior",
+    "successTitle": "Report submitted",
+    "successMessage": "Your report has been submitted to the RETROVA moderation team.",
+    "reference": "Reference",
     "suspicious": "Suspicious item",
     "other": "Other"
+  },
+  "contact": {
+    "eyebrow": "CONTACT RETROOVA", "title": "Let’s talk about your needs", "lead": "A question, a problem, a suggestion or a partnership opportunity? The RETROOVA team is here to help.", "promise": "We value every request and will direct you to the right person.", "helpTitle": "Need help?", "helpText": "Are you having a problem with your account, a listing or using RETROOVA?", "helpAction": "Visit the Help Center", "reportTitle": "Report a problem", "reportText": "Have you found a suspicious listing, fraud or content that breaks our rules?", "reportAction": "Report a listing", "partnerTitle": "Become a partner", "partnerText": "Do you represent a hotel, company, school, university, station, airport, institution or association?", "partnerAction": "Propose a partnership", "writeTitle": "Contact us", "writeText": "Do you have a general question, a suggestion or simply want to write to us?", "writeAction": "Send a message", "formEyebrow": "✉ CONTACT FORM", "formTitle": "Send us a message", "name": "Full name", "namePlaceholder": "Your name", "email": "Email address", "subject": "Subject of your request", "select": "Select", "subjectGeneral": "General question", "subjectTechnical": "Technical problem", "subjectAccount": "Account problem", "subjectListing": "Question about a listing", "subjectSuggestion": "Suggestion / improvement", "subjectPartnership": "Partnership", "subjectPress": "Press / media", "subjectOther": "Other", "itemReference": "Listing reference", "optional": "optional", "message": "Your message", "messagePlaceholder": "Explain your request...", "attachment": "Attachment", "attachmentHint": "JPG, PNG, WEBP or PDF — 5 MB maximum.", "submit": "Send my message", "internal": "The message will be sent internally to the administrator.", "confidential": "Your information remains confidential.", "confidentialText": "It is used only to process your request.", "followup": "You will receive a confirmation after submitting your request.", "shortcutsTitle": "Looking for an immediate answer?", "shortcutSearchTitle": "Looking for an item?", "shortcutSearchText": "Search RETROOVA.", "shortcutGuideTitle": "Want to learn how RETROOVA works?", "shortcutGuideText": "Read our guide.", "shortcutReportTitle": "Want to report a listing?", "shortcutReportText": "Use our reporting system.", "shortcutPrivacyTitle": "Have a question about your data?", "shortcutPrivacyText": "Read our privacy policy.", "invalid": "Check the required fields and try again.", "invalidAttachment": "The attachment is invalid or exceeds 5 MB.", "successEyebrow": "CONTACT RETROOVA", "successTitle": "Message sent successfully!", "successText": "Thank you for contacting RETROOVA. Your request has been recorded and will be reviewed by our team.", "referenceLabel": "Your request reference:", "referenceNote": "Keep this reference if you need to contact us again about this request.", "backHome": "Back to RETROVA"
   },
   "myItems": {
     "eyebrow": "MY SPACE",

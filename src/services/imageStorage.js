@@ -53,4 +53,13 @@ const storeImage = async (file, { sensitive = false } = {}) => {
     return { filename: file.filename, url: `/uploads/${file.filename}` };
 };
 
-module.exports = { cloudinaryConfigured, cloudinaryRequired, storeImage, sensitiveCategories };
+const removeLocalUpload = async (file) => {
+    if (!file?.path) return;
+    try {
+        await fs.unlink(file.path);
+    } catch (error) {
+        if (error.code !== 'ENOENT') console.error('Erreur nettoyage fichier uploadé:', error);
+    }
+};
+
+module.exports = { cloudinaryConfigured, cloudinaryRequired, storeImage, removeLocalUpload, sensitiveCategories };

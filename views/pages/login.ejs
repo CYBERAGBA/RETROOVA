@@ -22,7 +22,7 @@
                             </div>
                             <% } %>
 
-                                <form method="POST" action="/login" class="auth-form"><input type="hidden" name="_csrf"
+                                <form method="POST" action="/<%= locale === 'en' ? 'en/' : locale === 'fr' ? 'fr/' : '' %>login" class="auth-form"><input type="hidden" name="_csrf"
                                         value="<%= csrfToken %>">
                                     <input type="hidden" name="returnTo" value="<%= returnTo || '' %>">
                                     <div class="form-group">

@@ -15,7 +15,7 @@
             <div class="profile-hero-copy">
                 <p class="profile-kicker"><%= t('profile.memberRet', 'MEMBRE RETROOVA') %></p>
                 <h2><%= user?.name || 'Membre RETROOVA' %></h2>
-                <p class="profile-member-since"><%= t('profile.memberSince', 'Membre depuis') %> <%= user?.created_at ? new Date(user.created_at).getFullYear() : 'votre inscription' %></p>
+                <p class="profile-member-since"><%= t('profile.memberSince', 'Membre depuis') %> <%= formatDate(user?.created_at) || 'votre inscription' %></p>
                 <p class="reputation-badge <%= reputation?.tone || 'standard' %>"><%= reputation?.tone === 'success' ? t('dashboard.reputationGood', 'Bonne réputation') : reputation?.tone === 'danger' ? t('dashboard.reputationWarning', 'Compte sous surveillance') : t('dashboard.reputationStandard', 'Réputation standard') %><span>·</span><%= reputation?.level || t('dashboard.memberNew', 'Nouveau membre') %></p>
             </div>
             <div class="profile-verifications">
@@ -50,7 +50,7 @@
                 <div class="surface-heading"><div><span class="section-label"><%= t('profile.history', 'Votre historique') %></span><h2><%= t('profile.recentActivity', 'Activité récente') %></h2></div><span class="surface-mark">02</span></div>
                 <% if (activity?.length) { %>
                     <div class="activity-list">
-                        <% activity.forEach(entry => { %><article class="activity-entry"><span class="activity-icon"><%= entry.type === 'match' ? '✦' : '•' %></span><div><strong><%= entry.title %></strong><p><%= entry.detail %></p></div><time><%= entry.date ? new Date(entry.date).toLocaleDateString('fr-FR') : '' %></time></article><% }) %>
+                        <% activity.forEach(entry => { %><article class="activity-entry"><span class="activity-icon"><%= entry.type === 'match' ? '✦' : '•' %></span><div><strong><%= entry.title %></strong><p><%= entry.detail %></p></div><time><%= formatDate(entry.date) %></time></article><% }) %>
                     </div>
                 <% } else { %>
                     <div class="empty-state"><span>✦</span><p><%= t('profile.notAvailable', 'Votre activité apparaîtra ici.') %></p></div>

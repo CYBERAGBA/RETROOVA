@@ -10,7 +10,7 @@
                     <h1><%= item.title %></h1>
                     <div class="detail-quick-facts">
                         <span>📍 <strong><%= item.district ? item.district + ' · ' : '' %><%= item.city || t('itemDetail.locationUnknown', 'Lieu non précisé') %></strong></span>
-                        <span>📅 <strong><%= item.event_date ? new Date(`${item.event_date}T00:00:00`).toLocaleDateString(locale === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : t('itemDetail.dateUnknown', 'Date non précisée') %></strong></span>
+                        <span>📅 <strong><%= formatDate(item.event_date) || t('itemDetail.dateUnknown', 'Date non précisée') %></strong></span>
                             <span>🏷️ <strong><%= typeof categoryLabels !== 'undefined' && categoryLabels?.[item.category] || item.category || t('itemDetail.categoryUnknown', 'Catégorie non précisée') %></strong></span>
                     </div>
                 </div>

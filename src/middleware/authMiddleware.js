@@ -7,7 +7,8 @@ const isAuthenticated = (req, res, next) => {
   }
 
   const returnTo = req.path.endsWith('/report') ? req.originalUrl : '';
-  res.redirect(returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : '/login');
+  const localePrefix = /^\/(fr|en)(?:\/|$)/.exec(req.originalUrl)?.[0].replace(/\/$/, '') || '';
+  res.redirect(`${localePrefix}/login${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''}`);
 };
 
 /**

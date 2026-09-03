@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+<main class="container">
+    <article class="info-page contact-page">
+        <div class="info-brand-logo-wrap"><img src="/images/logo_nom_slogan_paysage.png" alt="RETROOVA" class="info-brand-logo"></div>
+        <span class="eyebrow"><%= t('contact.eyebrow', 'CONTACT RETROOVA') %></span>
+        <h1><%= t('contact.title', 'Parlons de votre besoin') %></h1>
+        <p class="info-lead"><%= t('contact.lead', 'Une question, un problème, une suggestion ou une opportunité de partenariat ? L’équipe RETROOVA est là pour vous répondre.') %></p>
+        <blockquote><%= t('contact.promise', 'Nous accordons de l’importance à chaque demande et nous vous orientons vers le bon interlocuteur.') %></blockquote>
+
+        <div class="contact-cards">
+            <a class="contact-card" href="/<%= locale %>/help"><span class="contact-card-icon">🆘</span><h2><%= t('contact.helpTitle', 'Besoin d’aide ?') %></h2><p><%= t('contact.helpText', 'Un problème avec votre compte, une annonce ou RETROOVA ?') %></p><strong><%= t('contact.helpAction', 'Consulter le Centre d’aide') %> →</strong></a>
+            <a class="contact-card" href="/<%= locale %>/report"><span class="contact-card-icon">🚨</span><h2><%= t('contact.reportTitle', 'Signaler un problème') %></h2><p><%= t('contact.reportText', 'Une annonce suspecte, une fraude ou un contenu contraire à nos règles ?') %></p><strong><%= t('contact.reportAction', 'Signaler une annonce') %> →</strong></a>
+            <a class="contact-card" href="/<%= locale %>/partnerships"><span class="contact-card-icon">🤝</span><h2><%= t('contact.partnerTitle', 'Devenir partenaire') %></h2><p><%= t('contact.partnerText', 'Vous représentez une organisation, une école, une institution ou une association ?') %></p><strong><%= t('contact.partnerAction', 'Proposer un partenariat') %> →</strong></a>
+            <a class="contact-card" href="#contact-form"><span class="contact-card-icon">💬</span><h2><%= t('contact.writeTitle', 'Nous contacter') %></h2><p><%= t('contact.writeText', 'Une question générale, une suggestion ou simplement envie de nous écrire ?') %></p><strong><%= t('contact.writeAction', 'Envoyer un message') %> →</strong></a>
+        </div>
+
+        <section class="contact-form-section" id="contact-form">
+            <div class="contact-form-heading"><span class="eyebrow"><%= t('contact.formEyebrow', '✉ FORMULAIRE DE CONTACT') %></span><h2><%= t('contact.formTitle', 'Envoyez-nous un message') %></h2></div>
+            <% if (error) { %><div class="alert alert-danger" role="alert"><p><%= error %></p></div><% } %>
+            <form method="POST" action="/<%= locale %>/contact" enctype="multipart/form-data" class="contact-request-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="form-grid">
+                    <label class="form-group"><span><%= t('contact.name', 'Nom complet') %> *</span><input type="text" name="name" value="<%= formData.name || '' %>" placeholder="<%= t('contact.namePlaceholder', 'Votre nom') %>" maxlength="120" required></label>
+                    <label class="form-group"><span><%= t('contact.email', 'Adresse e-mail') %> *</span><input type="email" name="email" value="<%= formData.email || '' %>" placeholder="vous@exemple.com" required></label>
+                    <label class="form-group form-span-2"><span><%= t('contact.subject', 'Objet de votre demande') %> *</span><select name="subject" required><option value=""><%= t('contact.select', 'Sélectionner') %></option><option value="general" <%= formData.subject === 'general' ? 'selected' : '' %>><%= t('contact.subjectGeneral', 'Question générale') %></option><option value="technical" <%= formData.subject === 'technical' ? 'selected' : '' %>><%= t('contact.subjectTechnical', 'Problème technique') %></option><option value="account" <%= formData.subject === 'account' ? 'selected' : '' %>><%= t('contact.subjectAccount', 'Problème avec mon compte') %></option><option value="listing" <%= formData.subject === 'listing' ? 'selected' : '' %>><%= t('contact.subjectListing', 'Question concernant une annonce') %></option><option value="suggestion" <%= formData.subject === 'suggestion' ? 'selected' : '' %>><%= t('contact.subjectSuggestion', 'Suggestion / amélioration') %></option><option value="partnership" <%= formData.subject === 'partnership' ? 'selected' : '' %>><%= t('contact.subjectPartnership', 'Partenariat') %></option><option value="press" <%= formData.subject === 'press' ? 'selected' : '' %>><%= t('contact.subjectPress', 'Presse / médias') %></option><option value="other" <%= formData.subject === 'other' ? 'selected' : '' %>><%= t('contact.subjectOther', 'Autre') %></option></select></label>
+                    <label class="form-group form-span-2"><span><%= t('contact.itemReference', 'Référence de l’annonce') %> <small>(<%= t('contact.optional', 'facultatif') %>)</small></span><input type="text" name="item_reference" value="<%= formData.itemReference || '' %>" placeholder="RTV-XXXXXXXX" maxlength="80"></label>
+                    <label class="form-group form-span-2"><span><%= t('contact.message', 'Votre message') %> *</span><textarea name="message" rows="7" maxlength="5000" placeholder="<%= t('contact.messagePlaceholder', 'Expliquez-nous votre demande...') %>" required><%= formData.message || '' %></textarea></label>
+                    <label class="form-group form-span-2"><span><%= t('contact.attachment', 'Pièce jointe') %> <small>(<%= t('contact.optional', 'facultatif') %>)</small></span><input type="file" name="attachment" accept="image/jpeg,image/png,image/webp,application/pdf"><small><%= t('contact.attachmentHint', 'JPG, PNG, WEBP ou PDF — 5 Mo maximum.') %></small></label>
+                </div>
+                <button type="submit" class="btn btn-primary"><%= t('contact.submit', 'Envoyer mon message') %> <span>→</span></button>
+                <p class="contact-trust"><strong>🔒 <%= t('contact.confidential', 'Vos informations restent confidentielles.') %></strong><br><%= t('contact.confidentialText', 'Elles sont utilisées uniquement pour traiter votre demande.') %></p>
+            </form>
+        </section>
+
+        <section class="contact-shortcuts"><h2><%= t('contact.shortcutsTitle', 'Vous cherchez peut-être une réponse immédiate ?') %></h2><div class="contact-shortcut-grid"><a href="/<%= locale %>/search"><strong>🔎 <%= t('contact.shortcutSearchTitle', 'Vous cherchez un objet ?') %></strong><span><%= t('contact.shortcutSearchText', 'Effectuez une recherche sur RETROOVA.') %></span></a><a href="/<%= locale %>/how-it-works"><strong>📖 <%= t('contact.shortcutGuideTitle', 'Vous souhaitez savoir comment fonctionne RETROOVA ?') %></strong><span><%= t('contact.shortcutGuideText', 'Consultez notre guide.') %></span></a><a href="/<%= locale %>/report"><strong>🚨 <%= t('contact.shortcutReportTitle', 'Vous souhaitez signaler une annonce ?') %></strong><span><%= t('contact.shortcutReportText', 'Utilisez notre système de signalement.') %></span></a><a href="/<%= locale %>/privacy"><strong>🔐 <%= t('contact.shortcutPrivacyTitle', 'Une question concernant vos données ?') %></strong><span><%= t('contact.shortcutPrivacyText', 'Consultez notre politique de confidentialité.') %></span></a></div></section>
+    </article>
+</main>
+<%- include('../partials/footer') %>

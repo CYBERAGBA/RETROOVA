@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { isValidDate, categories, categoryLabels } = require('../services/itemService');
 const { createMatchesFor } = require('../services/matchingService');
+const { removeLocalUpload } = require('../services/imageStorage');
 
 const emptyForm = (type) => ({ type, category: '', title: '', description: '', brand: '', model: '', color: '', city: '', district: '', location_description: '', event_date: '' });
 
@@ -17,7 +18,10 @@ class ItemController {
         const type = req.params.type;
         const formData = { ...emptyForm(type), ...req.body, type };
         const errors = this.validate(formData, req);
-        if (errors.length) return res.status(422).render('pages/item-form', { title: req.t('itemForm.publishAd', 'Nouvelle annonce'), formData, categories, categoryLabels, errors, isEdit: false });
+        if (errors.length) {
+            await removeLocalUpload(req.file);
+            return res.status(422).render('pages/item-form', { title: req.t('itemForm.publishAd', 'Nouvelle annonce'), formData, categories, categoryLabels, errors, isEdit: false });
+        }
         try {
             const item = { ...formData, id: uuidv4(), user_id: req.session.userId, photo_filename: req.storedImage?.filename || null, photo_url: req.storedImage?.url || null, is_anonymous: formData.is_anonymous ? 1 : 0, status: 'active' };
             await this.itemModel.create(item);
@@ -30,6 +34,7 @@ class ItemController {
             }
             res.redirect(`/items/${item.id}?message=${encodeURIComponent(req.t('messages.published', 'Annonce publiée avec succès'))}`);
         } catch (error) {
+            await removeLocalUpload(req.file);
             console.error('Erreur création annonce:', error);
             res.status(500).render('pages/item-form', { title: req.t('itemForm.publishAd', 'Nouvelle annonce'), formData, categories, categoryLabels, errors: [req.t('messages.publishError', 'Impossible de publier cette annonce.')], isEdit: false });
         }
@@ -90,7 +95,7 @@ class ItemController {
     };
 
     show = async (req, res) => {
-        const item = await this.itemModel.findById(req.params.id);
+        const item = await this.itemModel.findById(req.params.id, req.session?.userId);
         if (!item) {
             const slugCandidate = String(req.params.id || '').trim();
             const maybeBySlug = await this.itemModel.findBySlug(req.params.type || 'lost', slugCandidate);
@@ -116,17 +121,20 @@ class ItemController {
     };
 
     edit = async (req, res) => {
-        const item = await this.itemModel.findById(req.params.id);
+        const item = await this.itemModel.findById(req.params.id, req.session?.userId);
         if (!item || item.user_id !== req.session.userId) return res.status(403).render('403', { title: req.t('messages.forbidden', 'Accès refusé') });
         res.render('pages/item-form', { title: req.t('seo.editAd', 'Modifier mon annonce'), formData: item, categories, categoryLabels, isEdit: true, itemId: item.id });
     };
 
     update = async (req, res) => {
-        const item = await this.itemModel.findById(req.params.id);
+        const item = await this.itemModel.findById(req.params.id, req.session?.userId);
         if (!item || item.user_id !== req.session.userId) return res.status(403).render('403', { title: req.t('messages.forbidden', 'Accès refusé') });
         const formData = { ...item, ...req.body, type: item.type, status: item.status };
         const errors = this.validate(formData, req);
-        if (errors.length) return res.status(422).render('pages/item-form', { title: req.t('seo.editAd', 'Modifier mon annonce'), formData, categories, categoryLabels, errors, isEdit: true, itemId: item.id });
+        if (errors.length) {
+            await removeLocalUpload(req.file);
+            return res.status(422).render('pages/item-form', { title: req.t('seo.editAd', 'Modifier mon annonce'), formData, categories, categoryLabels, errors, isEdit: true, itemId: item.id });
+        }
         if (req.file) {
             formData.photo_filename = req.storedImage?.filename || req.file.filename;
             formData.photo_url = req.storedImage?.url || `/uploads/${req.file.filename}`;
@@ -160,23 +168,35 @@ class ItemController {
     report = async (req, res) => {
         const item = await this.itemModel.findById(req.params.id);
         if (!item) return res.status(404).render('404', { title: req.t('seo.notFoundAd', 'Annonce introuvable') });
-        res.render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item, error: req.query.error });
+        res.render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item, publicReference: `RTV-${item.id.replace(/-/g, '').slice(0, 8).toUpperCase()}`, error: req.query.error });
     };
 
-    reportGeneric = (req, res) => res.render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item: null, error: req.query.error });
+    reportGeneric = async (req, res) => {
+        const itemId = String(req.query.itemId || '').trim();
+        const item = itemId ? await this.itemModel.findById(itemId) : null;
+        if (itemId && !item) return res.status(404).render('404', { title: req.t('seo.notFoundAd', 'Annonce introuvable') });
+        res.render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item, publicReference: item ? `RTV-${item.id.replace(/-/g, '').slice(0, 8).toUpperCase()}` : '', error: req.query.error });
+    };
 
     submitReport = async (req, res) => {
         const itemId = req.params.id || String(req.body.itemId || '').trim();
         const item = await this.itemModel.findById(itemId);
         const reason = String(req.body.reason || '').trim();
-        const description = String(req.body.description || '').trim();
-        const allowedReasons = new Set(['fake', 'scam', 'inappropriate', 'personal', 'suspicious', 'other']);
+        const comment = String(req.body.comment || '').trim();
+        const allowedReasons = new Set(['scam', 'personal', 'inappropriate', 'fake', 'duplicate', 'returned', 'wrong-category', 'suspicious-content', 'suspicious-behavior', 'other']);
         if (!item) return res.status(404).render('404', { title: req.t('seo.notFoundAd', 'Annonce introuvable') });
-        if (!allowedReasons.has(reason) || description.length > 5000) {
-            return res.status(422).render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item, error: req.t('messages.invalidReport', 'Le signalement est invalide.') });
+        if (!allowedReasons.has(reason) || comment.length < 1 || comment.length > 5000 || item.status === 'expired') {
+            await removeLocalUpload(req.file);
+            return res.status(422).render('pages/report', { title: req.t('report.title', 'Signaler une annonce'), item, publicReference: `RTV-${item.id.replace(/-/g, '').slice(0, 8).toUpperCase()}`, error: req.t('messages.invalidReport', 'Le signalement est invalide.') });
         }
-        await this.itemModel.createReport({ id: uuidv4(), reporterId: req.session.userId, itemId: item.id, reason, description, attachmentFilename: req.file?.filename });
-        res.redirect(`/items/${item.id}?message=${encodeURIComponent(req.t('messages.reportSent', 'Votre signalement a été transmis à l’équipe de modération.'))}`);
+        const reportId = uuidv4();
+        try {
+            await this.itemModel.createReport({ reportId, publicReference: `RTV-${item.id.replace(/-/g, '').slice(0, 8).toUpperCase()}`, userId: req.session.userId, itemId: item.id, reason, comment, attachment: req.file?.filename });
+        } catch (error) {
+            await removeLocalUpload(req.file);
+            throw error;
+        }
+        res.render('pages/report-success', { title: req.t('report.successTitle', 'Signalement transmis'), reportReference: `RPT-${reportId.replace(/-/g, '').slice(0, 12).toUpperCase()}` });
     };
 
     submitProof = async (req, res) => {

@@ -50,7 +50,7 @@
                                                 value="<%= conversation.sender_id===user.id ? (conversation.receiver_public_id || '') : (conversation.sender_public_id || '') %>"><button
                                                 class="btn btn-small btn-danger"><%= t('communication.block', 'Bloquer') %></button></form>
                             </div><time>
-                                <%= createdAt %>
+                                <%= formatDate(createdAt) %>
                             </time>
                         </article>
                         <% }) } %>

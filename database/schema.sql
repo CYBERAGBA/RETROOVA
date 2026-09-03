@@ -138,25 +138,43 @@ CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created
 -- Signalements d'annonces
 -- ============================================
 CREATE TABLE IF NOT EXISTS reports (
-  id TEXT PRIMARY KEY,
-  reporter_id TEXT NOT NULL,
+  report_id TEXT PRIMARY KEY,
+  public_reference TEXT NOT NULL,
+  user_id TEXT NOT NULL,
   item_id TEXT NOT NULL,
   reason TEXT NOT NULL,
-  description TEXT,
-  attachment_filename TEXT,
-  status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewed', 'resolved', 'dismissed')),
+  comment TEXT NOT NULL,
+  attachment TEXT,
+  status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewing', 'resolved', 'rejected')),
   admin_notes TEXT,
   resolved_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_reports_reporter ON reports(reporter_id);
+CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id);
 CREATE INDEX IF NOT EXISTS idx_reports_item ON reports(item_id);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at);
+
+CREATE TABLE IF NOT EXISTS contact_requests (
+  id TEXT PRIMARY KEY,
+  public_reference TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  item_reference TEXT,
+  message TEXT NOT NULL,
+  attachment TEXT,
+  status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewing', 'resolved', 'rejected')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_contact_requests_status ON contact_requests(status);
+CREATE INDEX IF NOT EXISTS idx_contact_requests_created_at ON contact_requests(created_at);
 
 -- ============================================
 -- TABLE: blocked_users

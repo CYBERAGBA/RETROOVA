@@ -28,6 +28,7 @@ const {
   buildFaqSchema,
   buildLanguageAlternates
 } = require('./src/services/seoService');
+const { formatDate } = require('./src/services/dateService');
 
 // ============================================
 // Configuration
@@ -119,6 +120,10 @@ app.use(cookieParser());
 app.use((req, res, next) => { req.cookies = req.cookies || {}; next(); });
 app.use(localeMiddleware);
 app.use(i18nMiddleware);
+app.use((req, res, next) => {
+  res.locals.formatDate = (value) => formatDate(value, req.locale);
+  next();
+});
 
 // Sessions sécurisées
 app.use(session({
@@ -250,20 +255,7 @@ app.get('/health', (req, res) => {
 
 // Legacy homepage retained for compatibility
 app.get('/', async (req, res) => {
-  if (req.locale && req.locale !== DEFAULT_LOCALE) {
-    return res.redirect(`/${req.locale}/`);
-  }
-  const publicStats = await itemModel.getPublicStats();
-  const canonicalUrl = buildAbsoluteUrl(SITE_URL, '/');
-  res.render('pages/index', {
-    title: `RETROOVA — ${req.t('seo.homeTitle', 'Objets perdus et trouvés')}`,
-    lang: 'fr',
-    metaDescription: req.t('seo.homeDescription', 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.'),
-    publicStats,
-    canonicalUrl,
-    ogImage: buildAbsoluteUrl(SITE_URL, '/images/logo_nom_slogan_paysage.png'),
-    schemaJsonLd: buildWebSiteSchema(SITE_URL, 'fr')
-  });
+  return res.redirect(`/${req.locale || DEFAULT_LOCALE}/`);
 });
 
 // Page 404
@@ -319,6 +311,8 @@ module.exports = app;
 if (require.main === module) {
   DatabaseAdapter.initializeDatabase()
     .then(() => DatabaseAdapter.ensurePublicIds())
+    .then(() => DatabaseAdapter.ensureReportsTable())
+    .then(() => DatabaseAdapter.ensureContactRequestsTable())
     .then(() => DatabaseAdapter.ensurePartnershipRequestsTable())
     .then(() => startServer())
     .catch((error) => {

@@ -275,6 +275,70 @@ class DatabaseAdapter {
       });
     });
   }
+
+  static async ensureReportsTable() {
+    if (isPostgres) {
+      for (const [oldName, newName] of [['id', 'report_id'], ['reporter_id', 'user_id'], ['description', 'comment'], ['attachment_filename', 'attachment']]) {
+        await postgresPool.query(`ALTER TABLE reports RENAME COLUMN ${oldName} TO ${newName}`).catch((error) => {
+          if (!/does not exist|already exists/i.test(error.message)) throw error;
+        });
+      }
+      await postgresPool.query('ALTER TABLE reports ADD COLUMN IF NOT EXISTS public_reference TEXT');
+      await postgresPool.query("UPDATE reports SET public_reference = 'RTV-' || UPPER(SUBSTRING(REPLACE(item_id, '-', ''), 1, 8)), comment = COALESCE(comment, 'Ancien signalement') WHERE public_reference IS NULL OR comment IS NULL");
+      await postgresPool.query('ALTER TABLE reports DROP CONSTRAINT IF EXISTS reports_status_check');
+      await postgresPool.query("ALTER TABLE reports ADD CONSTRAINT reports_status_check CHECK (status IN ('pending', 'reviewing', 'resolved', 'rejected'))").catch(() => {});
+      await postgresPool.query('CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id)');
+      return;
+    }
+
+    const columns = await this.sqliteAll('PRAGMA table_info(reports)');
+    const currentColumns = new Set(columns.map((column) => column.name));
+    if (!currentColumns.has('report_id') || currentColumns.has('reporter_id')) {
+      await this.sqliteRun('ALTER TABLE reports RENAME TO reports_legacy');
+      await this.sqliteRun(`CREATE TABLE reports (
+        report_id TEXT PRIMARY KEY, public_reference TEXT NOT NULL, user_id TEXT NOT NULL, item_id TEXT NOT NULL,
+        reason TEXT NOT NULL, comment TEXT NOT NULL, attachment TEXT,
+        status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewing', 'resolved', 'rejected')),
+        admin_notes TEXT, resolved_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+      )`);
+      await this.sqliteRun(`INSERT INTO reports (report_id, public_reference, user_id, item_id, reason, comment, attachment, status, admin_notes, resolved_at, created_at, updated_at)
+        SELECT id, 'RTV-' || UPPER(SUBSTR(REPLACE(item_id, '-', ''), 1, 8)), reporter_id, item_id, reason,
+          COALESCE(description, 'Ancien signalement'), attachment_filename,
+          CASE status WHEN 'reviewed' THEN 'reviewing' WHEN 'dismissed' THEN 'rejected' ELSE status END,
+          admin_notes, resolved_at, created_at, updated_at FROM reports_legacy`);
+      await this.sqliteRun('DROP TABLE reports_legacy');
+    }
+    await this.sqliteRun('CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id)');
+    await this.sqliteRun('CREATE INDEX IF NOT EXISTS idx_reports_item ON reports(item_id)');
+    await this.sqliteRun('CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)');
+    await this.sqliteRun('CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at)');
+  }
+
+  static async ensureContactRequestsTable() {
+    if (isPostgres) {
+      await postgresPool.query(`CREATE TABLE IF NOT EXISTS contact_requests (
+        id TEXT PRIMARY KEY, public_reference TEXT UNIQUE NOT NULL, name TEXT NOT NULL, email TEXT NOT NULL,
+        subject TEXT NOT NULL, item_reference TEXT, message TEXT NOT NULL, attachment TEXT,
+        status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewing', 'resolved', 'rejected')),
+        created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW()
+      )`);
+      await postgresPool.query('CREATE INDEX IF NOT EXISTS idx_contact_requests_status ON contact_requests(status)');
+      await postgresPool.query('CREATE INDEX IF NOT EXISTS idx_contact_requests_created_at ON contact_requests(created_at)');
+      return;
+    }
+
+    await this.sqliteRun(`CREATE TABLE IF NOT EXISTS contact_requests (
+      id TEXT PRIMARY KEY, public_reference TEXT UNIQUE NOT NULL, name TEXT NOT NULL, email TEXT NOT NULL,
+      subject TEXT NOT NULL, item_reference TEXT, message TEXT NOT NULL, attachment TEXT,
+      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewing', 'resolved', 'rejected')),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+    await this.sqliteRun('CREATE INDEX IF NOT EXISTS idx_contact_requests_status ON contact_requests(status)');
+    await this.sqliteRun('CREATE INDEX IF NOT EXISTS idx_contact_requests_created_at ON contact_requests(created_at)');
+  }
 }
 
 module.exports = {

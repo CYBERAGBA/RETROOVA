@@ -211,6 +211,7 @@
     "description": "Votre signalement sera examiné par l’équipe RETROOVA.",
     "reason": "Motif",
     "select": "Sélectionner",
+    "itemPlaceholder": "Référence de l’annonce",
     "details": "Détails",
     "placeholder": "Expliquez le problème sans communiquer d’informations sensibles.",
     "submit": "Envoyer le signalement",
@@ -218,8 +219,19 @@
     "scam": "Arnaque",
     "inappropriate": "Contenu inapproprié",
     "personal": "Informations personnelles",
+    "duplicate": "Doublon",
+    "returned": "Objet déjà restitué",
+    "wrongCategory": "Mauvaise catégorie",
+    "suspiciousContent": "Contenu suspect",
+    "suspiciousBehavior": "Comportement suspect",
+    "successTitle": "Signalement transmis",
+    "successMessage": "Votre signalement a bien été transmis à l'équipe de modération de RETROVA.",
+    "reference": "Référence",
     "suspicious": "Objet suspect",
     "other": "Autre"
+  },
+  "contact": {
+    "eyebrow": "CONTACT RETROOVA", "title": "Parlons de votre besoin", "lead": "Une question, un problème, une suggestion ou une opportunité de partenariat ? L’équipe RETROOVA est là pour vous répondre.", "promise": "Nous accordons de l’importance à chaque demande et nous vous orientons vers le bon interlocuteur.", "helpTitle": "Besoin d’aide ?", "helpText": "Vous rencontrez un problème avec votre compte, une annonce ou l’utilisation de RETROOVA ?", "helpAction": "Consulter le Centre d’aide", "reportTitle": "Signaler un problème", "reportText": "Vous avez identifié une annonce suspecte, une fraude ou un contenu qui ne respecte pas nos règles ?", "reportAction": "Signaler une annonce", "partnerTitle": "Devenir partenaire", "partnerText": "Vous représentez un hôtel, une entreprise, une école, une université, une gare, un aéroport, une institution ou une association ?", "partnerAction": "Proposer un partenariat", "writeTitle": "Nous contacter", "writeText": "Vous avez une question générale, une suggestion ou souhaitez simplement nous écrire ?", "writeAction": "Envoyer un message", "formEyebrow": "✉ FORMULAIRE DE CONTACT", "formTitle": "Envoyez-nous un message", "name": "Nom complet", "namePlaceholder": "Votre nom", "email": "Adresse e-mail", "subject": "Objet de votre demande", "select": "Sélectionner", "subjectGeneral": "Question générale", "subjectTechnical": "Problème technique", "subjectAccount": "Problème avec mon compte", "subjectListing": "Question concernant une annonce", "subjectSuggestion": "Suggestion / amélioration", "subjectPartnership": "Partenariat", "subjectPress": "Presse / médias", "subjectOther": "Autre", "itemReference": "Référence de l’annonce", "optional": "facultatif", "message": "Votre message", "messagePlaceholder": "Expliquez-nous votre demande...", "attachment": "Pièce jointe", "attachmentHint": "JPG, PNG, WEBP ou PDF — 5 Mo maximum.", "submit": "Envoyer mon message", "internal": "Le message sera envoyé en interne à l’administrateur.", "confidential": "Vos informations restent confidentielles.", "confidentialText": "Elles sont utilisées uniquement pour traiter votre demande.", "followup": "Vous recevrez une confirmation après l’envoi de votre demande.", "shortcutsTitle": "Vous cherchez peut-être une réponse immédiate ?", "shortcutSearchTitle": "Vous cherchez un objet ?", "shortcutSearchText": "Effectuez une recherche sur RETROOVA.", "shortcutGuideTitle": "Vous souhaitez savoir comment fonctionne RETROOVA ?", "shortcutGuideText": "Consultez notre guide.", "shortcutReportTitle": "Vous souhaitez signaler une annonce ?", "shortcutReportText": "Utilisez notre système de signalement.", "shortcutPrivacyTitle": "Vous avez une question concernant vos données ?", "shortcutPrivacyText": "Consultez notre politique de confidentialité.", "invalid": "Vérifiez les champs obligatoires puis réessayez.", "invalidAttachment": "La pièce jointe est invalide ou dépasse 5 Mo.", "successEyebrow": "CONTACT RETROOVA", "successTitle": "Message envoyé avec succès !", "successText": "Merci d’avoir contacté RETROOVA. Votre demande a bien été enregistrée et sera examinée par notre équipe.", "referenceLabel": "Référence de votre demande :", "referenceNote": "Conservez cette référence si vous devez nous recontacter concernant cette demande.", "backHome": "Retour à RETROOVA"
   },
   "myItems": {
     "eyebrow": "MON ESPACE",

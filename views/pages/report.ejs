@@ -1,27 +1,20 @@
 <%- include('../partials/header') %>
     <main class="container">
         <div class="form-page">
-            <a href="<%= item ? '/items/' + item.id : '/' %>" class="back-link"><%= t('report.backToAd', 'Retour à l’annonce') %></a>
+            <a href="<%= item ? (locale === 'en' ? '/en' : '/fr') + '/items/' + item.id : (locale === 'en' ? '/en' : '/fr') + '/' %>" class="back-link"><%= t('report.backToAd', 'Retour à l’annonce') %></a>
             <div class="page-heading"><span class="eyebrow"><%= t('report.moderation', 'MODÉRATION') %></span>
                 <h1><%= t('report.title', 'Signaler une annonce') %></h1>
                 <p><%= t('report.description', 'Votre signalement sera examiné par l’équipe RETROOVA.') %></p>
             </div>
             <% if (error) { %><div class="alert alert-danger"><p><%= error %></p></div><% } %>
-            <form method="POST" action="<%= item ? '/items/' + item.id + '/report' : '/report' %>" enctype="multipart/form-data" class="item-form"><input type="hidden"
+            <form method="POST" action="<%= item ? (locale === 'en' ? '/en' : '/fr') + '/items/' + item.id + '/report' : (locale === 'en' ? '/en' : '/fr') + '/report' %>" enctype="multipart/form-data" class="item-form"><input type="hidden"
                     name="_csrf" value="<%= csrfToken %>">
-                <% if (item) { %><input type="hidden" name="itemId" value="<%= item.id %>"><% } else { %><div class="form-group"><label for="itemId"><%= t('report.item', 'Annonce concernée') %> *</label><input id="itemId" name="itemId" required placeholder="ID de l’annonce"></div><% } %>
+                <div class="form-group"><label for="publicReference"><%= t('report.item', 'Annonce concernée') %></label><input id="publicReference" value="<%= publicReference || '' %>" readonly required placeholder="<%= t('report.itemPlaceholder', 'Référence de l’annonce') %>"><input type="hidden" name="itemId" value="<%= item?.id || '' %>"></div>
                 <div class="form-group"><label for="reason"><%= t('report.reason', 'Motif') %> *</label><select id="reason" name="reason" required>
                         <option value=""><%= t('report.select', 'Sélectionner') %></option>
-                        <option value="fake"><%= t('report.fake', 'Fausse annonce') %></option>
-                        <option value="scam"><%= t('report.scam', 'Arnaque') %></option>
-                        <option value="inappropriate"><%= t('report.inappropriate', 'Contenu inapproprié') %></option>
-                        <option value="personal"><%= t('report.personal', 'Informations personnelles') %></option>
-                        <option value="suspicious"><%= t('report.suspicious', 'Objet suspect') %></option>
-                        <option value="other"><%= t('report.other', 'Autre') %></option>
+                        <option value="scam"><%= t('report.scam', 'Fraude/escroquerie') %></option><option value="personal"><%= t('report.personal', 'Informations personnelles exposées') %></option><option value="inappropriate"><%= t('report.inappropriate', 'Image inappropriée ou sensible') %></option><option value="fake"><%= t('report.fake', 'Annonce fausse ou trompeuse') %></option><option value="duplicate"><%= t('report.duplicate', 'Doublon') %></option><option value="returned"><%= t('report.returned', 'Objet déjà restitué') %></option><option value="wrong-category"><%= t('report.wrongCategory', 'Mauvaise catégorie') %></option><option value="suspicious-content"><%= t('report.suspiciousContent', 'Contenu suspect') %></option><option value="suspicious-behavior"><%= t('report.suspiciousBehavior', 'Comportement suspect') %></option><option value="other"><%= t('report.other', 'Autre') %></option>
                     </select></div>
-                <div class="form-group"><label for="description"><%= t('report.details', 'Détails') %></label><textarea id="description"
-                        name="description" rows="6"
-                        placeholder="<%= t('report.placeholder', 'Expliquez le problème sans communiquer d’informations sensibles.') %>"></textarea>
+                <div class="form-group"><label for="comment"><%= t('report.details', 'Commentaire') %> *</label><textarea id="comment" name="comment" rows="6" required maxlength="5000" placeholder="<%= t('report.placeholder', 'Expliquez le problème sans communiquer d’informations sensibles.') %>"></textarea>
                 </div>
                 <div class="form-group"><label for="attachment"><%= t('report.attachment', 'Pièce jointe (facultative)') %></label><input id="attachment" name="attachment" type="file" accept="image/jpeg,image/png,application/pdf"></div>
                 <button class="btn btn-danger" type="submit"><%= t('report.submit', 'Envoyer le signalement') %></button>
