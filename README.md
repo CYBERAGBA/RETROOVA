@@ -100,7 +100,7 @@ retrova/
 
 Avant de lancer le projet, assure-toi d’avoir installé :
 
-- Node.js 18+ ou version compatible
+- Node.js 22 LTS ou version compatible
 - npm
 - Git
 
@@ -522,5 +522,4 @@ Pour les questions ou problèmes :
 **RETROVA V1 - Lost. Found. Returned.** ✅
 
 Plateforme développée avec soin pour retrouver ce qu'on a perdu.
-#   R E T R O O V A  
- 
+# RETROOVA
