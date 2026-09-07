@@ -11,6 +11,11 @@
             <div><strong><%= overview.matches %></strong><span><%= t('admin.matches', 'Correspondances') %></span></div>
             <div><strong><%= overview.pending_reports %></strong><span><%= t('admin.pendingReports', 'Signalements à traiter') %></span></div>
         </section>
+        <nav class="admin-scope-filter" aria-label="<%= t('admin.dataScope', 'Type de données') %>">
+            <a href="/admin?scope=all" class="<%= scope === 'all' ? 'active' : '' %>"><%= t('admin.allData', 'Toutes') %></a>
+            <a href="/admin?scope=real" class="<%= scope === 'real' ? 'active' : '' %>"><%= t('admin.realData', 'Réelles') %></a>
+            <a href="/admin?scope=demo" class="<%= scope === 'demo' ? 'active' : '' %>"><%= t('admin.demoData', 'Démonstration') %></a>
+        </nav>
         <% if (typeof contactRequests !== 'undefined') { %>
         <section class="admin-panel">
             <div class="panel-heading"><h2><%= t('admin.contactRequests', 'Demandes de contact') %></h2><span><%= contactRequests.length %> <%= t('admin.requestCount', 'demandes') %></span></div>
@@ -24,7 +29,7 @@
                 <h2><%= t('admin.users', 'Utilisateurs') %></h2><span><%= users.length %> <%= t('admin.displayed', 'affichés') %></span>
             </div>
             <div class="admin-table">
-                <% users.forEach(account=> { %><div><span class="type-pill"><%= account.role === 'admin' ? t('admin.roleAdmin', 'Administrateur') : t('admin.roleUser', 'Utilisateur') %></span><strong><%= account.name %></strong><span><%= account.email %> · <%= account.city || t('admin.cityUnknown', 'Ville non précisée') %></span><span><%= account.status === 'active' ? t('admin.statusActive', 'Actif') : account.status === 'suspended' ? t('admin.statusSuspended', 'Suspendu') : account.status === 'deleted' ? t('admin.statusDeleted', 'Supprimé') : account.status %></span></div><% }) %>
+                <% users.forEach(account=> { %><div><span class="type-pill"><%= account.is_demo ? t('admin.demoBadge', 'DÉMO') : account.role === 'admin' ? t('admin.roleAdmin', 'Administrateur') : t('admin.roleUser', 'Utilisateur') %></span><strong><%= account.name %></strong><span><%= account.email %> · <%= account.city || t('admin.cityUnknown', 'Ville non précisée') %></span><span><%= account.status === 'active' ? t('admin.statusActive', 'Actif') : account.status === 'suspended' ? t('admin.statusSuspended', 'Suspendu') : account.status === 'deleted' ? t('admin.statusDeleted', 'Supprimé') : account.status %></span></div><% }) %>
             </div>
         </section>
         <section class="admin-panel">
@@ -77,7 +82,7 @@
                 <h2><%= t('admin.recentAds', 'Annonces récentes') %></h2><a href="/search"><%= t('admin.openSearch', 'Ouvrir la recherche') %></a>
             </div>
             <div class="admin-table">
-                <% items.forEach(item=> { %><div><span class="type-pill <%= item.type %>"><%= item.type === 'lost' ? t('common.lost', 'Perdu') : t('common.found', 'Trouvé') %></span><strong><%= item.title %></strong><span><%= item.city %> · <%= item.owner_name %></span><a href="/items/<%= item.id %>"><%= t('admin.view', 'Voir') %></a><form method="POST" action="/admin/items/<%= item.id %>/status" data-confirm="<%= t('admin.closeConfirm', 'Fermer cette annonce ?') %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button class="btn btn-small btn-danger"><%= t('admin.close', 'Fermer') %></button></form></div><% }) %>
+                <% items.forEach(item=> { %><div><span class="type-pill <%= item.type %>"><%= item.is_demo ? t('admin.demoBadge', 'DÉMO') : item.type === 'lost' ? t('common.lost', 'Perdu') : t('common.found', 'Trouvé') %></span><strong><%= item.title && item.title.toLowerCase() !== 'photo' ? item.title : item.type === 'found' ? t('common.found', 'Objet trouvé') : t('common.lost', 'Objet perdu') %></strong><span><%= item.city %> · <%= item.owner_name %></span><a href="/items/<%= item.id %>"><%= t('admin.view', 'Voir') %></a><form method="POST" action="/admin/items/<%= item.id %>/status" data-confirm="<%= t('admin.closeConfirm', 'Fermer cette annonce ?') %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button class="btn btn-small btn-danger"><%= t('admin.close', 'Fermer') %></button></form></div><% }) %>
             </div>
         </section>
         <section class="admin-panel">

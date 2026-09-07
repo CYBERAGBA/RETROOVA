@@ -1,4 +1,5 @@
 const { DatabaseAdapter } = require('../db');
+const { getDisplayTitle } = require('../services/itemService');
 
 class ItemModel {
     constructor() {
@@ -46,7 +47,7 @@ class ItemModel {
             sql += ' AND type = ?';
             params.push(type);
         }
-        return this.all(`${sql} ORDER BY created_at DESC`, params);
+        return this.all(`${sql} ORDER BY created_at DESC`, params).then((items) => items.map((item) => ({ ...item, title: getDisplayTitle(item.type, item.title) })));
     }
 
     search(filters = {}) {

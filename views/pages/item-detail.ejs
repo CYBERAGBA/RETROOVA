@@ -26,7 +26,7 @@
                 </div>
 
                 <aside class="detail-side-column">
-                        <section class="detail-author-card"><span class="section-label"><%= t('itemDetail.trust', 'CONFIANCE') %></span><div class="detail-author-avatar">👤</div><p class="detail-author-label"><%= t('itemDetail.publishedBy', 'Annonce publiée par') %></p><h2><%= item.is_anonymous ? t('itemDetail.publicMember', 'un membre RETROOVA') : (item.owner_name || t('itemDetail.publicMember', 'un membre RETROOVA')) %></h2><% if (typeof ownerReputation !== 'undefined' && ownerReputation) { %><p class="reputation-badge <%= ownerReputation.tone %>"><%= ownerReputation.tone === 'success' ? t('itemDetail.goodReputation', 'Bonne réputation') : ownerReputation.tone === 'danger' ? t('itemDetail.watchlist', 'Compte sous surveillance') : t('itemDetail.standardReputation', 'Réputation standard') %><span>·</span><%= ownerReputation.level %></p><% } %><% if (item.owner_public_id) { %><div class="detail-public-id"><span><%= t('itemDetail.publicId', 'Identifiant public') %></span><code id="advertiser-id"><%= item.owner_public_id %></code><button type="button" class="copy-id" data-copy-target="#advertiser-id"><%= t('itemDetail.copy', 'Copier') %></button></div><% } %></section>
+                        <section class="detail-author-card"><span class="section-label"><%= t('itemDetail.trust', 'CONFIANCE') %></span><div class="detail-author-avatar">👤</div><p class="detail-author-label"><%= t('itemDetail.publishedBy', 'Déclaré par') %></p><h2><%= t('itemDetail.publicMember', 'Membre RETROOVA') %></h2><% if (typeof ownerReputation !== 'undefined' && ownerReputation) { %><p class="reputation-badge <%= ownerReputation.tone %>"><%= ownerReputation.tone === 'success' ? t('itemDetail.goodReputation', 'Bonne réputation') : ownerReputation.tone === 'danger' ? t('itemDetail.watchlist', 'Compte sous surveillance') : t('itemDetail.standardReputation', 'Réputation standard') %><span>·</span><%= ownerReputation.level %></p><% } %><% if (item.owner_public_id) { %><div class="detail-public-id"><span><%= t('itemDetail.publicId', 'Identifiant public') %></span><code id="advertiser-id"><%= item.owner_public_id %></code><button type="button" class="copy-id" data-copy-target="#advertiser-id"><%= t('itemDetail.copy', 'Copier') %></button></div><% } %></section>
                     <section class="detail-actions">
                         <span class="section-label"><%= t('itemDetail.whatNext', 'QUE SOUHAITEZ-VOUS FAIRE ?') %></span>
                         <h2><%= t('itemDetail.actOnAd', 'Agir sur cette annonce') %></h2>
@@ -60,9 +60,9 @@
                         <% } else if (user) { %>
                             <p class="detail-muted"><%= t('itemDetail.contactReserved', 'Les actions de contact sont réservées à la personne concernée.') %></p>
                         <% } else { %>
-                            <a href="/login" class="btn btn-primary btn-block"><%= t('itemDetail.loginToAct', 'Se connecter pour agir') %></a>
+                            <a href="/<%= locale === 'en' ? 'en' : 'fr' %>/login" class="btn btn-primary btn-block"><%= t('itemDetail.loginToAct', 'Se connecter pour agir') %></a>
                         <% } %>
-                        <a href="/items/<%= item.id %>/report" class="detail-report">Signaler cette annonce <span>→</span></a>
+                        <a href="/<%= locale === 'en' ? 'en' : 'fr' %>/items/<%= item.id %>/report" class="detail-report"><%= t('itemDetail.report', 'Signaler cette annonce') %> <span>→</span></a>
                     </section>
                 </aside>
             </div>

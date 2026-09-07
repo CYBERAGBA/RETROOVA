@@ -10,6 +10,8 @@
     "start:prod": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/initDb.js",
+    "seed-demo": "node scripts/seedDemo.js seed",
+    "clear-demo": "node scripts/seedDemo.js clear",
     "test": "node --test test/smoke.test.js"
   },
   "engines": {

@@ -22,7 +22,7 @@
                             </div>
                             <% } %>
 
-                                <form method="POST" action="/<%= locale === 'en' ? 'en/' : locale === 'fr' ? 'fr/' : '' %>login" class="auth-form"><input type="hidden" name="_csrf"
+                                <form method="POST" action="/<%= locale === 'en' ? 'en/' : 'fr/' %>login" class="auth-form"><input type="hidden" name="_csrf"
                                         value="<%= csrfToken %>">
                                     <input type="hidden" name="returnTo" value="<%= returnTo || '' %>">
                                     <div class="form-group">
@@ -39,11 +39,12 @@
 
                                     <button type="submit" class="btn btn-primary btn-block"><%= t('auth.submitLogin', 'Se connecter') %></button>
                                 </form>
+                                <p class="auth-legal"><%= t('auth.loginLegalPrefix', 'En utilisant RETROOVA, vous acceptez nos') %> <a href="/<%= locale === 'en' ? 'en' : 'fr' %>/terms"><%= t('auth.termsLink', 'Conditions d’utilisation') %></a> <%= t('auth.loginLegalAnd', 'et reconnaissez notre') %> <a href="/<%= locale === 'en' ? 'en' : 'fr' %>/privacy"><%= t('auth.privacyLink', 'Politique de confidentialité') %></a>.</p>
 
                                 <div class="auth-divider"><%= t('common.or', 'ou') %></div>
 
                                 <p class="auth-link">
-                                    <%= t('auth.noAccount', 'Vous n\'avez pas de compte ?') %> <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>register"><%= t('auth.signUp', 'S\'inscrire') %></a>
+                                    <%= t('auth.noAccount', 'Vous n\'avez pas de compte ?') %> <a href="/<%= locale === 'en' ? 'en' : 'fr' %>/register"><%= t('auth.signUp', 'S\'inscrire') %></a>
                                 </p>
 
             </div>

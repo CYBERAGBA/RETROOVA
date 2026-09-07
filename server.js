@@ -311,6 +311,7 @@ module.exports = app;
 if (require.main === module) {
   DatabaseAdapter.initializeDatabase()
     .then(() => DatabaseAdapter.ensurePublicIds())
+    .then(() => DatabaseAdapter.ensureDemoColumns())
     .then(() => DatabaseAdapter.ensureReportsTable())
     .then(() => DatabaseAdapter.ensureContactRequestsTable())
     .then(() => DatabaseAdapter.ensurePartnershipRequestsTable())

@@ -29,7 +29,7 @@
       </div>
       <div class="detail-item">
         <span><%= t('adminDetail.received', 'Date de réception') %></span>
-        <strong><%= new Date(request.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) %> — <%= new Date(request.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) %></strong>
+        <strong><%= formatDate(request.created_at) %></strong>
       </div>
     </div>
 

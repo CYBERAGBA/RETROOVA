@@ -9,7 +9,7 @@ async function registerAndLogin(agent) {
     const registerPage = await agent.get('/register');
     const registerCsrf = /name="_csrf"\s+value="([^"]+)"/s.exec(registerPage.text)?.[1];
     await agent.post('/register').type('form').send({
-        name: 'Smoke User', email, password, passwordConfirm: password, city: 'Abidjan', _csrf: registerCsrf
+        name: 'Smoke User', email, password, passwordConfirm: password, city: 'Abidjan', acceptTerms: '1', _csrf: registerCsrf
     });
     const loginPage = await agent.get('/login');
     const loginCsrf = /name="_csrf"\s+value="([^"]+)"/s.exec(loginPage.text)?.[1];
@@ -242,6 +242,7 @@ test('le compte admin utilise /login et les routes admin restent protégées', {
         password: 'motdepasse-test',
         passwordConfirm: 'motdepasse-test',
         city: 'Abidjan',
+        acceptTerms: '1',
         _csrf: registerCsrf
     });
     assert.equal(registration.status, 302);

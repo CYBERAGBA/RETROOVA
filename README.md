@@ -179,6 +179,17 @@ npm test
 ```
 Lance les tests de validation disponibles.
 
+### Données de démonstration
+
+Les commandes suivantes nécessitent `DATABASE_URL` et PostgreSQL. Elles créent ou retirent uniquement les lignes marquées `is_demo = true` :
+
+```bash
+npm run seed-demo
+npm run clear-demo
+```
+
+Le seed est réexécutable, utilise les images déjà présentes dans `public/images/annonces` sans les copier, et génère les mots de passe DEMO à chaque exécution. Les emails DEMO utilisent le domaine réservé `demo.retrova.invalid` et ne doivent pas servir à l’envoi de messages.
+
 ---
 
 ## Flux utilisateur

@@ -66,9 +66,10 @@ const buildOrganizationSchema = (siteUrl, locale = 'fr') => ({
   url: siteUrl,
   logo: buildAbsoluteUrl(siteUrl, '/images/logo_nom_slogan_paysage.png'),
   sameAs: [
-    'https://www.linkedin.com',
-    'https://www.facebook.com',
-    'https://www.instagram.com'
+    'https://www.facebook.com/profile.php?id=100094905241127',
+    'https://www.instagram.com/invites/contact/?utm_source=ig_contact_invite&utm_medium=copy_link&utm_content=c8xee1y',
+    'https://www.linkedin.com/in/odessi-raoul-agba-716779343?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+    'https://wa.me/2250500072323'
   ],
   contactPoint: {
     '@type': 'ContactPoint',

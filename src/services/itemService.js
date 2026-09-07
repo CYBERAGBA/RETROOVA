@@ -29,4 +29,10 @@ const categoryLabels = {
     other: 'Autre'
 };
 
-module.exports = { categories, categoryLabels, isValidDate };
+function getDisplayTitle(type, title) {
+    const normalizedTitle = String(title || '').trim();
+    if (normalizedTitle && normalizedTitle.toLowerCase() !== 'photo') return normalizedTitle;
+    return type === 'found' ? 'Objet trouvé' : 'Objet perdu';
+}
+
+module.exports = { categories, categoryLabels, isValidDate, getDisplayTitle };

@@ -23,7 +23,7 @@ class AuthController {
    */
   postRegister = async (req, res) => {
     try {
-      const { name, email, password, passwordConfirm, phone, city } = req.body;
+      const { name, email, password, passwordConfirm, phone, city, acceptTerms } = req.body;
 
       // Valider les données
       const validation = this.authService.validateRegistration({
@@ -32,14 +32,15 @@ class AuthController {
         password,
         passwordConfirm,
         phone,
-        city
+        city,
+        acceptTerms
       });
 
       if (!validation.isValid) {
         return res.render('pages/register', {
           title: req.t('auth.registerTitle', 'Inscription'),
           errors: validation.errors,
-          formData: { name, email, phone, city }
+          formData: { name, email, phone, city, acceptTerms }
         });
       }
 
@@ -53,7 +54,8 @@ class AuthController {
       });
 
       // Rediriger avec message de succès
-      res.redirect(`/login?message=${encodeURIComponent(req.t('messages.registrationSuccess', 'Inscription réussie. Veuillez vous connecter.'))}`);
+      const localePrefix = req.locale === 'en' ? '/en' : '/fr';
+      res.redirect(`${localePrefix}/login?message=${encodeURIComponent(req.t('messages.registrationSuccess', 'Inscription réussie. Veuillez vous connecter.'))}`);
     } catch (error) {
       console.error('Erreur inscription:', error);
       res.render('pages/register', {
@@ -88,7 +90,8 @@ class AuthController {
         return res.render('pages/login', {
           title: req.t('auth.loginTitle', 'Connexion'),
           errors: validation.errors,
-          formData: { email }
+          formData: { email },
+          returnTo: req.body.returnTo || ''
         });
       }
 
@@ -113,7 +116,8 @@ class AuthController {
       res.render('pages/login', {
         title: req.t('auth.loginTitle', 'Connexion'),
         errors: [error.message],
-        formData: { email: req.body.email }
+        formData: { email: req.body.email },
+        returnTo: req.body.returnTo || ''
       });
     }
   };

@@ -28,17 +28,15 @@
                     <div class="empty-state">
                         <p><%= t('communication.empty', 'Aucun message pour le moment.') %></p>
                     </div>
-                    <% } else { conversations.filter(Boolean).forEach(conversation=> { const createdAt = conversation.created_at || conversation.messages?.[0]?.created_at || ''; %><article class="message-row">
-                            <div><strong>
-                                    <%= conversation.sender_id===user.id ? t('communication.you', 'Vous') : (conversation.sender_name || t('communication.user', 'Utilisateur')) %>
-                                </strong><span>
-                                    <%= conversation.item_title || t('communication.general', 'Conversation générale') %>
-                                </span>
-                                <% const conversationPublicId = conversation.sender_id===user.id ? conversation.receiver_public_id : conversation.sender_public_id; %>
-                                <% if (conversationPublicId) { %><small class="message-public-id"><%= t('communication.publicId', 'Identifiant public') %> : <strong><%= conversationPublicId %></strong></small><% } %>
-                                <p>
-                                    <%= conversation.message || (conversation.messages && conversation.messages[0] ? conversation.messages[0].message : '') %>
-                                </p>
+                    <% } else { conversations.filter(Boolean).forEach(conversation=> { const createdAt = conversation.created_at || conversation.messages?.[0]?.created_at || ''; const isSent = conversation.sender_id === user.id; const conversationPublicId = isSent ? conversation.receiver_public_id : conversation.sender_public_id; const messageText = conversation.message || (conversation.messages && conversation.messages[0] ? conversation.messages[0].message : ''); %><article class="message-row <%= isSent ? 'message-row-sent' : 'message-row-received' %>">
+                            <div class="message-content">
+                                <div class="message-metadata">
+                                    <strong><%= isSent ? t('communication.you', 'Vous') : (conversation.sender_name || t('communication.user', 'Utilisateur')) %></strong>
+                                    <time><%= formatDate(createdAt) %></time>
+                                    <span><%= conversation.item_title || t('communication.general', 'Conversation générale') %></span>
+                                    <% if (conversationPublicId) { %><small class="message-public-id"><%= t('communication.publicId', 'Identifiant public') %> : <strong><%= conversationPublicId %></strong></small><% } %>
+                                </div>
+                                <p class="message-body"><%= messageText %></p>
                                 <% if (!conversation.is_read && conversation.receiver_id===user.id) { %>
                                     <form method="POST" action="/messages/<%= conversation.id %>/read"><input
                                             type="hidden" name="_csrf" value="<%= csrfToken %>"><button
@@ -49,9 +47,7 @@
                                                 value="<%= csrfToken %>"><input type="hidden" name="publicId"
                                                 value="<%= conversation.sender_id===user.id ? (conversation.receiver_public_id || '') : (conversation.sender_public_id || '') %>"><button
                                                 class="btn btn-small btn-danger"><%= t('communication.block', 'Bloquer') %></button></form>
-                            </div><time>
-                                <%= formatDate(createdAt) %>
-                            </time>
+                            </div>
                         </article>
                         <% }) } %>
             </section>

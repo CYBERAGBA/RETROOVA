@@ -15,7 +15,7 @@
                     </div>
                     <% } %>
 
-                        <form method="POST" action="/register" class="auth-form"><input type="hidden" name="_csrf"
+                        <form method="POST" action="/<%= locale === 'en' ? 'en' : 'fr' %>/register" class="auth-form"><input type="hidden" name="_csrf"
                                 value="<%= csrfToken %>">
                             <div class="form-group">
                                 <label for="name"><%= t('profile.fullName', 'Nom complet') %></label>
@@ -54,11 +54,13 @@
                                     placeholder="<%= t('auth.confirmPasswordPlaceholder', 'Confirmez votre mot de passe') %>" required>
                             </div>
 
+                            <label class="form-group auth-consent"><span><input type="checkbox" name="acceptTerms" value="1" required <%= formData?.acceptTerms ? 'checked' : '' %>> <%= t('auth.acceptTermsPrefix', 'J’ai lu et j’accepte les') %> <a href="/<%= locale === 'en' ? 'en' : 'fr' %>/terms"><%= t('auth.termsLink', 'Conditions d’utilisation') %></a> <%= t('auth.acceptTermsSuffix', 'de RETROOVA.') %></span></label>
+
                             <button type="submit" class="btn btn-primary btn-block"><%= t('auth.createAccount', 'Créer mon compte') %></button>
                         </form>
 
                         <p class="auth-link">
-                            <%= t('auth.alreadyHaveAccount', 'Vous avez déjà un compte ?') %> <a href="/login"><%= t('auth.submitLogin', 'Se connecter') %></a>
+                            <%= t('auth.alreadyHaveAccount', 'Vous avez déjà un compte ?') %> <a href="/<%= locale === 'en' ? 'en' : 'fr' %>/login"><%= t('auth.submitLogin', 'Se connecter') %></a>
                         </p>
             </div>
         </div>

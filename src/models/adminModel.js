@@ -8,13 +8,26 @@ class AdminModel {
     get(sql, params = []) { return this.db.get(sql, params); }
     async ensurePartnershipTable() { await this.db.ensurePartnershipRequestsTable(); }
     async ensureContactRequestsTable() { await this.db.ensureContactRequestsTable(); }
-    async getOverview() {
-        const rows = await this.all(`SELECT (SELECT COUNT(*) FROM users WHERE status != 'deleted') AS users, (SELECT COUNT(*) FROM items WHERE type = 'lost') AS lost, (SELECT COUNT(*) FROM items WHERE type = 'found') AS found, (SELECT COUNT(*) FROM matches) AS matches, (SELECT COUNT(*) FROM reports WHERE status = 'pending') AS pending_reports`);
+    scopeCondition(scope, alias = '') {
+        const prefix = alias ? `${alias}.` : '';
+        if (scope === 'demo') return `${prefix}is_demo = TRUE`;
+        if (scope === 'real') return `${prefix}is_demo = FALSE`;
+        return 'TRUE';
+    }
+    async getOverview(scope = 'all') {
+        const userScope = this.scopeCondition(scope, 'users');
+        const itemScope = this.scopeCondition(scope, 'items');
+        const matchScope = scope === 'demo'
+            ? "(EXISTS (SELECT 1 FROM items WHERE items.id = matches.lost_item_id AND items.is_demo = TRUE) OR EXISTS (SELECT 1 FROM items WHERE items.id = matches.found_item_id AND items.is_demo = TRUE))"
+            : scope === 'real'
+                ? "(EXISTS (SELECT 1 FROM items WHERE items.id = matches.lost_item_id AND items.is_demo = FALSE) AND EXISTS (SELECT 1 FROM items WHERE items.id = matches.found_item_id AND items.is_demo = FALSE))"
+                : 'TRUE';
+        const rows = await this.all(`SELECT (SELECT COUNT(*) FROM users WHERE status != 'deleted' AND ${userScope}) AS users, (SELECT COUNT(*) FROM items WHERE type = 'lost' AND ${itemScope}) AS lost, (SELECT COUNT(*) FROM items WHERE type = 'found' AND ${itemScope}) AS found, (SELECT COUNT(*) FROM matches WHERE ${matchScope}) AS matches, (SELECT COUNT(*) FROM reports JOIN items ON items.id = reports.item_id WHERE reports.status = 'pending' AND ${itemScope}) AS pending_reports`);
         return rows[0];
     }
-    getRecentItems() { return this.all('SELECT items.*, users.name AS owner_name FROM items JOIN users ON users.id = items.user_id ORDER BY items.created_at DESC LIMIT 20'); }
-    getReports() { return this.all('SELECT reports.*, items.title AS item_title, users.name AS reporter_name FROM reports JOIN items ON items.id = reports.item_id JOIN users ON users.id = reports.user_id ORDER BY reports.created_at DESC LIMIT 50'); }
-    getUsers() { return this.all('SELECT id, name, email, city, role, status, created_at FROM users ORDER BY created_at DESC LIMIT 100'); }
+    getRecentItems(scope = 'all') { return this.all(`SELECT items.*, users.name AS owner_name FROM items JOIN users ON users.id = items.user_id WHERE ${this.scopeCondition(scope, 'items')} ORDER BY items.created_at DESC LIMIT 20`); }
+    getReports(scope = 'all') { return this.all(`SELECT reports.*, items.title AS item_title, users.name AS reporter_name FROM reports JOIN items ON items.id = reports.item_id JOIN users ON users.id = reports.user_id WHERE ${this.scopeCondition(scope, 'items')} ORDER BY reports.created_at DESC LIMIT 50`); }
+    getUsers(scope = 'all') { return this.all(`SELECT id, name, email, city, role, status, created_at, is_demo FROM users WHERE ${this.scopeCondition(scope)} ORDER BY created_at DESC LIMIT 100`); }
     async getContactRequests() { await this.ensureContactRequestsTable(); return this.all('SELECT * FROM contact_requests ORDER BY created_at DESC LIMIT 50'); }
     async createContactRequest(data) { await this.ensureContactRequestsTable(); return this.run('INSERT INTO contact_requests (id, public_reference, name, email, subject, item_reference, message, attachment, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [data.id, data.publicReference, data.name, data.email, data.subject, data.itemReference || null, data.message, data.attachment || null, 'pending']); }
     async getPartnershipRequests() { await this.ensurePartnershipTable(); return this.all('SELECT * FROM partnership_requests ORDER BY created_at DESC'); }

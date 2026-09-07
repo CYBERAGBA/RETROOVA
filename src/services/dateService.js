@@ -4,7 +4,7 @@ function formatDate(value, locale = 'fr') {
     if (!value) return '';
 
     let date;
-    const stringValue = String(value);
+    const stringValue = value instanceof Date ? value.toISOString() : String(value).trim();
     if (DATE_ONLY_PATTERN.test(stringValue)) {
         const [year, month, day] = stringValue.split('-').map(Number);
         date = new Date(year, month - 1, day);
@@ -12,7 +12,7 @@ function formatDate(value, locale = 'fr') {
         date = new Date(value);
     }
 
-    if (Number.isNaN(date.getTime())) return '';
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
     return new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'fr-FR', {
         day: 'numeric',
         month: 'long',

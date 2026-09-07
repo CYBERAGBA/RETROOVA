@@ -107,6 +107,74 @@
   flex: 1;
 }
 
+.message-row .message-content {
+  min-width: 0;
+}
+
+.message-metadata {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.7rem;
+  color: var(--text-light);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.message-metadata strong {
+  color: var(--primary-dark);
+  font-size: 0.8rem;
+}
+
+.message-metadata time {
+  color: var(--text-light);
+  font-size: 0.72rem;
+}
+
+.message-metadata span {
+  overflow-wrap: anywhere;
+}
+
+.message-row .message-public-id {
+  display: inline;
+  margin: 0;
+  color: var(--text-light);
+  font-size: 0.72rem;
+}
+
+.message-row .message-public-id strong {
+  color: var(--accent);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.message-row .message-body {
+  width: fit-content;
+  max-width: min(100%, 42rem);
+  margin: 0.7rem 0 0.8rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: var(--bg-soft);
+  color: var(--primary-dark);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.message-row-sent .message-body {
+  margin-left: auto;
+  background: rgba(13, 110, 253, 0.08);
+}
+
+.message-row-received .message-body {
+  border-left: 3px solid var(--accent);
+}
+
+.message-row form {
+  display: inline-block;
+  margin: 0.1rem 0.45rem 0 0;
+}
+
 .message-row span,
 .message-row p,
 .notification-row p,
@@ -117,11 +185,6 @@
   color: var(--text-light);
   font-size: 0.9rem;
   margin: 0.2rem 0;
-}
-
-.message-row time {
-  color: var(--text-light);
-  font-size: 0.75rem;
 }
 
 .contact-form {
@@ -1870,6 +1933,24 @@ input, select, textarea {
 .message-public-id strong { color: var(--accent); letter-spacing: 0.04em; }
 .message-row .btn-danger { min-height: 0; padding: 0.25rem 0.5rem; border-radius: 8px; background: transparent; border: 1px solid rgba(220,38,38,0.25); color: #b91c1c; font-size: 0.68rem; font-weight: 600; box-shadow: none; }
 .message-row .btn-danger:hover { background: rgba(220,38,38,0.06); transform: none; }
+
+@media (max-width: 600px) {
+  .message-row {
+    display: block;
+    padding: 0.9rem 0;
+  }
+
+  .message-row .message-body {
+    max-width: 100%;
+    padding: 0.8rem 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .message-row .btn {
+    min-height: 2.2rem;
+  }
+}
+
 .item-meta { font-size: 0.92rem; }
 .text-link { font-weight: 700; color: var(--primary); }
 

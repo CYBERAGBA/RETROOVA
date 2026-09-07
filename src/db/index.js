@@ -230,6 +230,44 @@ class DatabaseAdapter {
     });
   }
 
+  static async ensureDemoColumns() {
+    if (isPostgres) {
+      await postgresPool.query(`
+        ALTER TABLE users
+          ADD COLUMN IF NOT EXISTS first_name TEXT,
+          ADD COLUMN IF NOT EXISTS last_name TEXT,
+          ADD COLUMN IF NOT EXISTS preferred_locale TEXT NOT NULL DEFAULT 'fr',
+          ADD COLUMN IF NOT EXISTS is_demo BOOLEAN NOT NULL DEFAULT FALSE;
+        ALTER TABLE items
+          ADD COLUMN IF NOT EXISTS is_demo BOOLEAN NOT NULL DEFAULT FALSE;
+      `);
+      return;
+    }
+
+    const db = this.sqliteOpen();
+    await new Promise((resolve, reject) => {
+      db.all('PRAGMA table_info(users)', (error, columns) => {
+        if (error) return reject(error);
+        const existing = new Set(columns.map((column) => column.name));
+        const statements = [
+          ['first_name', 'TEXT'],
+          ['last_name', 'TEXT'],
+          ['preferred_locale', "TEXT NOT NULL DEFAULT 'fr'"],
+          ['is_demo', 'BOOLEAN NOT NULL DEFAULT 0']
+        ].filter(([name]) => !existing.has(name)).map(([name, definition]) => `ALTER TABLE users ADD COLUMN ${name} ${definition}`);
+        db.all('PRAGMA table_info(items)', (itemsError, itemColumns) => {
+          if (itemsError) return reject(itemsError);
+          if (!itemColumns.some((column) => column.name === 'is_demo')) statements.push('ALTER TABLE items ADD COLUMN is_demo BOOLEAN NOT NULL DEFAULT 0');
+          const next = (index) => {
+            if (index >= statements.length) return resolve();
+            db.run(statements[index], (alterError) => alterError ? reject(alterError) : next(index + 1));
+          };
+          next(0);
+        });
+      });
+    }).finally(() => db.close());
+  }
+
   static async ensurePartnershipRequestsTable() {
     if (isPostgres) {
       await postgresPool.query(`

@@ -97,7 +97,13 @@
     "cityPlaceholder": "Your city",
     "passwordHint": "At least 8 characters for security",
     "passwordPlaceholder": "At least 8 characters",
-    "confirmPasswordPlaceholder": "Confirm your password"
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "acceptTermsPrefix": "I have read and accept RETROOVA’s",
+    "acceptTermsSuffix": "",
+    "termsLink": "Terms of Use",
+    "privacyLink": "Privacy Policy",
+    "loginLegalPrefix": "By using RETROOVA, you accept our",
+    "loginLegalAnd": "and acknowledge our"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -410,6 +416,7 @@
     "unknown": "Not specified",
     "closeConfirm": "Close this listing?",
     "reportDetailUnknown": "Not specified"
+    ,"dataScope": "Data type", "allData": "All", "realData": "Real", "demoData": "Demo", "demoBadge": "DEMO"
   },
   "info": {
     "backHome": "Back to home",

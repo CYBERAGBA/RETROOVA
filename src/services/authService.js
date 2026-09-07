@@ -39,6 +39,10 @@ class AuthService {
       errors.push('Ville requise');
     }
 
+    if (!data.acceptTerms) {
+      errors.push('Vous devez accepter les Conditions d’utilisation de RETROOVA');
+    }
+
     return {
       isValid: errors.length === 0,
       errors

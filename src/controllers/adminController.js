@@ -1,15 +1,16 @@
 class AdminController {
     constructor(model) { this.model = model; }
     dashboard = async (req, res) => {
+        const scope = ['all', 'real', 'demo'].includes(req.query.scope) ? req.query.scope : 'all';
         const [overview, items, reports, users, partnershipRequests, contactRequests] = await Promise.all([
-            this.model.getOverview(),
-            this.model.getRecentItems(),
-            this.model.getReports(),
-            this.model.getUsers(),
+            this.model.getOverview(scope),
+            this.model.getRecentItems(scope),
+            this.model.getReports(scope),
+            this.model.getUsers(scope),
             this.model.getPartnershipRequests(),
             this.model.getContactRequests()
         ]);
-        res.render('pages/admin', { title: req.t('common.admin', 'Administration'), overview, items, reports, users, partnershipRequests, contactRequests });
+        res.render('pages/admin', { title: req.t('common.admin', 'Administration'), overview, items, reports, users, partnershipRequests, contactRequests, scope });
     };
     partnershipDetail = async (req, res) => {
         const partnershipRequest = await this.model.getPartnershipRequestById(req.params.id);

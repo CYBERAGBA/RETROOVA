@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { isValidDate, categories, categoryLabels } = require('../services/itemService');
+const { isValidDate, categories, categoryLabels, getDisplayTitle } = require('../services/itemService');
 const { createMatchesFor } = require('../services/matchingService');
 const { removeLocalUpload } = require('../services/imageStorage');
 
@@ -42,7 +42,7 @@ class ItemController {
 
     search = async (req, res) => {
         try {
-            const results = await this.itemModel.search(req.query);
+            const results = (await this.itemModel.search(req.query)).map((item) => ({ ...item, title: getDisplayTitle(item.type, item.title) }));
             const canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
             res.render('pages/search', {
                 title: req.t('seo.searchTitle', 'Rechercher un objet perdu ou trouvé'),
@@ -62,7 +62,7 @@ class ItemController {
     };
 
     map = async (req, res) => {
-        const results = await this.itemModel.search(req.query);
+        const results = (await this.itemModel.search(req.query)).map((item) => ({ ...item, title: getDisplayTitle(item.type, item.title) }));
         res.render('pages/map', { title: req.t('seo.mapTitle', 'Carte des annonces'), metaDescription: req.t('seo.mapDescription', 'Explorez les annonces actives par ville et quartier sur RETROOVA.'), results });
     };
 
@@ -75,7 +75,7 @@ class ItemController {
     listPublic = async (req, res, typeOverride = null) => {
         const type = typeOverride || req.query.type || 'lost';
         const filters = { ...req.query, type };
-        const results = await this.itemModel.search(filters);
+        const results = (await this.itemModel.search(filters)).map((item) => ({ ...item, title: getDisplayTitle(item.type, item.title) }));
         const canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
         const metaDescription = type === 'lost'
             ? req.t('seo.lostDescription', 'Consultez les objets perdus à retrouver près de vous sur RETROOVA. Recherchez par ville, catégorie et mot-clé.')
@@ -103,6 +103,7 @@ class ItemController {
             return res.redirect(`/items/${maybeBySlug.id}`);
         }
         if (['closed', 'expired'].includes(item.status) && item.user_id !== req.session.userId) return res.status(404).render('404', { title: req.t('seo.notFoundAd', 'Annonce introuvable') });
+        item.title = getDisplayTitle(item.type, item.title);
         const matches = req.session.userId ? await this.itemModel.getMatchesForUser(req.session.userId) : [];
         const ownerReputation = this.userModel && !item.is_anonymous ? await this.userModel.getReputation(item.user_id) : null;
         const { categoryLabels } = require('../services/itemService');
