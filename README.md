@@ -245,6 +245,20 @@ Avant tout déploiement en production, il est recommandé de :
 - configurer un stockage de fichiers fiable ;
 - activer les logs et le monitoring.
 
+### Railway et donnees de demonstration
+
+Sur Railway, configure `DATABASE_URL`, `SESSION_SECRET` et les autres variables de production, puis utilise le demarrage Node standard (`npm start`). Le script `scripts/deploySeed.js` s execute au demarrage de l application, apres que la base est disponible, et cree de facon idempotente les utilisateurs et annonces marques `is_demo = true`.
+
+Le build ne contacte pas la base de donnees. Apres un nouveau deploiement, les annonces sont visibles depuis `/fr/search` et `/fr/map`; la page `/fr/` affiche uniquement les statistiques publiques.
+
+Pour controler le deploiement depuis Railway :
+
+```bash
+npm run seed-demo
+```
+
+Cette commande doit etre lancee avec `DATABASE_URL` configuree et ne doit pas etre utilisee avec une base de production sans verifier les donnees ciblees.
+
 ---
 
 ## Roadmap

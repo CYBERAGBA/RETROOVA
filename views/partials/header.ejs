@@ -37,6 +37,7 @@
         </div>
 
         <nav class="navbar-menu">
+            <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>" class="nav-link nav-icon-link tooltip-target" aria-label="<%= t('nav.home', 'Accueil') %>" data-tooltip="<%= t('nav.home', 'Accueil') %>">⌂</a>
             <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>search" class="nav-link nav-icon-link tooltip-target" aria-label="<%= t('nav.search', 'Rechercher') %>" data-tooltip="<%= t('nav.search', 'Rechercher') %>">⌕</a>
 
             <% if (user) { %>
@@ -64,7 +65,6 @@
                         <span aria-hidden="true">👤</span>
                     </button>
                     <div class="dropdown-menu">
-                        <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.home', 'Accueil') %>"><%= t('nav.home', 'Accueil') %></a>
                         <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>login" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.login', 'Connexion') %>"><%= t('nav.login', 'Connexion') %></a>
                         <a href="/<%= locale === 'en' ? 'en/' : 'fr/' %>register" class="dropdown-item tooltip-target" data-tooltip="<%= t('nav.register', 'Inscription') %>"><%= t('nav.register', 'Inscription') %></a>
                     </div>

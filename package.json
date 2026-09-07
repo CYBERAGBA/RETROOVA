@@ -6,8 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "build": "node -e \"console.log('No build step required for this Node.js application.');\"",
-    "start": "node server.js",
-    "start:prod": "node server.js",
+    "start": "node scripts/deploySeed.js && node server.js",
+    "start:prod": "node scripts/deploySeed.js && node server.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/initDb.js",
     "seed-demo": "node scripts/seedDemo.js seed",
