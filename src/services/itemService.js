@@ -1,33 +1,39 @@
-const categories = ['phone', 'wallet', 'bank-card', 'id-card', 'passport', 'license', 'documents', 'keys', 'jewelry', 'bag', 'computer', 'tablet', 'luggage', 'clothing', 'electronics', 'birth-certificate', 'cmu-card', 'money-card', 'book', 'notebook', 'other-things', 'other'];
+const { englishCategoryLabels, englishSubcategoryLabels } = require('./categoryTranslations');
+
+const categoryDefinitions = [
+    { id: 'electronics', label: 'Téléphones & appareils électroniques', subcategories: [['phone', 'Téléphone / Smartphone'], ['laptop', 'Ordinateur portable'], ['desktop', 'Ordinateur de bureau'], ['tablet', 'Tablette'], ['calculator', 'Calculatrice'], ['smartwatch', 'Montre connectée'], ['earbuds', 'Écouteurs'], ['headphones', 'Casque audio'], ['camera', 'Appareil photo'], ['camcorder', 'Caméra / Caméscope'], ['game-console', 'Console de jeux'], ['mp3-player', 'Lecteur audio / MP3'], ['external-hard-drive', 'Disque dur externe'], ['usb-drive', 'Clé USB'], ['memory-card', 'Carte mémoire'], ['charger', 'Chargeur'], ['cable', 'Câble'], ['powerbank', 'Batterie externe / Powerbank'], ['adapter', 'Adaptateur'], ['router-modem', 'Routeur / Modem'], ['gps', 'GPS'], ['remote-control', 'Télécommande'], ['electronic-accessory', 'Accessoires électroniques'], ['other-electronic-device', 'Autre appareil électronique']] },
+    { id: 'documents', label: 'Documents & pièces d’identité', subcategories: [['national-id', 'Carte nationale d’identité (CNI)'], ['passport', 'Passeport'], ['driving-license', 'Permis de conduire'], ['residence-card', 'Carte de séjour'], ['student-card', 'Carte d’étudiant'], ['school-card', 'Carte scolaire'], ['professional-card', 'Carte professionnelle'], ['electoral-card', 'Carte électorale'], ['administrative-document', 'Acte / document administratif'], ['certificate', 'Certificat / attestation'], ['diploma', 'Diplôme'], ['administrative-file', 'Dossier administratif'], ['professional-document', 'Document professionnel'], ['school-document', 'Document scolaire'], ['notebook-record', 'Carnet / livret'], ['other-document', 'Autre document']] },
+    { id: 'payments', label: 'Portefeuilles, argent & moyens de paiement', subcategories: [['wallet', 'Portefeuille'], ['purse', 'Porte-monnaie'], ['cash', 'Argent liquide'], ['bank-card', 'Carte bancaire'], ['prepaid-card', 'Carte prépayée'], ['payment-card', 'Carte de paiement'], ['loyalty-card', 'Carte de fidélité'], ['transport-card', 'Carte de transport'], ['cheque', 'Chèque'], ['cheque-book', 'Carnet de chèques'], ['card-holder', 'Porte-cartes'], ['other-payment-method', 'Autre moyen de paiement']] },
+    { id: 'bags', label: 'Sacs & bagages', subcategories: [['handbag', 'Sac à main'], ['backpack', 'Sac à dos'], ['schoolbag', 'Cartable'], ['satchel', 'Sacoche'], ['laptop-bag', 'Sacoche ordinateur'], ['briefcase', 'Mallette'], ['suitcase', 'Valise'], ['carry-on', 'Bagage cabine'], ['travel-bag', 'Sac de voyage'], ['sports-bag', 'Sac de sport'], ['pouch', 'Pochette'], ['case', 'Étui'], ['toiletry-case', 'Trousse de toilette'], ['other-bag-luggage', 'Autre sac / bagage']] },
+    { id: 'keys', label: 'Clés & accessoires', subcategories: [['house-key', 'Clé de maison'], ['car-key', 'Clé de voiture'], ['motorcycle-key', 'Clé de moto'], ['keyring', 'Trousseau de clés'], ['keychain', 'Porte-clés'], ['access-badge', 'Badge d’accès'], ['gate-remote', 'Télécommande de portail'], ['professional-badge', 'Carte / badge professionnel'], ['other-key-accessory', 'Autre clé ou accessoire']] },
+    { id: 'jewelry', label: 'Bijoux & montres', subcategories: [['ring', 'Bague'], ['wedding-ring', 'Alliance'], ['necklace', 'Collier'], ['chain', 'Chaîne'], ['bracelet', 'Bracelet'], ['earrings', 'Boucles d’oreilles'], ['pendant', 'Pendentif'], ['brooch', 'Broche'], ['anklet', 'Bijou de cheville'], ['watch', 'Montre'], ['pocket-watch', 'Montre de poche'], ['child-jewelry', 'Bijou pour enfant'], ['other-jewelry', 'Autre bijou']] },
+    { id: 'clothing', label: 'Vêtements & accessoires', subcategories: [['shirt', 'Chemise'], ['t-shirt', 'T-shirt'], ['polo', 'Polo'], ['trousers', 'Pantalon'], ['jeans', 'Jean'], ['shorts', 'Short'], ['skirt', 'Jupe'], ['dress', 'Robe'], ['suit', 'Costume'], ['jacket', 'Veste'], ['coat', 'Manteau'], ['sweater', 'Pull'], ['sweatshirt', 'Sweat'], ['traditional-outfit', 'Tenue traditionnelle'], ['uniform', 'Uniforme'], ['underwear', 'Sous-vêtement'], ['baby-child-clothing', 'Vêtement bébé / enfant'], ['shoes', 'Chaussures'], ['sneakers', 'Baskets'], ['sandals', 'Sandales'], ['flip-flops', 'Claquettes'], ['boots', 'Bottes'], ['work-shoes', 'Chaussures professionnelles'], ['cap', 'Casquette'], ['hat', 'Chapeau'], ['beanie', 'Bonnet'], ['scarf', 'Écharpe'], ['headscarf', 'Foulard'], ['belt', 'Ceinture'], ['tie', 'Cravate'], ['gloves', 'Gants'], ['glasses', 'Lunettes'], ['sunglasses', 'Lunettes de soleil'], ['waist-bag', 'Sac banane'], ['other-clothing-accessory', 'Autre accessoire vestimentaire']] },
+    { id: 'vehicles', label: 'Véhicules & accessoires', subcategories: [['car', 'Voiture'], ['motorcycle', 'Moto'], ['scooter', 'Scooter'], ['tricycle', 'Tricycle'], ['bicycle', 'Vélo'], ['mountain-bike', 'VTT'], ['scooter-board', 'Trottinette'], ['other-vehicle', 'Autre véhicule'], ['motorcycle-helmet', 'Casque de moto'], ['license-plate', 'Plaque d’immatriculation'], ['vehicle-key', 'Clé de véhicule'], ['vehicle-remote', 'Télécommande de véhicule'], ['vehicle-papers', 'Papiers du véhicule'], ['vehicle-registration', 'Carte grise'], ['car-accessory', 'Accessoire automobile'], ['motorcycle-accessory', 'Accessoire moto'], ['bicycle-accessory', 'Accessoire vélo'], ['other-vehicle-accessory', 'Autre']] },
+    { id: 'animals', label: 'Animaux & accessoires', subcategories: [['dog', 'Chien'], ['cat', 'Chat'], ['bird', 'Oiseau'], ['rabbit', 'Lapin'], ['rodent', 'Rongeur'], ['turtle', 'Tortue'], ['other-animal', 'Autre animal'], ['pet-collar', 'Collier'], ['leash', 'Laisse'], ['harness', 'Harnais'], ['cage', 'Cage'], ['pet-bed', 'Panier'], ['bowl', 'Gamelle'], ['pet-accessory', 'Accessoire animal']] },
+    { id: 'school', label: 'Livres, fournitures & matériel scolaire', subcategories: [['book', 'Livre'], ['textbook', 'Manuel scolaire'], ['novel', 'Roman'], ['notebook', 'Cahier'], ['agenda', 'Agenda'], ['school-notebook', 'Carnet'], ['binder', 'Classeur'], ['school-file', 'Dossier'], ['pencil-case', 'Trousse'], ['pen', 'Stylo'], ['pencil', 'Crayon'], ['marker', 'Marqueur'], ['ruler', 'Règle'], ['school-bag', 'Sac scolaire'], ['school-calculator', 'Calculatrice scolaire'], ['drawing-material', 'Matériel de dessin'], ['geometry-material', 'Matériel de géométrie'], ['school-supply', 'Fourniture scolaire'], ['other-school-material', 'Autre matériel scolaire']] },
+    { id: 'professional', label: 'Instruments, matériel professionnel & équipements', subcategories: [['guitar', 'Guitare'], ['piano-keyboard', 'Piano / Clavier'], ['violin', 'Violon'], ['drums', 'Batterie'], ['flute', 'Flûte'], ['trumpet', 'Trompette'], ['saxophone', 'Saxophone'], ['microphone', 'Microphone'], ['other-instrument', 'Autre instrument'], ['speaker', 'Enceinte'], ['amplifier', 'Amplificateur'], ['mixing-console', 'Console de mixage'], ['projector', 'Projecteur'], ['video-equipment', 'Équipement vidéo'], ['audio-equipment', 'Équipement audio'], ['tool', 'Outil'], ['drill', 'Perceuse'], ['construction-equipment', 'Équipement de chantier'], ['professional-computer', 'Matériel informatique professionnel'], ['office-equipment', 'Équipement de bureau'], ['medical-equipment', 'Matériel médical'], ['laboratory-equipment', 'Matériel de laboratoire'], ['commercial-equipment', 'Équipement commercial'], ['industrial-equipment', 'Équipement industriel'], ['other-professional-equipment', 'Autre équipement professionnel']] },
+    { id: 'personal', label: 'Objets personnels, enfants & loisirs', subcategories: [['umbrella', 'Parapluie'], ['water-bottle', 'Gourde'], ['bottle', 'Bouteille'], ['thermos', 'Thermos'], ['cosmetics', 'Cosmétiques'], ['care-product', 'Produit de soin'], ['brush-comb', 'Brosse / peigne'], ['toiletry-kit', 'Trousse de toilette'], ['personal-medical', 'Objet médical personnel'], ['personal-accessory', 'Accessoire personnel'], ['other-personal-object', 'Autre objet personnel'], ['toy', 'Jouet'], ['stuffed-animal', 'Peluche'], ['stroller', 'Poussette'], ['baby-bottle', 'Biberon'], ['diaper-bag', 'Sac à langer'], ['baby-accessory', 'Accessoire bébé'], ['child-accessory', 'Accessoire enfant'], ['ball', 'Ballon'], ['jersey', 'Maillot'], ['sports-shoes', 'Chaussures de sport'], ['racket', 'Raquette'], ['fitness-equipment', 'Équipement de fitness'], ['sports-equipment', 'Équipement sportif'], ['board-game', 'Jeu de société'], ['video-game', 'Jeu vidéo'], ['collectible', 'Objet de collection'], ['collection-album', 'Album / collection'], ['leisure-equipment', 'Matériel de loisirs'], ['travel-item', 'Article de voyage'], ['other-sport-item', 'Autre article de sport'], ['other-leisure', 'Autre loisir'], ['tableware', 'Vaisselle'], ['utensil', 'Ustensile'], ['small-appliance', 'Petit appareil électroménager'], ['decoration', 'Décoration'], ['kitchen-item', 'Article de cuisine'], ['household-item', 'Article de maison'], ['craft-object', 'Objet artisanal'], ['religious-object', 'Objet religieux'], ['other-domestic-object', 'Autre objet domestique'], ['unidentified-object', 'Objet non identifié'], ['miscellaneous-object', 'Objet divers'], ['other-object', 'Autre']] }
+];
+
+const categories = categoryDefinitions.map(({ id }) => id);
+const categoryLabels = Object.fromEntries(categoryDefinitions.map(({ id, label }) => [id, label]));
+const subcategoryDefinitions = Object.fromEntries(categoryDefinitions.map(({ id, subcategories }) => [id, subcategories.map(([value, label]) => ({ value: `${id}:${value}`, label }))]));
+const subcategoryLabels = Object.fromEntries(Object.values(subcategoryDefinitions).flat().map(({ value, label }) => [value, label]));
+const subcategoryCategory = Object.fromEntries(Object.entries(subcategoryDefinitions).flatMap(([category, entries]) => entries.map(({ value }) => [value, category])));
+const englishCategoryDefinitions = categoryDefinitions.map(({ id, subcategories }) => ({ id, label: englishCategoryLabels[id], subcategories: subcategories.map(([value]) => [value, englishSubcategoryLabels[`${id}:${value}`]]) }));
+const englishSubcategoryDefinitions = Object.fromEntries(englishCategoryDefinitions.map(({ id, subcategories }) => [id, subcategories.map(([value, label]) => ({ value: `${id}:${value}`, label }))]));
+const legacyCategoryMap = { phone: 'electronics', wallet: 'payments', 'bank-card': 'payments', 'id-card': 'documents', passport: 'documents', license: 'documents', documents: 'documents', keys: 'keys', jewelry: 'jewelry', bag: 'bags', computer: 'electronics', tablet: 'electronics', luggage: 'bags', clothing: 'clothing', electronics: 'electronics', 'birth-certificate': 'documents', 'cmu-card': 'documents', 'money-card': 'payments', book: 'school', notebook: 'school', 'other-things': 'personal', other: 'personal', vehicle: 'vehicles', animal: 'animals', professional: 'professional' };
+const legacySubcategory = (category, title = '') => {
+    const text = String(title).toLowerCase();
+    const choices = { phone: 'phone', computer: text.includes('chargeur') ? 'charger' : 'laptop', tablet: 'tablet', electronics: text.includes('calculatrice') ? 'calculator' : text.includes('écouteur') ? 'earbuds' : 'electronic-accessory', wallet: 'wallet', 'bank-card': 'bank-card', 'money-card': 'payment-card', 'id-card': 'national-id', passport: 'passport', license: 'driving-license', documents: text.includes('dossier') ? 'administrative-file' : text.includes('certificat') ? 'certificate' : 'administrative-document', 'birth-certificate': 'administrative-document', 'cmu-card': 'professional-card', keys: text.includes('maison') ? 'house-key' : 'keyring', jewelry: text.includes('boucle') ? 'earrings' : text.includes('collier') ? 'necklace' : 'bracelet', bag: text.includes('sport') ? 'sports-bag' : text.includes('dos') ? 'backpack' : 'handbag', luggage: text.includes('cabine') ? 'carry-on' : 'suitcase', clothing: text.includes('foulard') ? 'headscarf' : text.includes('veste') ? 'jacket' : 'other-clothing-accessory', book: text.includes('roman') ? 'novel' : text.includes('manuel') ? 'textbook' : 'book', notebook: text.includes('agenda') ? 'agenda' : text.includes('trousse') ? 'pencil-case' : 'notebook', vehicle: text.includes('vélo') ? 'bicycle' : 'other-vehicle', animal: text.includes('chien') ? 'dog' : 'other-animal', professional: text.includes('outil') ? 'tool' : 'other-professional-equipment', 'other-things': 'other-object', other: 'other-object' };
+    const canonicalCategory = legacyCategoryMap[category] || 'personal';
+    const value = `${canonicalCategory}:${choices[category] || 'other-object'}`;
+    return subcategoryCategory[value] ? value : `${canonicalCategory}:other-${canonicalCategory === 'personal' ? 'object' : canonicalCategory}`;
+};
 
 function isValidDate(value) {
     return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value));
 }
-
-const categoryLabels = {
-    phone: 'Téléphone',
-    wallet: 'Portefeuille',
-    'bank-card': 'Carte bancaire',
-    'id-card': 'Carte d’identité',
-    passport: 'Passeport',
-    license: 'Permis de conduire',
-    documents: 'Documents',
-    keys: 'Clés',
-    jewelry: 'Bijoux',
-    bag: 'Sac',
-    computer: 'Ordinateur',
-    tablet: 'Tablette',
-    luggage: 'Bagage',
-    clothing: 'Vêtement',
-    electronics: 'Électronique',
-    'birth-certificate': 'Extrait de naissance',
-    'cmu-card': 'Carte CMU',
-    'money-card': 'Carte monétaire',
-    book: 'Livre',
-    notebook: 'Cahier',
-    'other-things': 'Autres choses',
-    other: 'Autre'
-};
 
 function getDisplayTitle(type, title) {
     const normalizedTitle = String(title || '').trim();
@@ -35,4 +41,8 @@ function getDisplayTitle(type, title) {
     return type === 'found' ? 'Objet trouvé' : 'Objet perdu';
 }
 
-module.exports = { categories, categoryLabels, isValidDate, getDisplayTitle };
+function isValidCategory(category) { return categories.includes(category); }
+function isValidSubcategory(category, subcategory) { return Boolean(subcategoryCategory[subcategory] && subcategoryCategory[subcategory] === category); }
+function getSubcategories(category) { return subcategoryDefinitions[category] || []; }
+
+module.exports = { categoryDefinitions, englishCategoryDefinitions, categories, categoryLabels, englishCategoryLabels, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, subcategoryCategory, legacyCategoryMap, legacySubcategory, isValidCategory, isValidSubcategory, getSubcategories, isValidDate, getDisplayTitle };

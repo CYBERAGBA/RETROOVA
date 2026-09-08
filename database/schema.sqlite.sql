@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS items (
   user_id TEXT NOT NULL,
   type TEXT NOT NULL CHECK(type IN ('lost', 'found')),
   category TEXT NOT NULL,
+  subcategory TEXT,
   title TEXT NOT NULL,
   description TEXT,
   brand TEXT,

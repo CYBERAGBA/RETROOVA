@@ -1,5 +1,6 @@
 <%- include('../partials/header') %>
     <main class="home-page">
+        <% const displayCategoryDefinitions = locale === 'en' ? englishCategoryDefinitions : categoryDefinitions; %>
         <section class="home-hero container">
             <div class="hero-copy">
                 <div class="hero-brand hero-brand-wide">
@@ -19,8 +20,8 @@
                         <span aria-hidden="true">▦</span>
                         <select name="category" aria-label="<%= t('common.category', 'Catégorie') %>">
                             <option value=""><%= t('common.category', 'Catégorie') %></option>
-                            <% ['phone','wallet','bank-card','id-card','passport','license','documents','keys','jewelry','bag','computer','tablet','luggage','clothing','electronics','birth-certificate','cmu-card','money-card','book','notebook','other-things','other'].forEach((category) => { %>
-                                <option value="<%= category %>"><%= t('categories.' + category, category) %></option>
+                            <% displayCategoryDefinitions.forEach((category) => { %>
+                                <option value="<%= category.id %>"><%= category.label %></option>
                             <% }); %>
                         </select>
                     </label>
@@ -53,7 +54,7 @@
             <div class="home-stat">
                 <span class="stat-symbol orange">⌕</span>
                 <div>
-                    <strong><%= publicStats?.matches || 0 %></strong>
+                    <strong><%= publicStats?.found || 0 %></strong>
                     <span><%= t('home.statsMatches', 'Annonces trouvées') %></span>
                 </div>
             </div>

@@ -1,5 +1,7 @@
 <%- include('../partials/header') %>
     <main class="container item-detail-page">
+        <% const displayCategoryLabels = locale === 'en' ? englishCategoryLabels : categoryLabels; %>
+        <% const displaySubcategoryLabels = locale === 'en' ? englishSubcategoryLabels : subcategoryLabels; %>
         <a href="/search" class="back-link detail-back-link">← <%= t('itemDetail.backToResults', 'Retour aux résultats') %></a>
         <% if (typeof message !== 'undefined' && message) { %><div class="alert alert-success"><p>✅ <%= message %></p></div><% } %>
 
@@ -11,7 +13,7 @@
                     <div class="detail-quick-facts">
                         <span>📍 <strong><%= item.district ? item.district + ' · ' : '' %><%= item.city || t('itemDetail.locationUnknown', 'Lieu non précisé') %></strong></span>
                         <span>📅 <strong><%= formatDate(item.event_date) || t('itemDetail.dateUnknown', 'Date non précisée') %></strong></span>
-                            <span>🏷️ <strong><%= typeof categoryLabels !== 'undefined' && categoryLabels?.[item.category] || item.category || t('itemDetail.categoryUnknown', 'Catégorie non précisée') %></strong></span>
+                            <span>🏷️ <strong><%= displayCategoryLabels?.[item.category] || item.category || t('itemDetail.categoryUnknown', 'Catégorie non précisée') %><%= item.subcategory ? ' · ' + (displaySubcategoryLabels?.[item.subcategory] || item.subcategory) : '' %></strong></span>
                     </div>
                 </div>
                 <div class="detail-media">

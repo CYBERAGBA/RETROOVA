@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const csrfMiddleware = require('../middleware/csrfMiddleware');
-const { categories, categoryLabels } = require('../services/itemService');
+const { categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels } = require('../services/itemService');
 const { cloudinaryConfigured, cloudinaryRequired, storeImage, removeLocalUpload, sensitiveCategories } = require('../services/imageStorage');
 const reportRateLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false });
 
@@ -74,6 +74,13 @@ const uploadPhoto = (type, isEdit = false) => (req, res, next) => upload.single(
             formData: { ...req.body, type: type || req.body.type || 'lost' },
             categories,
             categoryLabels,
+            englishCategoryLabels,
+            englishCategoryDefinitions,
+            categoryDefinitions,
+            englishSubcategoryDefinitions,
+            subcategoryDefinitions,
+            subcategoryLabels,
+            englishSubcategoryLabels,
             errors: [req.t('itemForm.photoTooLarge', `The photo is too large. The maximum allowed size is ${MAX_PHOTO_SIZE_LABEL}.`)],
             isEdit,
             itemId: req.params.id
@@ -85,6 +92,13 @@ const uploadPhoto = (type, isEdit = false) => (req, res, next) => upload.single(
             formData: { ...req.body, type: type || req.body.type || 'lost' },
             categories,
             categoryLabels,
+            englishCategoryLabels,
+            categoryDefinitions,
+            englishCategoryDefinitions,
+            englishSubcategoryDefinitions,
+            subcategoryDefinitions,
+            subcategoryLabels,
+            englishSubcategoryLabels,
             errors: [req.t('itemForm.invalidPhoto', 'The file must be a JPG, PNG, GIF, or WebP image.')],
             isEdit,
             itemId: req.params.id
@@ -97,6 +111,13 @@ const uploadPhoto = (type, isEdit = false) => (req, res, next) => upload.single(
             formData: { ...req.body, type: type || req.body.type || 'lost' },
             categories,
             categoryLabels,
+            englishCategoryLabels,
+            categoryDefinitions,
+            englishCategoryDefinitions,
+            englishSubcategoryDefinitions,
+            subcategoryDefinitions,
+            subcategoryLabels,
+            englishSubcategoryLabels,
             errors: [req.t('itemForm.photoUploadError', 'The image could not be uploaded. Please try again.')],
             isEdit,
             itemId: req.params.id

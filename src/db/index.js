@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
 const sqlite3 = require('sqlite3').verbose();
+const { categories, legacyCategoryMap, legacySubcategory, isValidSubcategory, getSubcategories } = require('../services/itemService');
 
 const APP_ROOT = path.resolve(__dirname, '../..');
 const DATABASE_URL = process.env.DATABASE_URL || '';
@@ -266,6 +267,32 @@ class DatabaseAdapter {
         });
       });
     }).finally(() => db.close());
+  }
+
+  static async ensureCategoryColumns() {
+    if (isPostgres) {
+      await postgresPool.query('ALTER TABLE items ADD COLUMN IF NOT EXISTS subcategory TEXT');
+      const rows = await postgresPool.query('SELECT id, category, subcategory, title FROM items');
+      for (const item of rows.rows) {
+        const category = categories.includes(item.category) ? item.category : legacyCategoryMap[item.category] || 'personal';
+        const subcategory = isValidSubcategory(category, item.subcategory) ? item.subcategory : categories.includes(item.category) ? getSubcategories(category)[0]?.value : legacySubcategory(item.category, item.title);
+        if (item.category !== category || item.subcategory !== subcategory) {
+          await postgresPool.query('UPDATE items SET category = $1, subcategory = $2 WHERE id = $3', [category, subcategory, item.id]);
+        }
+      }
+      await postgresPool.query('CREATE INDEX IF NOT EXISTS idx_items_subcategory ON items(subcategory)');
+      return;
+    }
+
+    const columns = await this.sqliteAll('PRAGMA table_info(items)');
+    if (!columns.some((column) => column.name === 'subcategory')) await this.sqliteRun('ALTER TABLE items ADD COLUMN subcategory TEXT');
+    const rows = await this.sqliteAll('SELECT id, category, subcategory, title FROM items');
+    for (const item of rows) {
+      const category = categories.includes(item.category) ? item.category : legacyCategoryMap[item.category] || 'personal';
+      const subcategory = isValidSubcategory(category, item.subcategory) ? item.subcategory : categories.includes(item.category) ? getSubcategories(category)[0]?.value : legacySubcategory(item.category, item.title);
+      if (item.category !== category || item.subcategory !== subcategory) await this.sqliteRun('UPDATE items SET category = ?, subcategory = ? WHERE id = ?', [category, subcategory, item.id]);
+    }
+    await this.sqliteRun('CREATE INDEX IF NOT EXISTS idx_items_subcategory ON items(subcategory)');
   }
 
   static async ensurePartnershipRequestsTable() {

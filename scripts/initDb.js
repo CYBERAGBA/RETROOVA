@@ -23,6 +23,7 @@ console.log(`
 async function configurePostgresAdmin() {
   const { pool } = DatabaseAdapter;
   await DatabaseAdapter.initializeDatabase();
+  await DatabaseAdapter.ensureCategoryColumns();
 
   const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [ADMIN_EMAIL]);
   const passwordHash = await bcryptjs.hash(ADMIN_PASSWORD, 10);
@@ -64,6 +65,7 @@ async function configureSqliteAdmin() {
       resolve();
     });
   });
+  await DatabaseAdapter.ensureCategoryColumns();
 
   const adminId = uuidv4();
   const passwordHash = await bcryptjs.hash(ADMIN_PASSWORD, 10);

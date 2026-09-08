@@ -12,7 +12,7 @@
     "init-db": "node scripts/initDb.js",
     "seed-demo": "node scripts/seedDemo.js seed",
     "clear-demo": "node scripts/seedDemo.js clear",
-    "test": "node --test test/smoke.test.js"
+    "test": "node --test test/*.test.js"
   },
   "engines": {
     "node": ">=22.0.0"

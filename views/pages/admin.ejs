@@ -1,5 +1,7 @@
 <%- include('../partials/header') %>
     <main class="container">
+        <% const displayCategoryLabels = locale === 'en' ? englishCategoryLabels : categoryLabels; %>
+        <% const displaySubcategoryLabels = locale === 'en' ? englishSubcategoryLabels : subcategoryLabels; %>
         <div class="page-heading"><span class="eyebrow"><%= t('adminDetail.adminSpace', 'ESPACE ADMINISTRATEUR') %></span>
             <h1><%= t('admin.title', 'Pilotage RETROOVA') %></h1>
             <p><%= t('admin.subtitle', 'Modérez les annonces et surveillez l’activité de la plateforme.') %></p>
@@ -82,7 +84,7 @@
                 <h2><%= t('admin.recentAds', 'Annonces récentes') %></h2><a href="/search"><%= t('admin.openSearch', 'Ouvrir la recherche') %></a>
             </div>
             <div class="admin-table">
-                <% items.forEach(item=> { %><div><span class="type-pill <%= item.type %>"><%= item.is_demo ? t('admin.demoBadge', 'DÉMO') : item.type === 'lost' ? t('common.lost', 'Perdu') : t('common.found', 'Trouvé') %></span><strong><%= item.title && item.title.toLowerCase() !== 'photo' ? item.title : item.type === 'found' ? t('common.found', 'Objet trouvé') : t('common.lost', 'Objet perdu') %></strong><span><%= item.city %> · <%= item.owner_name %></span><a href="/items/<%= item.id %>"><%= t('admin.view', 'Voir') %></a><form method="POST" action="/admin/items/<%= item.id %>/status" data-confirm="<%= t('admin.closeConfirm', 'Fermer cette annonce ?') %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button class="btn btn-small btn-danger"><%= t('admin.close', 'Fermer') %></button></form></div><% }) %>
+                    <% items.forEach(item=> { %><div><span class="type-pill <%= item.type %>"><%= item.is_demo ? t('admin.demoBadge', 'DÉMO') : item.type === 'lost' ? t('common.lost', 'Perdu') : t('common.found', 'Trouvé') %></span><strong><%= item.title && item.title.toLowerCase() !== 'photo' ? item.title : item.type === 'found' ? t('common.found', 'Objet trouvé') : t('common.lost', 'Objet perdu') %></strong><span><%= displayCategoryLabels[item.category] || item.category %><%= item.subcategory ? ' · ' + (displaySubcategoryLabels[item.subcategory] || item.subcategory) : '' %> · <%= item.city %> · <%= item.owner_name %></span><a href="/items/<%= item.id %>"><%= t('admin.view', 'Voir') %></a><form method="POST" action="/admin/items/<%= item.id %>/status" data-confirm="<%= t('admin.closeConfirm', 'Fermer cette annonce ?') %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button class="btn btn-small btn-danger"><%= t('admin.close', 'Fermer') %></button></form></div><% }) %>
             </div>
         </section>
         <section class="admin-panel">

@@ -1,5 +1,7 @@
 <%- include('../partials/header') %>
     <main class="container">
+                <% const displayCategoryDefinitions = locale === 'en' ? englishCategoryDefinitions : categoryDefinitions; %>
+                <% const displaySubcategoryDefinitions = locale === 'en' ? englishSubcategoryDefinitions : subcategoryDefinitions; %>
         <div class="form-page">
             <a href="/dashboard" class="back-link">← <%= t('itemForm.backToDashboard', 'Retour au tableau de bord') %></a>
             <div class="page-heading">
@@ -28,8 +30,16 @@
                     <div class="form-group"><label for="category"><%= t('itemForm.categoryLabel', 'Catégorie') %> *</label><select id="category"
                             name="category" required>
                             <option value=""><%= t('common.select', 'Sélectionner') %></option>
-                            <% categories.forEach(category=> { %><option value="<%= category %>"
-                                    <%=formData.category===category ? 'selected' : '' %>><%= t('categories.' + category, categoryLabels[category]) %>
+                            <% displayCategoryDefinitions.forEach(category=> { %><option value="<%= category.id %>"
+                                    <%=formData.category===category.id ? 'selected' : '' %>><%= category.label %>
+                                </option>
+                                <% }) %>
+                        </select></div>
+                    <div class="form-group"><label for="subcategory"><%= t('itemForm.subcategoryLabel', 'Sous-catégorie') %> *</label><select id="subcategory"
+                            name="subcategory" required>
+                            <option value=""><%= t('common.select', 'Sélectionner') %></option>
+                            <% Object.values(displaySubcategoryDefinitions).flat().forEach(subcategory=> { %><option value="<%= subcategory.value %>"
+                                    <%=formData.subcategory===subcategory.value ? 'selected' : '' %>><%= subcategory.label %>
                                 </option>
                                 <% }) %>
                         </select></div>
@@ -70,4 +80,25 @@
         </div>
         </div>
     </main>
+        <script>
+                (() => {
+                        const category = document.getElementById('category');
+                        const subcategory = document.getElementById('subcategory');
+                        if (!category || !subcategory) return;
+                        const options = Array.from(subcategory.options);
+                        const updateSubcategories = () => {
+                                const prefix = `${category.value}:`;
+                                let selectedVisible = false;
+                                options.forEach((option) => {
+                                        if (!option.value) return;
+                                        const visible = option.value.startsWith(prefix);
+                                        option.hidden = !visible;
+                                        if (visible && option.value === subcategory.value) selectedVisible = true;
+                                });
+                                if (!selectedVisible) subcategory.value = '';
+                        };
+                        category.addEventListener('change', updateSubcategories);
+                        updateSubcategories();
+                })();
+        </script>
     <%- include('../partials/footer') %>

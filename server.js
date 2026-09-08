@@ -29,6 +29,7 @@ const {
   buildLanguageAlternates
 } = require('./src/services/seoService');
 const { formatDate } = require('./src/services/dateService');
+const { categoryDefinitions, englishCategoryDefinitions } = require('./src/services/itemService');
 
 // ============================================
 // Configuration
@@ -206,6 +207,8 @@ app.get('/fr/', async (req, res) => {
     lang: 'fr',
     metaDescription: req.t('seo.homeDescription', 'RETROOVA aide à retrouver les objets perdus et à remettre en contact les personnes qui ont trouvé un bien avec son propriétaire.'),
     publicStats,
+    categoryDefinitions,
+    englishCategoryDefinitions,
     canonicalUrl,
     ogImage: buildAbsoluteUrl(SITE_URL, '/images/logo_nom_slogan_paysage.png'),
     schemaJsonLd: buildWebSiteSchema(SITE_URL, 'fr')
@@ -220,6 +223,8 @@ app.get('/en/', async (req, res) => {
     lang: 'en',
     metaDescription: req.t('seo.homeDescription', 'RETROOVA helps people recover lost items and reconnect found belongings with their owners.'),
     publicStats,
+    categoryDefinitions,
+    englishCategoryDefinitions,
     canonicalUrl,
     ogImage: buildAbsoluteUrl(SITE_URL, '/images/logo_nom_slogan_paysage.png'),
     schemaJsonLd: buildWebSiteSchema(SITE_URL, 'en')
@@ -312,6 +317,7 @@ if (require.main === module) {
   DatabaseAdapter.initializeDatabase()
     .then(() => DatabaseAdapter.ensurePublicIds())
     .then(() => DatabaseAdapter.ensureDemoColumns())
+    .then(() => DatabaseAdapter.ensureCategoryColumns())
     .then(() => DatabaseAdapter.ensureReportsTable())
     .then(() => DatabaseAdapter.ensureContactRequestsTable())
     .then(() => DatabaseAdapter.ensurePartnershipRequestsTable())

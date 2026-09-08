@@ -1,5 +1,7 @@
 <%- include('../partials/header') %>
     <main class="container">
+        <% const displayCategoryDefinitions = locale === 'en' ? englishCategoryDefinitions : categoryDefinitions; %>
+        <% const displaySubcategoryDefinitions = locale === 'en' ? englishSubcategoryDefinitions : subcategoryDefinitions; %>
         <div class="search-page">
             <div class="page-heading">
                 <span class="eyebrow"><%= t('search.eyebrow', 'RECHERCHER') %></span>
@@ -16,8 +18,14 @@
                 </select>
                 <select name="category">
                     <option value=""><%= t('common.category', 'Catégorie') %></option>
-                    <% categories.forEach(category => { %>
-                        <option value="<%= category %>" <%= filters.category === category ? 'selected' : '' %>><%= t('categories.' + category, categoryLabels[category]) %></option>
+                    <% displayCategoryDefinitions.forEach(category => { %>
+                        <option value="<%= category.id %>" <%= filters.category === category.id ? 'selected' : '' %>><%= category.label %></option>
+                    <% }) %>
+                </select>
+                <select name="subcategory">
+                    <option value=""><%= t('itemForm.subcategoryLabel', 'Sous-catégorie') %></option>
+                    <% Object.values(displaySubcategoryDefinitions).flat().forEach(subcategory => { %>
+                        <option value="<%= subcategory.value %>" <%= filters.subcategory === subcategory.value ? 'selected' : '' %>><%= subcategory.label %></option>
                     <% }) %>
                 </select>
                 <input type="text" name="city" value="<%= filters.city || '' %>" placeholder="<%= t('common.city', 'Ville') %>">
@@ -54,6 +62,8 @@
                         <article class="item-card">
                             <% if (item.photo_url) { %>
                                 <img src="<%= item.photo_url %>" alt="Photo de <%= item.title %>" class="item-card-photo" onerror="this.remove()">
+                            <% } else { %>
+                                <div class="item-card-photo-placeholder" aria-hidden="true"><%= item.type === 'lost' ? '⌕' : '✓' %></div>
                             <% } %>
                             <div class="item-card-top">
                                 <span class="type-pill <%= item.type %>"><%= item.type === 'lost' ? t('search.lostTag', 'PERDU') : t('search.foundTag', 'TROUVÉ') %></span>
@@ -61,7 +71,7 @@
                                 <span class="item-date"><%= formatDate(item.event_date) || t('search.dateUnknown', 'Date non précisée') %></span>
                             </div>
                             <h3><a href="/items/<%= item.id %>"><%= item.title %></a></h3>
-                            <p class="item-meta"><%= item.category %> · <%= item.city %><%= item.district ? ' · ' + item.district : '' %></p>
+                            <p class="item-meta"><%= (locale === 'en' ? englishCategoryLabels[item.category] : categoryLabels[item.category]) || item.category %><%= item.subcategory ? ' · ' + ((locale === 'en' ? englishSubcategoryLabels[item.subcategory] : subcategoryLabels[item.subcategory]) || item.subcategory) : '' %> · <%= item.city %><%= item.district ? ' · ' + item.district : '' %></p>
                             <p><%= item.description ? item.description.substring(0, 130) + (item.description.length > 130 ? '…' : '') : t('search.descriptionUnknown', 'Aucune description.') %></p>
                             <a href="/items/<%= item.id %>" class="text-link"><%= t('search.viewAd', 'Voir l\'annonce') %> →</a>
                         </article>

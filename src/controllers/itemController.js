@@ -1,9 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
-const { isValidDate, categories, categoryLabels, getDisplayTitle } = require('../services/itemService');
+const { isValidDate, categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, legacyCategoryMap, legacySubcategory, isValidCategory, isValidSubcategory, getDisplayTitle } = require('../services/itemService');
 const { createMatchesFor } = require('../services/matchingService');
 const { removeLocalUpload } = require('../services/imageStorage');
 
-const emptyForm = (type) => ({ type, category: '', title: '', description: '', brand: '', model: '', color: '', city: '', district: '', location_description: '', event_date: '' });
+const emptyForm = (type) => ({ type, category: '', subcategory: '', title: '', description: '', brand: '', model: '', color: '', city: '', district: '', location_description: '', event_date: '' });
 
 class ItemController {
     constructor(itemModel, communicationModel = null, userModel = null) {
@@ -12,15 +12,17 @@ class ItemController {
         this.userModel = userModel;
     }
 
-    showCreate = (req, res) => res.render('pages/item-form', { title: req.params.type === 'found' ? req.t('itemForm.publishFound', 'Déclarer un objet trouvé') : req.t('itemForm.publishLost', 'Déclarer un objet perdu'), formData: emptyForm(req.params.type), categories, categoryLabels, isEdit: false });
+    showCreate = (req, res) => res.render('pages/item-form', { title: req.params.type === 'found' ? req.t('itemForm.publishFound', 'Déclarer un objet trouvé') : req.t('itemForm.publishLost', 'Déclarer un objet perdu'), formData: emptyForm(req.params.type), categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, isEdit: false });
 
     create = async (req, res) => {
         const type = req.params.type;
         const formData = { ...emptyForm(type), ...req.body, type };
+        if (!isValidCategory(formData.category) && legacyCategoryMap[formData.category]) formData.category = legacyCategoryMap[formData.category];
+        if (!formData.subcategory) formData.subcategory = legacySubcategory(req.body.category, formData.title);
         const errors = this.validate(formData, req);
         if (errors.length) {
             await removeLocalUpload(req.file);
-            return res.status(422).render('pages/item-form', { title: req.t('itemForm.publishAd', 'Nouvelle annonce'), formData, categories, categoryLabels, errors, isEdit: false });
+            return res.status(422).render('pages/item-form', { title: req.t('itemForm.publishAd', 'Nouvelle annonce'), formData, categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, errors, isEdit: false });
         }
         try {
             const item = { ...formData, id: uuidv4(), user_id: req.session.userId, photo_filename: req.storedImage?.filename || null, photo_url: req.storedImage?.url || null, is_anonymous: formData.is_anonymous ? 1 : 0, status: 'active' };
@@ -36,7 +38,7 @@ class ItemController {
         } catch (error) {
             await removeLocalUpload(req.file);
             console.error('Erreur création annonce:', error);
-            res.status(500).render('pages/item-form', { title: req.t('itemForm.publishAd', 'Nouvelle annonce'), formData, categories, categoryLabels, errors: [req.t('messages.publishError', 'Impossible de publier cette annonce.')], isEdit: false });
+            res.status(500).render('pages/item-form', { title: req.t('itemForm.publishAd', 'Nouvelle annonce'), formData, categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, errors: [req.t('messages.publishError', 'Impossible de publier cette annonce.')], isEdit: false });
         }
     };
 
@@ -52,18 +54,25 @@ class ItemController {
                 filters: req.query,
                 categories,
                 categoryLabels,
+                englishCategoryLabels,
+                categoryDefinitions,
+                englishCategoryDefinitions,
+                subcategoryDefinitions,
+                englishSubcategoryDefinitions,
+                subcategoryLabels,
+                englishSubcategoryLabels,
                 page: Math.max(1, Number.parseInt(req.query.page, 10) || 1),
                 hasNextPage: results.length > 12
             });
         } catch (error) {
             console.error('Erreur recherche:', error);
-            res.status(500).render('pages/search', { title: req.t('seo.searchTitle', 'Rechercher un objet perdu ou trouvé'), results: [], filters: req.query, categories, categoryLabels, page: 1, hasNextPage: false, error: req.t('messages.searchError', 'La recherche est momentanément indisponible.') });
+            res.status(500).render('pages/search', { title: req.t('seo.searchTitle', 'Rechercher un objet perdu ou trouvé'), results: [], filters: req.query, categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, page: 1, hasNextPage: false, error: req.t('messages.searchError', 'La recherche est momentanément indisponible.') });
         }
     };
 
     map = async (req, res) => {
         const results = (await this.itemModel.search(req.query)).map((item) => ({ ...item, title: getDisplayTitle(item.type, item.title) }));
-        res.render('pages/map', { title: req.t('seo.mapTitle', 'Carte des annonces'), metaDescription: req.t('seo.mapDescription', 'Explorez les annonces actives par ville et quartier sur RETROOVA.'), results });
+        res.render('pages/map', { title: req.t('seo.mapTitle', 'Carte des annonces'), metaDescription: req.t('seo.mapDescription', 'Explorez les annonces actives par ville et quartier sur RETROOVA.'), results, categoryLabels, subcategoryLabels, englishCategoryLabels, englishSubcategoryLabels });
     };
 
     listMine = async (req, res) => {
@@ -88,6 +97,13 @@ class ItemController {
             filters,
             categories,
             categoryLabels,
+            englishCategoryLabels,
+            categoryDefinitions,
+            englishCategoryDefinitions,
+            subcategoryDefinitions,
+            englishSubcategoryDefinitions,
+            subcategoryLabels,
+            englishSubcategoryLabels,
             page: Math.max(1, Number.parseInt(req.query.page, 10) || 1),
             hasNextPage: results.length > 12,
             type
@@ -106,7 +122,7 @@ class ItemController {
         item.title = getDisplayTitle(item.type, item.title);
         const matches = req.session.userId ? await this.itemModel.getMatchesForUser(req.session.userId) : [];
         const ownerReputation = this.userModel && !item.is_anonymous ? await this.userModel.getReputation(item.user_id) : null;
-        const { categoryLabels } = require('../services/itemService');
+        const { categoryLabels, englishCategoryLabels, subcategoryLabels, englishSubcategoryLabels } = require('../services/itemService');
         const canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
         const metaDescription = `${item.type === 'lost' ? 'Objet perdu' : 'Objet trouvé'} : ${item.title}. ${item.city || 'Ville non précisée'}${item.district ? `, ${item.district}` : ''}. Consultez cette annonce RETROOVA et contactez le déclarant.`;
         res.render('pages/item-detail', {
@@ -116,6 +132,9 @@ class ItemController {
             item,
             ownerReputation,
             categoryLabels,
+            englishCategoryLabels,
+            subcategoryLabels,
+            englishSubcategoryLabels,
             matches: matches.filter((match) => match.lost_item_id === item.id || match.found_item_id === item.id),
             message: req.query.message
         });
@@ -124,17 +143,19 @@ class ItemController {
     edit = async (req, res) => {
         const item = await this.itemModel.findById(req.params.id, req.session?.userId);
         if (!item || item.user_id !== req.session.userId) return res.status(403).render('403', { title: req.t('messages.forbidden', 'Accès refusé') });
-        res.render('pages/item-form', { title: req.t('seo.editAd', 'Modifier mon annonce'), formData: item, categories, categoryLabels, isEdit: true, itemId: item.id });
+        res.render('pages/item-form', { title: req.t('seo.editAd', 'Modifier mon annonce'), formData: item, categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, isEdit: true, itemId: item.id });
     };
 
     update = async (req, res) => {
         const item = await this.itemModel.findById(req.params.id, req.session?.userId);
         if (!item || item.user_id !== req.session.userId) return res.status(403).render('403', { title: req.t('messages.forbidden', 'Accès refusé') });
         const formData = { ...item, ...req.body, type: item.type, status: item.status };
+        if (!isValidCategory(formData.category) && legacyCategoryMap[formData.category]) formData.category = legacyCategoryMap[formData.category];
+        if (!formData.subcategory) formData.subcategory = legacySubcategory(req.body.category || item.category, formData.title);
         const errors = this.validate(formData, req);
         if (errors.length) {
             await removeLocalUpload(req.file);
-            return res.status(422).render('pages/item-form', { title: req.t('seo.editAd', 'Modifier mon annonce'), formData, categories, categoryLabels, errors, isEdit: true, itemId: item.id });
+            return res.status(422).render('pages/item-form', { title: req.t('seo.editAd', 'Modifier mon annonce'), formData, categories, categoryLabels, englishCategoryLabels, categoryDefinitions, englishCategoryDefinitions, subcategoryDefinitions, englishSubcategoryDefinitions, subcategoryLabels, englishSubcategoryLabels, errors, isEdit: true, itemId: item.id });
         }
         if (req.file) {
             formData.photo_filename = req.storedImage?.filename || req.file.filename;
@@ -250,7 +271,8 @@ class ItemController {
         const translate = req?.t || ((key, fallback) => fallback);
         const errors = [];
         if (!['lost', 'found'].includes(data.type)) errors.push(translate('itemForm.invalidType', 'Le type d’annonce est invalide.'));
-        if (!categories.includes(data.category)) errors.push(translate('itemForm.chooseCategory', 'Choisissez une catégorie.'));
+        if (!isValidCategory(data.category)) errors.push(translate('itemForm.chooseCategory', 'Choisissez une catégorie.'));
+        if (!isValidSubcategory(data.category, data.subcategory)) errors.push(translate('itemForm.chooseSubcategory', 'Choisissez une sous-catégorie valide.'));
         if (!data.title || data.title.trim().length < 3) errors.push(translate('itemForm.titleMin', 'Le titre doit contenir au moins 3 caractères.'));
         if (!data.city || data.city.trim().length < 2) errors.push(translate('itemForm.cityRequired', 'La ville est obligatoire.'));
         if (data.event_date && !isValidDate(data.event_date)) errors.push(translate('itemForm.invalidDate', 'La date de l’événement est invalide.'));

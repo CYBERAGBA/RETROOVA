@@ -1,4 +1,23 @@
 <%- include('../partials/header') %>
+    <% const whatsappMessage = `Bonjour RETROOVA 👋
+
+Je souhaite signaler un problème sur la plateforme.
+
+Type de signalement :
+- Annonce suspecte
+- Contenu inapproprié
+- Erreur technique
+- Problème avec une annonce
+- Autre
+
+Lien de l’annonce concernée (si applicable) :
+[À compléter]
+
+Description du problème :
+[À compléter]
+
+Merci de prendre en compte mon signalement et de me tenir informé de la suite.`; %>
+    <% const whatsappUrl = `https://wa.me/2250500072323?text=${encodeURIComponent(whatsappMessage)}`; %>
     <main class="container">
         <div class="form-page">
             <a href="<%= item ? (locale === 'en' ? '/en' : '/fr') + '/items/' + item.id : (locale === 'en' ? '/en' : '/fr') + '/' %>" class="back-link"><%= t('report.backToAd', 'Retour à l’annonce') %></a>
@@ -19,6 +38,12 @@
                 <div class="form-group"><label for="attachment"><%= t('report.attachment', 'Pièce jointe (facultative)') %></label><input id="attachment" name="attachment" type="file" accept="image/jpeg,image/png,application/pdf"></div>
                 <button class="btn btn-danger" type="submit"><%= t('report.submit', 'Envoyer le signalement') %></button>
             </form>
+            <div class="report-whatsapp">
+                <a class="report-whatsapp-button" href="<%= whatsappUrl %>" target="_blank" rel="noopener noreferrer" aria-label="<%= t('report.whatsappButton', 'Contacter RETROOVA sur WhatsApp') %>">
+                    <span aria-hidden="true">◉</span> <%= t('report.whatsappButton', 'Contacter RETROOVA sur WhatsApp') %>
+                </a>
+                <p><%= t('report.whatsappHelp', 'Besoin d’une assistance rapide ? Contactez-nous directement sur WhatsApp.') %></p>
+            </div>
         </div>
     </main>
     <%- include('../partials/footer') %>

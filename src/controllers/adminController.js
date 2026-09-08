@@ -1,3 +1,5 @@
+const { categoryLabels, subcategoryLabels } = require('../services/itemService');
+
 class AdminController {
     constructor(model) { this.model = model; }
     dashboard = async (req, res) => {
@@ -10,7 +12,7 @@ class AdminController {
             this.model.getPartnershipRequests(),
             this.model.getContactRequests()
         ]);
-        res.render('pages/admin', { title: req.t('common.admin', 'Administration'), overview, items, reports, users, partnershipRequests, contactRequests, scope });
+        res.render('pages/admin', { title: req.t('common.admin', 'Administration'), overview, items, reports, users, partnershipRequests, contactRequests, scope, categoryLabels, englishCategoryLabels, subcategoryLabels, englishSubcategoryLabels });
     };
     partnershipDetail = async (req, res) => {
         const partnershipRequest = await this.model.getPartnershipRequestById(req.params.id);

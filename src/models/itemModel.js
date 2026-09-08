@@ -19,7 +19,7 @@ class ItemModel {
     }
 
     create(item) {
-        const fields = ['id', 'user_id', 'type', 'category', 'title', 'description', 'brand', 'model', 'color', 'city', 'district', 'location_description', 'event_date', 'photo_filename', 'photo_url', 'is_anonymous', 'status'];
+        const fields = ['id', 'user_id', 'type', 'category', 'subcategory', 'title', 'description', 'brand', 'model', 'color', 'city', 'district', 'location_description', 'event_date', 'photo_filename', 'photo_url', 'is_anonymous', 'status'];
         const values = fields.map((field) => field === 'is_anonymous' && this.db.isPostgres ? Boolean(item[field]) : item[field] ?? null);
         return this.run(`INSERT INTO items (${fields.join(', ')}) VALUES (${fields.map(() => '?').join(', ')})`, values);
     }
@@ -68,6 +68,10 @@ class ItemModel {
             conditions.push('items.category = ?');
             params.push(filters.category);
         }
+        if (filters.subcategory) {
+            conditions.push('items.subcategory = ?');
+            params.push(filters.subcategory);
+        }
         addLike('items.city', filters.city);
         addLike('items.district', filters.district);
         if (filters.startDate) {
@@ -93,7 +97,7 @@ class ItemModel {
     }
 
     update(id, userId, item) {
-        const fields = ['category', 'title', 'description', 'brand', 'model', 'color', 'city', 'district', 'location_description', 'event_date', 'photo_filename', 'photo_url', 'is_anonymous'];
+        const fields = ['category', 'subcategory', 'title', 'description', 'brand', 'model', 'color', 'city', 'district', 'location_description', 'event_date', 'photo_filename', 'photo_url', 'is_anonymous'];
         const values = fields.map((field) => field === 'is_anonymous' && this.db.isPostgres ? Boolean(item[field]) : item[field] ?? null);
         values.push(id, userId);
         return this.run(`UPDATE items SET ${fields.map((field) => `${field} = ?`).join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?`, values);
@@ -120,7 +124,7 @@ class ItemModel {
     }
 
     getPublicStats() {
-        return this.get(`SELECT (SELECT COUNT(*) FROM items JOIN users ON users.id = items.user_id WHERE items.status NOT IN ('closed', 'expired') AND users.status = 'active') AS declared, (SELECT COUNT(*) FROM matches) AS matches, (SELECT COUNT(*) FROM items JOIN users ON users.id = items.user_id WHERE items.status = 'returned' AND users.status = 'active') AS returned, (SELECT COUNT(*) FROM users WHERE status = 'active') AS users`);
+        return this.get(`SELECT (SELECT COUNT(*) FROM items JOIN users ON users.id = items.user_id WHERE items.status NOT IN ('closed', 'expired') AND users.status = 'active') AS declared, (SELECT COUNT(*) FROM items JOIN users ON users.id = items.user_id WHERE items.type = 'found' AND items.status NOT IN ('closed', 'expired') AND users.status = 'active') AS found, (SELECT COUNT(*) FROM matches) AS matches, (SELECT COUNT(*) FROM items JOIN users ON users.id = items.user_id WHERE items.status = 'returned' AND users.status = 'active') AS returned, (SELECT COUNT(*) FROM users WHERE status = 'active') AS users`);
     }
 
     updateStatus(id, userId, status) {

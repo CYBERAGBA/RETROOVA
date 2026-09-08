@@ -5,6 +5,7 @@ const bcryptjs = require('bcryptjs');
 require('dotenv').config();
 
 const { DatabaseAdapter, isPostgres, UPLOADS_DIR } = require('../src/db');
+const { legacyCategoryMap, legacySubcategory } = require('../src/services/itemService');
 
 const ROOT = path.resolve(__dirname, '..');
 const DEMO_EMAIL_DOMAIN = 'demo.retrova.invalid';
@@ -78,6 +79,9 @@ const itemSeed = [
   ['lost', 'phone', 'Téléphone perdu à Bouaké', 'Téléphone avec coque jaune, perdu après une course en taxi. L’écran présente une petite rayure.', 'Tecno', 'Camon 20', 'Noir', 'Bouake', 'Air France', '2025-08-20'],
   ['found', 'other', 'Parapluie trouvé à Paris', 'Parapluie pliant bleu trouvé à l’entrée d’un immeuble. Une étiquette porte les lettres A.M.', '', '', 'Bleu', 'Paris', 'Belleville', '2025-08-12'],
   ['lost', 'bag', 'Sac en toile perdu à Abidjan', 'Sac en toile beige avec un cahier et une bouteille vide. Perdu dans le quartier des affaires.', '', '', 'Beige', 'Abidjan', 'Plateau', '2025-08-04'],
+  ['found', 'vehicle', 'Vélo trouvé à Abidjan', 'Vélo urbain retrouvé près d’un parking. Une sonnette argentée est fixée au guidon.', '', '', 'Noir', 'Abidjan', 'Cocody', '2025-07-28'],
+  ['lost', 'animal', 'Chien perdu à Dakar', 'Chien de taille moyenne perdu près d’un parc. Il porte un collier bleu.', '', '', 'Brun', 'Dakar', 'Fann', '2025-07-20'],
+  ['found', 'professional', 'Outil trouvé à Yopougon', 'Outil manuel retrouvé dans une salle de chantier. Il porte une poignée rouge.', '', '', 'Rouge', 'Abidjan', 'Yopougon', '2025-07-12'],
 ];
 
 const idFor = (kind, index) => {
@@ -87,7 +91,14 @@ const idFor = (kind, index) => {
   return `${hex.slice(0, 8).join('')}-${hex.slice(8, 12).join('')}-${hex.slice(12, 16).join('')}-${hex.slice(16, 20).join('')}-${hex.slice(20).join('')}`;
 };
 
-const imageFor = (index) => index < 30 ? IMAGE_FILES[index % IMAGE_FILES.length] : null;
+const imageByItemId = new Map([
+  [idFor('item', 5), 'annonce_pc_lenovo_x260_perdu.jpg'],
+  [idFor('item', 8), 'annonce_roman_soundjata_de_niane_trouve.jpg'],
+  [idFor('item', 17), 'annonce_plan_de_lotissement_perdu.png'],
+  [idFor('item', 22), 'annonce_calculatrice_sharp_perdu.jpg'],
+  [idFor('item', 31), 'annonce_lot_de_roman_perdu.png']
+]);
+const imageFor = (itemId) => imageByItemId.get(itemId) || null;
 const userForItem = (index) => index < 10 ? index : index < 20 ? 10 + ((index - 10) % 10) : index % users.length;
 const createdAtFor = (eventDate, index) => `${eventDate}T${String(8 + (index % 10)).padStart(2, '0')}:${String((index * 7) % 60).padStart(2, '0')}:00Z`;
 
@@ -104,6 +115,7 @@ async function ensureSchema() {
   await DatabaseAdapter.initializeDatabase();
   await DatabaseAdapter.ensurePublicIds();
   await DatabaseAdapter.ensureDemoColumns();
+  await DatabaseAdapter.ensureCategoryColumns();
 }
 
 async function seed() {
@@ -129,20 +141,22 @@ async function seed() {
 
     for (let index = 0; index < itemSeed.length; index += 1) {
       const [type, category, title, description, brand, model, color, city, district, eventDate] = itemSeed[index];
-      const filename = imageFor(index, category);
       const itemId = idFor('item', index);
+      const filename = imageFor(itemId);
+      const canonicalCategory = legacyCategoryMap[category] || category;
+      const subcategory = legacySubcategory(category, title);
       const userId = userIds[userForItem(index)];
       const createdAt = createdAtFor(eventDate, index);
       await client.query(`
-        INSERT INTO items (id, user_id, type, category, title, description, brand, model, color, city, district, location_description, event_date, photo_filename, photo_url, is_anonymous, status, views_count, is_demo, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7, ''), NULLIF($8, ''), $9, $10, $11, $12, $13, $14, $15, FALSE, 'active', $16, TRUE, $17, $17)
-        ON CONFLICT (id) DO UPDATE SET user_id = EXCLUDED.user_id, type = EXCLUDED.type, category = EXCLUDED.category, title = EXCLUDED.title, description = EXCLUDED.description, brand = EXCLUDED.brand, model = EXCLUDED.model, color = EXCLUDED.color, city = EXCLUDED.city, district = EXCLUDED.district, event_date = EXCLUDED.event_date, photo_filename = EXCLUDED.photo_filename, photo_url = EXCLUDED.photo_url, is_demo = TRUE, status = 'active', updated_at = EXCLUDED.updated_at
+        INSERT INTO items (id, user_id, type, category, subcategory, title, description, brand, model, color, city, district, location_description, event_date, photo_filename, photo_url, is_anonymous, status, views_count, is_demo, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7, ''), NULLIF($8, ''), $9, $10, $11, $12, $13, $14, $15, $16, FALSE, 'active', $17, TRUE, $18, $18)
+        ON CONFLICT (id) DO UPDATE SET user_id = EXCLUDED.user_id, type = EXCLUDED.type, category = EXCLUDED.category, subcategory = EXCLUDED.subcategory, title = EXCLUDED.title, description = EXCLUDED.description, brand = EXCLUDED.brand, model = EXCLUDED.model, color = EXCLUDED.color, city = EXCLUDED.city, district = EXCLUDED.district, event_date = EXCLUDED.event_date, photo_filename = EXCLUDED.photo_filename, photo_url = EXCLUDED.photo_url, is_demo = TRUE, status = 'active', updated_at = EXCLUDED.updated_at
         WHERE items.is_demo = TRUE`,
-        [itemId, userId, type, category, title, description, brand, model, color, city, district, `Zone de démonstration près de ${district}`, eventDate, filename, filename ? `/images/annonces/${encodeURIComponent(filename)}` : null, (index * 13) % 240, createdAt]
+        [itemId, userId, type, canonicalCategory, subcategory, title, description, brand, model, color, city, district, `Zone de démonstration près de ${district}`, eventDate, filename, filename ? `/images/annonces/${encodeURIComponent(filename)}` : null, (index * 13) % 240, createdAt]
       );
     }
     await client.query('COMMIT');
-    console.log(`Seed DEMO terminé: ${users.length} utilisateurs, ${itemSeed.length} annonces, ${itemSeed.filter((_, index) => imageFor(index)).length} avec image.`);
+    console.log(`Seed DEMO terminé: ${users.length} utilisateurs, ${itemSeed.length} annonces, ${itemSeed.filter((_, index) => imageFor(idFor('item', index))).length} avec image.`);
     console.log('Les comptes DEMO utilisent des emails @demo.retrova.invalid; aucun mot de passe n’est écrit dans le code.');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -178,13 +192,17 @@ async function clear() {
   }
 }
 
-(async () => {
-  try {
-    const command = process.argv[2] || 'seed';
-    if (!['seed', 'clear'].includes(command)) throw new Error('Commande attendue: seed ou clear');
-    await (command === 'seed' ? seed() : clear());
-  } catch (error) {
-    console.error(`Erreur ${process.argv[2] || 'seed'}-demo:`, error.message);
-    process.exitCode = 1;
-  }
-})();
+module.exports = { IMAGE_DIR, IMAGE_FILES, imageByItemId, imageFor, idFor, itemSeed };
+
+if (require.main === module) {
+  (async () => {
+    try {
+      const command = process.argv[2] || 'seed';
+      if (!['seed', 'clear'].includes(command)) throw new Error('Commande attendue: seed ou clear');
+      await (command === 'seed' ? seed() : clear());
+    } catch (error) {
+      console.error(`Erreur ${process.argv[2] || 'seed'}-demo:`, error.message);
+      process.exitCode = 1;
+    }
+  })();
+}

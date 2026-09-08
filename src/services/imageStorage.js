@@ -2,7 +2,7 @@ const { Readable } = require('stream');
 const fs = require('fs/promises');
 const sharp = require('sharp');
 const { v2: cloudinary } = require('cloudinary');
-const sensitiveCategories = new Set(['id-card', 'passport', 'license', 'bank-card', 'documents', 'birth-certificate', 'cmu-card', 'money-card']);
+const sensitiveCategories = new Set(['documents', 'payments', 'id-card', 'passport', 'license', 'bank-card', 'documents', 'birth-certificate', 'cmu-card', 'money-card']);
 
 const cloudinaryConfigured = Boolean(
     process.env.CLOUDINARY_CLOUD_NAME

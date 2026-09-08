@@ -2063,6 +2063,36 @@ input:focus, select:focus, textarea:focus {
   max-width: 900px;
   margin: 0 auto;
 }
+.report-whatsapp {
+  margin-top: 1rem;
+  text-align: center;
+}
+.report-whatsapp-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  background: #25d366;
+  color: #063b20;
+  font-size: 0.86rem;
+  font-weight: 800;
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.18);
+}
+.report-whatsapp-button:hover,
+.report-whatsapp-button:focus-visible {
+  background: #1ebe5d;
+  color: #042b17;
+}
+.report-whatsapp-button span {
+  font-size: 0.78rem;
+}
+.report-whatsapp p {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
