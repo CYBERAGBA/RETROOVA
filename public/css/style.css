@@ -813,6 +813,280 @@
   line-height: 1.7;
 }
 
+.how-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.6fr);
+  gap: 2rem;
+  align-items: center;
+  margin: -0.5rem -0.5rem 2rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(255, 138, 0, 0.1));
+}
+
+.how-hero h2 {
+  max-width: 680px;
+  margin: 0.7rem 0;
+  color: var(--primary-dark);
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  line-height: 0.98;
+}
+
+.how-hero p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--text-light);
+  font-size: 1.12rem;
+  line-height: 1.7;
+}
+
+.how-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+}
+
+.how-hero-mark {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  align-content: center;
+  gap: 0.4rem;
+  border: 1px solid rgba(13, 110, 253, 0.18);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--primary-dark);
+  text-align: center;
+}
+
+.how-hero-mark span {
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.how-hero-mark strong {
+  color: var(--accent);
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.how-hero-mark small {
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.how-section {
+  margin: 0 0 3rem;
+  padding-top: 0.5rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.how-section-number {
+  display: inline-block;
+  margin-bottom: 0.55rem;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.how-section > h2 {
+  margin-bottom: 0.8rem;
+  color: var(--primary-dark);
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+}
+
+.how-intro {
+  max-width: 740px;
+  font-size: 1.05rem;
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+.how-steps > div,
+.how-criteria > div,
+.how-safety > div {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(242, 244, 247, 0.72);
+}
+
+.how-steps > div {
+  padding: 1rem;
+}
+
+.how-steps span {
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.how-steps h3 {
+  margin: 0.7rem 0 0.35rem;
+  color: var(--primary-dark);
+  font-size: 1rem;
+}
+
+.how-steps p {
+  margin: 0;
+  font-size: 0.87rem;
+}
+
+.how-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.how-split > div {
+  padding: 1.35rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fbfcfe;
+}
+
+.how-split ol,
+.how-split ul {
+  padding-left: 1.2rem;
+}
+
+.how-split li,
+.how-section li {
+  margin: 0.55rem 0;
+}
+
+.how-section blockquote {
+  margin-top: 1.2rem;
+}
+
+.how-criteria {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.4rem 0;
+}
+
+.how-criteria > div {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem;
+}
+
+.how-criteria span {
+  font-size: 1.15rem;
+}
+
+.how-criteria strong {
+  color: var(--primary-dark);
+  font-size: 0.88rem;
+}
+
+.how-note {
+  margin: 0;
+  color: var(--primary-dark) !important;
+  font-weight: 800;
+}
+
+.how-safety {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.how-safety > div {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  column-gap: 0.55rem;
+  padding: 0.85rem;
+}
+
+.how-safety span {
+  grid-row: span 2;
+  font-size: 1.25rem;
+}
+
+.how-safety strong {
+  color: var(--primary-dark);
+}
+
+.how-safety p {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+}
+
+.how-report {
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 138, 0, 0.25);
+  border-radius: 18px;
+  background: rgba(255, 138, 0, 0.07);
+}
+
+.how-resolution {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.how-final {
+  margin: 1rem 0 2rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: #fff;
+  text-align: center;
+}
+
+.how-final h2,
+.how-final p {
+  color: #fff;
+}
+
+.how-final p {
+  margin-bottom: 0;
+}
+
+.how-final .how-actions {
+  justify-content: center;
+}
+
+@media (max-width: 800px) {
+  .how-hero,
+  .how-split {
+    grid-template-columns: 1fr;
+  }
+
+  .how-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .how-criteria {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .how-hero {
+    margin: -0.5rem 0 2rem;
+    padding: 1.2rem;
+  }
+
+  .how-steps,
+  .how-criteria {
+    grid-template-columns: 1fr;
+  }
+
+  .how-actions .btn {
+    width: 100%;
+  }
+}
+
 @media (max-width: 620px) {
   .terms-toc ul {
     grid-template-columns: 1fr;

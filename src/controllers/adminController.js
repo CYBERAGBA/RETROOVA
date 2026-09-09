@@ -1,4 +1,9 @@
-const { categoryLabels, subcategoryLabels } = require('../services/itemService');
+const {
+    categoryLabels,
+    englishCategoryLabels,
+    subcategoryLabels,
+    englishSubcategoryLabels
+} = require('../services/itemService');
 
 class AdminController {
     constructor(model) { this.model = model; }
