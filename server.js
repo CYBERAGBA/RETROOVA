@@ -86,19 +86,39 @@ app.get('/robots.txt', (req, res) => {
 
 app.get('/sitemap.xml', async (req, res) => {
   const publicPages = [
-    { url: '/', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '1.0' },
-    { url: '/search', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.9' },
-    { url: '/map', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
-    { url: '/how-it-works', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
-    { url: '/about', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
-    { url: '/partnerships', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
-    { url: '/privacy', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
-    { url: '/terms', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
-    { url: '/contact', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.5' },
-    { url: '/help', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
-    { url: '/security', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.6' },
-    { url: '/login', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.4' },
-    { url: '/register', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.4' }
+    // Home pages (localized)
+    { url: '/fr/', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '1.0' },
+    { url: '/en/', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '1.0' },
+   
+    
+    { url: '/fr/how-it-works', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
+    { url: '/en/how-it-works', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
+    // About pages (localized)
+    { url: '/fr/about', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: '/en/about', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    // Partnerships pages (localized)
+    { url: '/fr/partnerships', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: '/en/partnerships', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    // Privacy pages (localized)
+    { url: '/fr/privacy', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
+    { url: '/en/privacy', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
+    // Terms pages (localized)
+    { url: '/fr/terms', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
+    { url: '/en/terms', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
+    // Contact pages (localized)
+    { url: '/fr/contact', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.5' },
+    { url: '/en/contact', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.5' },
+    // Help pages (localized)
+    { url: '/fr/help', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: '/en/help', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    // Security pages (localized)
+    { url: '/fr/security', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.6' },
+    { url: '/en/security', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.6' },
+    // Lost/Found forms (localized)
+    { url: '/fr/lost', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
+    { url: '/en/lost', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
+    { url: '/fr/found', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
+    { url: '/en/found', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' }
   ];
 
   const items = await itemModel.all("SELECT id, title, type, created_at, updated_at FROM items WHERE status NOT IN ('closed', 'expired') ORDER BY created_at DESC LIMIT 500");

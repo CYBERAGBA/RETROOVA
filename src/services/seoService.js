@@ -15,11 +15,28 @@ const buildLanguageAlternates = (siteUrl, pathName = '/', locales = ['fr', 'en']
   const normalizedPath = String(pathName || '/').split('?')[0] || '/';
   const currentPath = normalizedPath.startsWith('/') ? normalizedPath : `/${normalizedPath}`;
 
-  return locales.reduce((acc, locale) => {
-    const localePath = locale === 'fr' ? currentPath : `/en${currentPath === '/' ? '' : currentPath}`;
-    acc[locale] = buildAbsoluteUrl(siteUrl, localePath);
-    return acc;
-  }, {});
+  // Extract the slug (path without locale prefix)
+  let slug = currentPath;
+  if (currentPath.startsWith('/fr/') || currentPath === '/fr') {
+    slug = currentPath === '/fr' ? '/' : currentPath.substring(3); // Remove '/fr'
+  } else if (currentPath.startsWith('/en/') || currentPath === '/en') {
+    slug = currentPath === '/en' ? '/' : currentPath.substring(3); // Remove '/en'
+  }
+
+  const result = {};
+  
+  locales.forEach((locale) => {
+    const prefix = locale === 'fr' ? '/fr' : '/en';
+    const localePath = slug === '/' ? `${prefix}/` : `${prefix}${slug}`;
+    result[locale] = buildAbsoluteUrl(siteUrl, localePath);
+  });
+
+  // Add x-default pointing to French version
+  const frPrefix = '/fr';
+  const defaultPath = slug === '/' ? `${frPrefix}/` : `${frPrefix}${slug}`;
+  result['x-default'] = buildAbsoluteUrl(siteUrl, defaultPath);
+
+  return result;
 };
 
 const buildSitemapXml = (siteUrl, pages = [], items = []) => {
@@ -36,13 +53,27 @@ const buildSitemapXml = (siteUrl, pages = [], items = []) => {
     });
   });
 
+  // Generate localized URLs for items: /fr/items/:id and /en/items/:id
   items.forEach((item) => {
     if (!item || !item.id) return;
+    const lastmod = item.updated_at || item.created_at || null;
+    const changefreq = 'weekly';
+    const priority = '0.7';
+    
+    // French version
     entries.push({
-      url: buildAbsoluteUrl(siteUrl, `/items/${item.id}`),
-      lastmod: item.updated_at || item.created_at || null,
-      changefreq: 'weekly',
-      priority: '0.7'
+      url: buildAbsoluteUrl(siteUrl, `/fr/items/${item.id}`),
+      lastmod,
+      changefreq,
+      priority
+    });
+    
+    // English version
+    entries.push({
+      url: buildAbsoluteUrl(siteUrl, `/en/items/${item.id}`),
+      lastmod,
+      changefreq,
+      priority
     });
   });
 
@@ -88,7 +119,7 @@ const buildWebSiteSchema = (siteUrl, locale = 'fr') => ({
   description: 'Plateforme de signalement et de recherche d’objets perdus et trouvés.',
   potentialAction: {
     '@type': 'SearchAction',
-    target: `${buildAbsoluteUrl(siteUrl, '/search')}?keyword={search_term_string}`,
+    target: `${buildAbsoluteUrl(siteUrl, `/${locale}/search`)}?keyword={search_term_string}`,
     'query-input': 'required name=search_term_string'
   }
 });

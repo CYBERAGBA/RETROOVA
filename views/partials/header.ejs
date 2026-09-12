@@ -15,9 +15,7 @@
 <% if (typeof alternateLinks !== 'undefined' && alternateLinks) { %>
     <%- alternateLinks %>
 <% } %>
-<% if (typeof schemaJsonLd !== 'undefined' && schemaJsonLd) { %>
-    <script type="application/ld+json"><%- JSON.stringify(schemaJsonLd) %></script>
-<% } %>
+
 <% if (typeof faqSchema !== 'undefined' && faqSchema) { %>
     <script type="application/ld+json"><%- JSON.stringify(faqSchema) %></script>
 <% } %>

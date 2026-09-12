@@ -419,8 +419,8 @@ const buildAboutPageMarkup = (locale = 'fr') => {
 
 const pages = {
     '/how-it-works': {
-        fr: ['Comment ça marche ? | RETROOVA', 'Découvrez comment RETROOVA facilite la déclaration, la recherche, l’identification et la restitution des objets perdus et trouvés.', () => buildHowItWorksPageMarkup('fr')],
-        en: ['How does it work? | RETROOVA', 'Discover how RETROOVA makes it easier to report, search for, identify and return lost and found items.', () => buildHowItWorksPageMarkup('en')]
+        fr: ['Comment ça marche ?', 'Découvrez comment RETROOVA facilite la déclaration, la recherche, l’identification et la restitution des objets perdus et trouvés.', () => buildHowItWorksPageMarkup('fr')],
+        en: ['How does it work?', 'Discover how RETROOVA makes it easier to report, search for, identify and return lost and found items.', () => buildHowItWorksPageMarkup('en')]
     },
     '/about': {
         fr: ['À propos de RETROOVA', 'Une plateforme conçue pour rapprocher les objets perdus de leurs propriétaires.', () => buildAboutPageMarkup('fr')],
@@ -461,8 +461,8 @@ const pages = {
         en: ['Security', 'Your safety is our priority.', () => buildSecurityPageMarkup('en')]
     },
     '/help': {
-        fr: ['Centre d’aide RETROOVA', 'Comment pouvons-nous vous aider ?', () => buildHelpPageMarkup('fr')],
-        en: ['RETROVA Help Center', 'How can we help?', () => buildHelpPageMarkup('en')]
+        fr: ['Centre d'aide', 'Comment pouvons-nous vous aider ?', () => buildHelpPageMarkup('fr')],
+        en: ['Help Center', 'How can we help?', () => buildHelpPageMarkup('en')]
     },
     '/report': {
         fr: ['Signaler', 'Signalement d’un comportement ou d’une annonce suspecte.', `
