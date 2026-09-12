@@ -461,7 +461,7 @@ const pages = {
         en: ['Security', 'Your safety is our priority.', () => buildSecurityPageMarkup('en')]
     },
     '/help': {
-        fr: ['Centre d'aide', 'Comment pouvons-nous vous aider ?', () => buildHelpPageMarkup('fr')],
+        fr: ["Centre d'aide", 'Comment pouvons-nous vous aider ?', () => buildHelpPageMarkup('fr')],
         en: ['Help Center', 'How can we help?', () => buildHelpPageMarkup('en')]
     },
     '/report': {
