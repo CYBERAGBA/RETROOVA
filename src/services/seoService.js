@@ -38,6 +38,17 @@ const buildLanguageAlternates = (siteUrl, pathName = '/', locales = ['fr', 'en']
 
   return result;
 };
+const formatSitemapDate = (date) => {
+  if (!date) return null;
+
+  const parsed = new Date(date);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed.toISOString();
+};
 
 const buildSitemapXml = (siteUrl, pages = [], items = []) => {
   const entries = [];
@@ -45,9 +56,12 @@ const buildSitemapXml = (siteUrl, pages = [], items = []) => {
   pages.forEach((page) => {
     const url = typeof page === 'string' ? page : page.url;
     if (!url) return;
+
     entries.push({
       url: buildAbsoluteUrl(siteUrl, url),
-      lastmod: typeof page === 'object' ? page.lastmod : null,
+      lastmod: typeof page === 'object'
+        ? formatSitemapDate(page.lastmod)
+        : null,
       changefreq: typeof page === 'object' ? page.changefreq : null,
       priority: typeof page === 'object' ? page.priority : null
     });
@@ -56,10 +70,14 @@ const buildSitemapXml = (siteUrl, pages = [], items = []) => {
   // Generate localized URLs for items: /fr/items/:id and /en/items/:id
   items.forEach((item) => {
     if (!item || !item.id) return;
-    const lastmod = item.updated_at || item.created_at || null;
+
+    const lastmod = formatSitemapDate(
+      item.updated_at || item.created_at || null
+    );
+
     const changefreq = 'weekly';
     const priority = '0.7';
-    
+
     // French version
     entries.push({
       url: buildAbsoluteUrl(siteUrl, `/fr/items/${item.id}`),
@@ -67,7 +85,7 @@ const buildSitemapXml = (siteUrl, pages = [], items = []) => {
       changefreq,
       priority
     });
-    
+
     // English version
     entries.push({
       url: buildAbsoluteUrl(siteUrl, `/en/items/${item.id}`),
@@ -81,9 +99,18 @@ const buildSitemapXml = (siteUrl, pages = [], items = []) => {
   entries.forEach((entry) => uniqueEntries.set(entry.url, entry));
 
   const xmlUrls = [...uniqueEntries.values()].map((entry) => {
-    const lastmod = entry.lastmod ? `\n    <lastmod>${escapeXml(entry.lastmod)}</lastmod>` : '';
-    const changefreq = entry.changefreq ? `\n    <changefreq>${escapeXml(entry.changefreq)}</changefreq>` : '';
-    const priority = entry.priority ? `\n    <priority>${escapeXml(String(entry.priority))}</priority>` : '';
+    const lastmod = entry.lastmod
+      ? `\n    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`
+      : '';
+
+    const changefreq = entry.changefreq
+      ? `\n    <changefreq>${escapeXml(entry.changefreq)}</changefreq>`
+      : '';
+
+    const priority = entry.priority
+      ? `\n    <priority>${escapeXml(String(entry.priority))}</priority>`
+      : '';
+
     return `  <url>\n    <loc>${escapeXml(entry.url)}</loc>${lastmod}${changefreq}${priority}\n  </url>`;
   }).join('\n');
 
