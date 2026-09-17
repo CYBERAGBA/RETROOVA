@@ -6,7 +6,7 @@ const escapeXml = (value = '') => String(value)
   .replace(/'/g, '&apos;');
 
 const buildAbsoluteUrl = (siteUrl, pathName = '/') => {
-  const base = String(siteUrl || 'https://retroova.com').replace(/\/$/, '');
+  const base = String(siteUrl || 'https://retroova.com').replace(/\/\$/, '');
   const normalizedPath = String(pathName || '/').startsWith('/') ? String(pathName) : `/${pathName}`;
   return `${base}${normalizedPath}`;
 };
@@ -38,6 +38,7 @@ const buildLanguageAlternates = (siteUrl, pathName = '/', locales = ['fr', 'en']
 
   return result;
 };
+
 const formatSitemapDate = (date) => {
   if (!date) return null;
 
@@ -49,14 +50,6 @@ const formatSitemapDate = (date) => {
 
   return parsed.toISOString();
 };
-
-  const parsed = new Date(date);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return null;
-  }
-
-  return parsed.toISOString();
 
 const buildSitemapXml = (siteUrl, pages = [], items = []) => {
   const entries = [];
@@ -154,7 +147,7 @@ const buildWebSiteSchema = (siteUrl, locale = 'fr') => ({
   description: 'Plateforme de signalement et de recherche d’objets perdus et trouvés.',
   potentialAction: {
     '@type': 'SearchAction',
-    target: `${buildAbsoluteUrl(siteUrl, `/${locale}/search`)}?keyword={search_term_string}`,
+    target: `${buildAbsoluteUrl(siteUrl, `/\${locale}/search`)}?keyword={search_term_string}`,
     'query-input': 'required name=search_term_string'
   }
 });
@@ -181,3 +174,4 @@ module.exports = {
   buildWebSiteSchema,
   buildFaqSchema
 };
+
