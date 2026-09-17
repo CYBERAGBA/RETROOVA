@@ -50,9 +50,6 @@ const formatSitemapDate = (date) => {
   return parsed.toISOString();
 };
 
-const formatSitemapDate = (date) => {
-  if (!date) return null;
-
   const parsed = new Date(date);
 
   if (Number.isNaN(parsed.getTime())) {
