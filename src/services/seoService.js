@@ -57,7 +57,7 @@ const formatSitemapDate = (date) => {
   }
 
   return parsed.toISOString();
-};
+
 const buildSitemapXml = (siteUrl, pages = [], items = []) => {
   const entries = [];
 
