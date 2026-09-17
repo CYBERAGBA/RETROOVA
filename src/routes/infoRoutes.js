@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
+const { isAuthenticated } = require('../middleware/authMiddleware');
 
 const contactDirectory = path.resolve(process.env.CONTACT_UPLOADS_DIR || path.join(__dirname, '../../private-uploads/contact'));
 fs.mkdirSync(contactDirectory, { recursive: true });
@@ -35,7 +36,7 @@ module.exports = (adminModel) => {
     const router = express.Router();
     const controller = new InfoController(adminModel);
     ['/how-it-works', '/about', '/privacy', '/terms', '/security', '/help'].forEach((route) => router.get(route, controller.show));
-    ['/partnerships', '/partenariats'].forEach((route) => { router.get(route, controller.show); router.post(route, csrfMiddleware, controller.submitPartnership); });
+    ['/partnerships', '/partenariats'].forEach((route) => { router.get(route, controller.show); router.post(route, isAuthenticated, csrfMiddleware, controller.submitPartnership); });
     router.get('/contact', controller.contact);
     router.post('/contact', contactRateLimit, uploadContactAttachment, csrfMiddleware, controller.submitContact);
     return router;

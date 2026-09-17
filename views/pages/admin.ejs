@@ -1,99 +1,16 @@
 <%- include('../partials/header') %>
-    <main class="container">
-        <% const displayCategoryLabels = locale === 'en' ? englishCategoryLabels : categoryLabels; %>
-        <% const displaySubcategoryLabels = locale === 'en' ? englishSubcategoryLabels : subcategoryLabels; %>
-        <div class="page-heading"><span class="eyebrow"><%= t('adminDetail.adminSpace', 'ESPACE ADMINISTRATEUR') %></span>
-            <h1><%= t('admin.title', 'Pilotage RETROOVA') %></h1>
-            <p><%= t('admin.subtitle', 'Modérez les annonces et surveillez l’activité de la plateforme.') %></p>
-        </div>
-        <section class="admin-stats">
-            <div><strong><%= overview.users %></strong><span><%= t('admin.users', 'Utilisateurs') %></span></div>
-            <div><strong><%= overview.lost %></strong><span><%= t('admin.lostItems', 'Objets perdus') %></span></div>
-            <div><strong><%= overview.found %></strong><span><%= t('admin.foundItems', 'Objets trouvés') %></span></div>
-            <div><strong><%= overview.matches %></strong><span><%= t('admin.matches', 'Correspondances') %></span></div>
-            <div><strong><%= overview.pending_reports %></strong><span><%= t('admin.pendingReports', 'Signalements à traiter') %></span></div>
-        </section>
-        <nav class="admin-scope-filter" aria-label="<%= t('admin.dataScope', 'Type de données') %>">
-            <a href="/admin?scope=all" class="<%= scope === 'all' ? 'active' : '' %>"><%= t('admin.allData', 'Toutes') %></a>
-            <a href="/admin?scope=real" class="<%= scope === 'real' ? 'active' : '' %>"><%= t('admin.realData', 'Réelles') %></a>
-            <a href="/admin?scope=demo" class="<%= scope === 'demo' ? 'active' : '' %>"><%= t('admin.demoData', 'Démonstration') %></a>
-        </nav>
-        <% if (typeof contactRequests !== 'undefined') { %>
-        <section class="admin-panel">
-            <div class="panel-heading"><h2><%= t('admin.contactRequests', 'Demandes de contact') %></h2><span><%= contactRequests.length %> <%= t('admin.requestCount', 'demandes') %></span></div>
-            <% if (!contactRequests.length) { %><div class="empty-state"><p><%= t('admin.noContactRequests', 'Aucune demande de contact.') %></p></div><% } else { %>
-                <div class="admin-table contact-request-table"><% contactRequests.forEach((request) => { %><div><strong><%= request.public_reference %></strong><span><%= request.name %> · <%= request.email %></span><span><%= request.subject %><%= request.item_reference ? ' · ' + request.item_reference : '' %></span><small><%= request.message %></small><span><%= formatDate(request.created_at) %></span></div><% }) %></div>
-            <% } %>
-        </section>
-        <% } %>
-        <section class="admin-panel">
-            <div class="panel-heading">
-                <h2><%= t('admin.users', 'Utilisateurs') %></h2><span><%= users.length %> <%= t('admin.displayed', 'affichés') %></span>
-            </div>
-            <div class="admin-table">
-                <% users.forEach(account=> { %><div><span class="type-pill"><%= account.is_demo ? t('admin.demoBadge', 'DÉMO') : account.role === 'admin' ? t('admin.roleAdmin', 'Administrateur') : t('admin.roleUser', 'Utilisateur') %></span><strong><%= account.name %></strong><span><%= account.email %> · <%= account.city || t('admin.cityUnknown', 'Ville non précisée') %></span><span><%= account.status === 'active' ? t('admin.statusActive', 'Actif') : account.status === 'suspended' ? t('admin.statusSuspended', 'Suspendu') : account.status === 'deleted' ? t('admin.statusDeleted', 'Supprimé') : account.status %></span></div><% }) %>
-            </div>
-        </section>
-        <section class="admin-panel">
-            <div class="panel-heading">
-                <h2><%= t('admin.requests', 'Demandes de partenariat') %></h2><span><%= partnershipRequests.length %> <%= t('admin.requestCount', 'demandes') %></span>
-            </div>
-            <% if (!partnershipRequests.length) { %>
-                <div class="empty-state">
-                    <p><%= t('admin.noRequests', 'Aucune demande de partenariat.') %></p>
-                </div>
-                <% } else { %>
-                    <div class="admin-table partnership-table">
-                        <% partnershipRequests.forEach((request) => { %>
-                            <div>
-                                <strong><%= request.organization_name %></strong>
-                                <span><%= request.partnership_type %></span>
-                                <span><%= request.contact_name %></span>
-                                <span><%= request.country || t('admin.unknown', 'Non précisé') %></span>
-                                <span><%= formatDate(request.created_at) %></span>
-                                <span class="partnership-status <%= request.status %>"><%= request.status === 'new' ? t('admin.statusNew', 'Nouveau') : request.status === 'in_progress' ? t('admin.statusInProgress', 'En cours') : request.status === 'accepted' ? t('admin.statusAccepted', 'Accepté') : request.status === 'archived' ? t('admin.statusArchived', 'Archivé') : t('admin.statusRejected', 'Rejeté') %></span>
-                                <a href="/admin/partnerships/<%= request.id %>"><%= t('admin.view', 'Voir') %></a>
-                            </div>
-                        <% }) %>
-                    </div>
-                <% } %>
-        </section>
-        <section class="admin-panel">
-            <div class="panel-heading">
-                <h2><%= t('admin.reports', 'Signalements') %></h2><span><%= reports.length %> <%= t('admin.recentReports', 'récents') %></span>
-            </div>
-            <% if (!reports.length) { %>
-                <div class="empty-state">
-                    <p><%= t('admin.noReports', 'Aucun signalement.') %></p>
-                </div>
-                <% } else { reports.forEach(report=> { %><article class="report-row">
-                        <div><strong><%= report.public_reference %> · <%= report.item_title %></strong>
-                            <p><%= report.reason %> · <%= t('admin.by', 'par') %> <%= report.reporter_name %></p><small><%= report.comment || t('admin.reportDetailUnknown', 'Sans précision') %></small>
-                        </div>
-                        <form method="POST" action="/admin/reports/<%= report.report_id %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><select name="status">
-                                <option value="pending" <%=report.status==='pending' ? 'selected' : '' %>><%= t('admin.statusPending', 'En attente') %></option>
-                                <option value="reviewing" <%=report.status==='reviewing' ? 'selected' : '' %>><%= t('admin.statusReviewing', 'En cours d’examen') %></option>
-                                <option value="resolved" <%=report.status==='resolved' ? 'selected' : '' %>><%= t('admin.statusResolved', 'Résolu') %></option>
-                                <option value="rejected" <%=report.status==='rejected' ? 'selected' : '' %>><%= t('admin.statusRejected', 'Rejeté') %></option>
-                            </select><input name="notes" placeholder="<%= t('admin.notePlaceholder', 'Note admin') %>" value="<%= report.admin_notes || '' %>"><button class="btn btn-small btn-primary"><%= t('admin.update', 'Mettre à jour') %></button></form>
-                    </article>
-                    <% }) } %>
-        </section>
-        <section class="admin-panel">
-            <div class="panel-heading">
-                <h2><%= t('admin.recentAds', 'Annonces récentes') %></h2><a href="/search"><%= t('admin.openSearch', 'Ouvrir la recherche') %></a>
-            </div>
-            <div class="admin-table">
-                    <% items.forEach(item=> { %><div><span class="type-pill <%= item.type %>"><%= item.is_demo ? t('admin.demoBadge', 'DÉMO') : item.type === 'lost' ? t('common.lost', 'Perdu') : t('common.found', 'Trouvé') %></span><strong><%= item.title && item.title.toLowerCase() !== 'photo' ? item.title : item.type === 'found' ? t('common.found', 'Objet trouvé') : t('common.lost', 'Objet perdu') %></strong><span><%= displayCategoryLabels[item.category] || item.category %><%= item.subcategory ? ' · ' + (displaySubcategoryLabels[item.subcategory] || item.subcategory) : '' %> · <%= item.city %> · <%= item.owner_name %></span><a href="/items/<%= item.id %>"><%= t('admin.view', 'Voir') %></a><form method="POST" action="/admin/items/<%= item.id %>/status" data-confirm="<%= t('admin.closeConfirm', 'Fermer cette annonce ?') %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button class="btn btn-small btn-danger"><%= t('admin.close', 'Fermer') %></button></form></div><% }) %>
-            </div>
-        </section>
-        <section class="admin-panel">
-            <div class="panel-heading">
-                <h2><%= t('admin.users', 'Utilisateurs') %></h2><span><%= users.length %> <%= t('admin.displayed', 'affichés') %></span>
-            </div>
-            <div class="admin-table">
-                <% users.forEach(account=> { %><div><span class="type-pill"><%= account.role %></span><strong><%= account.name %></strong><span><%= account.email %></span><form method="POST" action="/admin/users/<%= account.id %>/status"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="<%= account.status === 'suspended' ? 'active' : 'suspended' %>"><button class="btn btn-small btn-secondary"><%= account.status==='suspended' ? t('admin.reactivate', 'Réactiver') : t('admin.suspend', 'Suspendre') %></button></form></div><% }) %>
-            </div>
-        </section>
-    </main>
-    <%- include('../partials/footer') %>
+<main class="container admin-dashboard-page">
+    <% const displayCategoryLabels = locale === 'en' ? englishCategoryLabels : categoryLabels; %>
+    <% const displaySubcategoryLabels = locale === 'en' ? englishSubcategoryLabels : subcategoryLabels; %>
+    <div class="page-heading"><span class="eyebrow"><%= t('adminDetail.adminSpace', 'ESPACE ADMINISTRATEUR') %></span><h1><%= t('admin.title', 'Pilotage RETROOVA') %></h1><p><%= t('admin.subtitle', 'Modérez les annonces et surveillez l’activité de la plateforme.') %></p></div>
+    <section class="admin-stats"><div><strong><%= overview.users %></strong><span><%= t('admin.users', 'Utilisateurs') %></span></div><div><strong><%= overview.lost %></strong><span><%= t('admin.lostItems', 'Objets perdus') %></span></div><div><strong><%= overview.found %></strong><span><%= t('admin.foundItems', 'Objets trouvés') %></span></div><div><strong><%= overview.matches %></strong><span><%= t('admin.matches', 'Correspondances') %></span></div><div><strong><%= overview.pending_reports %></strong><span><%= t('admin.pendingReports', 'Signalements à traiter') %></span></div></section>
+    <nav class="admin-scope-filter" aria-label="<%= t('admin.dataScope', 'Type de données') %>"><a href="/admin?scope=all" class="<%= scope === 'all' ? 'active' : '' %>"><%= t('admin.allData', 'Toutes') %></a><a href="/admin?scope=real" class="<%= scope === 'real' ? 'active' : '' %>"><%= t('admin.realData', 'Réelles') %></a><a href="/admin?scope=demo" class="<%= scope === 'demo' ? 'active' : '' %>"><%= t('admin.demoData', 'Démonstration') %></a></nav>
+    <div class="admin-workspace-grid">
+        <section class="admin-panel admin-panel--contacts"><div class="panel-heading"><h2><%= t('admin.contactRequests', 'Demandes de contact') %></h2><span><%= contactRequests.length %> <%= t('admin.requestCount', 'demandes') %></span></div><% if (!contactRequests.length) { %><div class="empty-state"><p><%= t('admin.noContactRequests', 'Aucune demande de contact.') %></p></div><% } else { %><div class="admin-record-list"><% contactRequests.forEach((request) => { %><article class="admin-record"><div><strong><%= request.public_reference %></strong><p><%= request.name %> · <%= request.email %></p></div><div><span class="admin-record__label"><%= request.subject %><%= request.item_reference ? ' · ' + request.item_reference : '' %></span><small><%= request.message %></small></div><time><%= formatDate(request.created_at) %></time></article><% }) %></div><% } %></section>
+        <section class="admin-panel admin-panel--partnerships"><div class="panel-heading"><h2><%= t('admin.requests', 'Demandes de partenariat') %></h2><span><%= partnershipRequests.length %> <%= t('admin.requestCount', 'demandes') %></span></div><% if (!partnershipRequests.length) { %><div class="empty-state"><p><%= t('admin.noRequests', 'Aucune demande de partenariat.') %></p></div><% } else { %><div class="admin-record-list"><% partnershipRequests.forEach((request) => { %><article class="admin-record"><div><strong><%= request.organization_name %></strong><p><%= request.contact_name %> · <%= request.country || t('admin.unknown', 'Non précisé') %></p></div><div><span class="admin-record__label"><%= request.partnership_type %></span><span class="partnership-status <%= request.status %>"><%= request.status === 'new' ? t('admin.statusNew', 'Nouveau') : request.status === 'in_progress' ? t('admin.statusInProgress', 'En cours') : request.status === 'accepted' ? t('admin.statusAccepted', 'Accepté') : request.status === 'archived' ? t('admin.statusArchived', 'Archivé') : t('admin.statusRejected', 'Rejeté') %></span></div><time><%= formatDate(request.created_at) %></time><a class="text-link" href="/admin/partnerships/<%= request.id %>"><%= t('admin.view', 'Voir') %> <span>→</span></a></article><% }) %></div><% } %></section>
+        <section class="admin-panel admin-panel--reports"><div class="panel-heading"><h2><%= t('admin.reports', 'Signalements') %></h2><span><%= reports.length %> <%= t('admin.recentReports', 'récents') %></span></div><% if (!reports.length) { %><div class="empty-state"><p><%= t('admin.noReports', 'Aucun signalement.') %></p></div><% } else { reports.forEach(report => { %><article class="report-row"><div><strong><%= report.public_reference %> · <%= report.item_title %></strong><p><%= report.reason %> · <%= t('admin.by', 'par') %> <%= report.reporter_name %></p><small><%= report.comment || t('admin.reportDetailUnknown', 'Sans précision') %></small></div><form method="POST" action="/admin/reports/<%= report.report_id %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><select name="status"><option value="pending" <%=report.status==='pending' ? 'selected' : '' %>><%= t('admin.statusPending', 'En attente') %></option><option value="reviewing" <%=report.status==='reviewing' ? 'selected' : '' %>><%= t('admin.statusReviewing', 'En cours d’examen') %></option><option value="resolved" <%=report.status==='resolved' ? 'selected' : '' %>><%= t('admin.statusResolved', 'Résolu') %></option><option value="rejected" <%=report.status==='rejected' ? 'selected' : '' %>><%= t('admin.statusRejected', 'Rejeté') %></option></select><input name="notes" placeholder="<%= t('admin.notePlaceholder', 'Note admin') %>" value="<%= report.admin_notes || '' %>"><button class="btn btn-small btn-primary"><%= t('admin.update', 'Mettre à jour') %></button></form></article><% }) } %></section>
+        <section class="admin-panel admin-panel--items"><div class="panel-heading"><h2><%= t('admin.recentAds', 'Annonces récentes') %></h2><a class="text-link" href="/search"><%= t('admin.openSearch', 'Ouvrir la recherche') %> <span>→</span></a></div><div class="admin-record-list"><% items.forEach(item => { %><article class="admin-record"><span class="type-pill <%= item.type %>"><%= item.is_demo ? t('admin.demoBadge', 'DÉMO') : item.type === 'lost' ? t('common.lost', 'Perdu') : t('common.found', 'Trouvé') %></span><div><strong><%= item.title && item.title.toLowerCase() !== 'photo' ? item.title : item.type === 'found' ? t('common.found', 'Objet trouvé') : t('common.lost', 'Objet perdu') %></strong><p><%= displayCategoryLabels[item.category] || item.category %><%= item.subcategory ? ' · ' + (displaySubcategoryLabels[item.subcategory] || item.subcategory) : '' %> · <%= item.city %> · <%= item.owner_name %></p></div><a class="text-link" href="/items/<%= item.id %>"><%= t('admin.view', 'Voir') %> <span>→</span></a><form method="POST" action="/admin/items/<%= item.id %>/status" data-confirm="<%= t('admin.closeConfirm', 'Fermer cette annonce ?') %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="closed"><button class="btn btn-small btn-danger"><%= t('admin.close', 'Fermer') %></button></form></article><% }) %></div></section>
+        <section class="admin-panel admin-panel--users"><div class="panel-heading"><h2><%= t('admin.users', 'Utilisateurs') %></h2><span><%= users.length %> <%= t('admin.displayed', 'affichés') %></span></div><div class="admin-record-list"><% users.forEach(account => { %><article class="admin-record"><span class="type-pill"><%= account.is_demo ? t('admin.demoBadge', 'DÉMO') : account.role === 'admin' ? t('admin.roleAdmin', 'Administrateur') : t('admin.roleUser', 'Utilisateur') %></span><div><strong><%= account.name %></strong><p><%= account.email %> · <%= account.city || t('admin.cityUnknown', 'Ville non précisée') %></p></div><span class="admin-record__label"><%= account.status === 'active' ? t('admin.statusActive', 'Actif') : account.status === 'suspended' ? t('admin.statusSuspended', 'Suspendu') : t('admin.statusDeleted', 'Supprimé') %></span><form method="POST" action="/admin/users/<%= account.id %>/status"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="<%= account.status === 'suspended' ? 'active' : 'suspended' %>"><button class="btn btn-small btn-secondary"><%= account.status==='suspended' ? t('admin.reactivate', 'Réactiver') : t('admin.suspend', 'Suspendre') %></button></form></article><% }) %></div></section>
+    </div>
+</main>
+<%- include('../partials/footer') %>

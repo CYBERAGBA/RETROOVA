@@ -81,47 +81,50 @@ app.use(helmet({
 }));
 
 app.get('/robots.txt', (req, res) => {
-  res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /dashboard\nDisallow: /profile\nDisallow: /messages\nDisallow: /notifications\nDisallow: /login\nDisallow: /register\nSitemap: ${buildAbsoluteUrl(SITE_URL, '/sitemap.xml')}\n`);
+  res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /dashboard\nDisallow: /profile\nDisallow: /messages\nDisallow: /notifications\nDisallow: /login\nDisallow: /register\nDisallow: /lost/create\nDisallow: /found/create\nDisallow: /fr/login\nDisallow: /fr/register\nDisallow: /fr/lost/create\nDisallow: /fr/found/create\nDisallow: /en/login\nDisallow: /en/register\nDisallow: /en/lost/create\nDisallow: /en/found/create\nSitemap: ${buildAbsoluteUrl(SITE_URL, '/sitemap.xml')}\n`);
 });
 
 app.get('/sitemap.xml', async (req, res) => {
   const publicPages = [
     // Home pages (localized)
-    { url: '/fr/', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '1.0' },
-    { url: '/en/', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '1.0' },
+    { url: '/fr/', changefreq: 'daily', priority: '1.0' },
+    { url: '/en/', changefreq: 'daily', priority: '1.0' },
+    { url: '/fr/search', changefreq: 'daily', priority: '0.9' },
+    { url: '/en/search', changefreq: 'daily', priority: '0.9' },
+    { url: '/fr/map', changefreq: 'daily', priority: '0.7' },
+    { url: '/en/map', changefreq: 'daily', priority: '0.7' },
+    { url: '/fr/lost', changefreq: 'daily', priority: '0.9' },
+    { url: '/en/lost', changefreq: 'daily', priority: '0.9' },
+    { url: '/fr/found', changefreq: 'daily', priority: '0.9' },
+    { url: '/en/found', changefreq: 'daily', priority: '0.9' },
    
     
-    { url: '/fr/how-it-works', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
-    { url: '/en/how-it-works', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.8' },
+    { url: '/fr/how-it-works', changefreq: 'monthly', priority: '0.8' },
+    { url: '/en/how-it-works', changefreq: 'monthly', priority: '0.8' },
     // About pages (localized)
-    { url: '/fr/about', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
-    { url: '/en/about', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: '/fr/about', changefreq: 'monthly', priority: '0.7' },
+    { url: '/en/about', changefreq: 'monthly', priority: '0.7' },
     // Partnerships pages (localized)
-    { url: '/fr/partnerships', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
-    { url: '/en/partnerships', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: '/fr/partnerships', changefreq: 'monthly', priority: '0.7' },
+    { url: '/en/partnerships', changefreq: 'monthly', priority: '0.7' },
     // Privacy pages (localized)
-    { url: '/fr/privacy', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
-    { url: '/en/privacy', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
+    { url: '/fr/privacy', changefreq: 'yearly', priority: '0.5' },
+    { url: '/en/privacy', changefreq: 'yearly', priority: '0.5' },
     // Terms pages (localized)
-    { url: '/fr/terms', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
-    { url: '/en/terms', lastmod: new Date().toISOString(), changefreq: 'yearly', priority: '0.5' },
+    { url: '/fr/terms', changefreq: 'yearly', priority: '0.5' },
+    { url: '/en/terms', changefreq: 'yearly', priority: '0.5' },
     // Contact pages (localized)
-    { url: '/fr/contact', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.5' },
-    { url: '/en/contact', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.5' },
+    { url: '/fr/contact', changefreq: 'monthly', priority: '0.5' },
+    { url: '/en/contact', changefreq: 'monthly', priority: '0.5' },
     // Help pages (localized)
-    { url: '/fr/help', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
-    { url: '/en/help', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.7' },
+    { url: '/fr/help', changefreq: 'monthly', priority: '0.7' },
+    { url: '/en/help', changefreq: 'monthly', priority: '0.7' },
     // Security pages (localized)
-    { url: '/fr/security', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.6' },
-    { url: '/en/security', lastmod: new Date().toISOString(), changefreq: 'monthly', priority: '0.6' },
-    // Lost/Found forms (localized)
-    { url: '/fr/lost', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
-    { url: '/en/lost', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
-    { url: '/fr/found', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' },
-    { url: '/en/found', lastmod: new Date().toISOString(), changefreq: 'weekly', priority: '0.8' }
+    { url: '/fr/security', changefreq: 'monthly', priority: '0.6' },
+    { url: '/en/security', changefreq: 'monthly', priority: '0.6' }
   ];
 
-  const items = await itemModel.all("SELECT id, title, type, created_at, updated_at FROM items WHERE status NOT IN ('closed', 'expired') ORDER BY created_at DESC LIMIT 500");
+  const items = await itemModel.all("SELECT items.id, items.title, items.type, items.created_at, items.updated_at FROM items JOIN users ON users.id = items.user_id WHERE items.status IN ('active', 'matched', 'in_contact') AND users.status = 'active' ORDER BY items.created_at DESC LIMIT 500");
   const xml = buildSitemapXml(SITE_URL, publicPages, items);
   res.type('application/xml').send(xml);
 });

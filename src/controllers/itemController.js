@@ -45,7 +45,7 @@ class ItemController {
     search = async (req, res) => {
         try {
             const results = (await this.itemModel.search(req.query)).map((item) => ({ ...item, title: getDisplayTitle(item.type, item.title) }));
-            const canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
+            const canonicalUrl = res.locals.canonicalUrl;
             res.render('pages/search', {
                 title: req.t('seo.searchTitle', 'Rechercher un objet perdu ou trouvé'),
                 metaDescription: req.t('seo.searchDescription', 'Trouvez un objet perdu ou trouvé par ville, catégorie, mot-clé ou date sur RETROOVA.'),
@@ -85,7 +85,7 @@ class ItemController {
         const type = typeOverride || req.query.type || 'lost';
         const filters = { ...req.query, type };
         const results = (await this.itemModel.search(filters)).map((item) => ({ ...item, title: getDisplayTitle(item.type, item.title) }));
-        const canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
+        const canonicalUrl = res.locals.canonicalUrl;
         const metaDescription = type === 'lost'
             ? req.t('seo.lostDescription', 'Consultez les objets perdus à retrouver près de vous sur RETROOVA. Recherchez par ville, catégorie et mot-clé.')
             : req.t('seo.foundDescription', 'Consultez les objets trouvés et retrouvez les propriétaires sur RETROOVA. Recherchez par ville, catégorie et mot-clé.');
@@ -123,8 +123,13 @@ class ItemController {
         const matches = req.session.userId ? await this.itemModel.getMatchesForUser(req.session.userId) : [];
         const ownerReputation = this.userModel && !item.is_anonymous ? await this.userModel.getReputation(item.user_id) : null;
         const { categoryLabels, englishCategoryLabels, subcategoryLabels, englishSubcategoryLabels } = require('../services/itemService');
-        const canonicalUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
-        const metaDescription = `${item.type === 'lost' ? 'Objet perdu' : 'Objet trouvé'} : ${item.title}. ${item.city || 'Ville non précisée'}${item.district ? `, ${item.district}` : ''}. Consultez cette annonce RETROOVA et contactez le déclarant.`;
+        const canonicalUrl = res.locals.canonicalUrl;
+        const isEnglish = req.locale === 'en';
+        const itemType = item.type === 'lost' ? (isEnglish ? 'Lost item' : 'Objet perdu') : (isEnglish ? 'Found item' : 'Objet trouvé');
+        const city = item.city || (isEnglish ? 'City not specified' : 'Ville non précisée');
+        const metaDescription = isEnglish
+            ? `${itemType}: ${item.title}. ${city}${item.district ? `, ${item.district}` : ''}. View this RETROOVA listing and contact the reporter.`
+            : `${itemType} : ${item.title}. ${city}${item.district ? `, ${item.district}` : ''}. Consultez cette annonce RETROOVA et contactez le déclarant.`;
         res.render('pages/item-detail', {
             title: item.title,
             metaDescription,

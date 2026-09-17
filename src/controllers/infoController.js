@@ -61,7 +61,7 @@ const partnershipTypes = [
     'Autre'
 ];
 
-const buildPartnershipPageMarkup = (csrfToken = '', locale = 'fr') => {
+const buildPartnershipPageMarkup = (csrfToken = '', locale = 'fr', isAuthenticated = false) => {
     const isFrench = locale === 'fr';
     const header = isFrench ? 'DEVENIR PARTENAIRE' : 'BECOME A PARTNER';
     const title = isFrench ? 'Parlons de votre projet' : "Let's talk about your project";
@@ -125,7 +125,7 @@ const buildPartnershipPageMarkup = (csrfToken = '', locale = 'fr') => {
                     <span class="eyebrow">${header}</span>
                     <h3>${title}</h3>
                 </div>
-                <form method="POST" action="/partnerships" class="partnership-form">
+                <form method="POST" action="/${locale}/partnerships" class="partnership-form" data-requires-account="${isAuthenticated ? 'false' : 'true'}">
                     <input type="hidden" name="_csrf" value="${csrfToken}">
                     <div class="form-grid">
                         <label class="form-group"><span>${formLabel}</span><input type="text" name="organization_name" placeholder="${isFrench ? 'Ex. ABC Hotels' : 'Ex. ABC Hotels'}" required></label>
@@ -152,6 +152,7 @@ const buildPartnershipPageMarkup = (csrfToken = '', locale = 'fr') => {
                 </form>
             </div>
         </section>
+        ${isAuthenticated ? '' : `<div class="account-required-modal" id="partnership-account-modal" hidden role="dialog" aria-modal="true" aria-labelledby="partnership-account-title"><div class="account-required-modal__backdrop" data-close-partnership-modal></div><div class="account-required-modal__dialog"><button class="account-required-modal__close" type="button" aria-label="${isFrench ? 'Fermer' : 'Close'}" data-close-partnership-modal>×</button><span class="eyebrow">${isFrench ? 'COMPTE RETROOVA' : 'RETROOVA ACCOUNT'}</span><h3 id="partnership-account-title">${isFrench ? 'Connectez-vous pour envoyer votre demande' : 'Sign in to send your request'}</h3><p>${isFrench ? 'Votre demande est prête. Pour la transmettre à notre équipe, connectez-vous ou créez gratuitement votre espace RETROOVA.' : 'Your request is ready. To send it to our team, sign in or create your free RETROOVA account.'}</p><div class="account-required-modal__actions"><a class="btn btn-primary" href="/${locale}/login">${isFrench ? 'Se connecter' : 'Sign in'}</a><a class="btn btn-secondary" href="/${locale}/register">${isFrench ? 'Créer un compte' : 'Create an account'}</a></div></div></div><script>document.addEventListener('DOMContentLoaded',function(){var form=document.querySelector('.partnership-form[data-requires-account="true"]');var modal=document.getElementById('partnership-account-modal');if(!form||!modal)return;var close=function(){modal.hidden=true;document.body.classList.remove('modal-open');};form.addEventListener('submit',function(event){event.preventDefault();modal.hidden=false;document.body.classList.add('modal-open');modal.querySelector('.account-required-modal__close').focus();});modal.querySelectorAll('[data-close-partnership-modal]').forEach(function(button){button.addEventListener('click',close);});document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!modal.hidden)close();});});</script>`}
 `;
 };
 
@@ -461,7 +462,7 @@ const pages = {
         en: ['Security', 'Your safety is our priority.', () => buildSecurityPageMarkup('en')]
     },
     '/help': {
-        fr: ['Centre d'aide', 'Comment pouvons-nous vous aider ?', () => buildHelpPageMarkup('fr')],
+        fr: ["Centre d'aide", 'Comment pouvons-nous vous aider ?', () => buildHelpPageMarkup('fr')],
         en: ['Help Center', 'How can we help?', () => buildHelpPageMarkup('en')]
     },
     '/report': {
@@ -498,7 +499,7 @@ class InfoController {
         const page = getLocalizedPage(pages[req.path] || pages['/help'], locale);
         const [title, lead, content] = Array.isArray(page) ? page : [page.title, page.lead, page.content];
         const currentFaqItems = req.path === '/help' ? [] : req.path === '/how-it-works' ? getLocalizedHowFaqItems(locale) : getLocalizedFaqItems(locale);
-        const renderedContent = typeof content === 'function' ? content(req.session?.csrfToken || '') : content;
+        const renderedContent = typeof content === 'function' ? content(req.session?.csrfToken || '', locale, Boolean(req.session?.userId)) : content;
         res.render('pages/info', {
             title,
             metaDescription: lead,
